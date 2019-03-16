@@ -5,6 +5,8 @@ import com.eric.dao.ApiApkMapMapper;
 import com.eric.dao.ApiMapper;
 import com.eric.dao.ApkMapper;
 import com.eric.service.APIService;
+import com.eric.service.AuthorityService;
+import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import com.eric.tools.api.APIHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -32,6 +35,8 @@ public class TestTools {
     ApiApkMapMapper apiApkMapMapper;
     @Autowired
     APIService apiService;
+    @Autowired
+    AuthorityService authorityService;
 
 
     @Test
@@ -93,6 +98,50 @@ public class TestTools {
         criteria.andApiMad5EqualTo("7c12ae96db72a5c0f78db57b2cbf79a5");
         List<Api> apis = apiMapper.selectByExample(example);
         System.out.println(apis.size());
+    }
+
+    /**
+     * 将E:\BiSheProjects\APKs\APISrc文件夹下的文件中的API信息全部提取到数据库
+     */
+    @Test
+    public void  test6(){
+        File file = new File("E:\\BiSheProjects\\APKs\\APISrc");
+        if(file.exists()){
+            //文件存在
+            //文件是目录
+            if(file.isDirectory()){
+                //目录下的所有文件
+                File[] files = file.listFiles();
+                for (File f : files) {
+                    apiService.saveApi(f.getAbsolutePath());
+
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 测试权限的提取
+     */
+    @Test
+    public void test7(){
+        List<String> list = AndroidManifestAnalyze.xmlHandle("E:\\BiSheProjects\\APKs\\des\\com.anybeen.mark.app\\AndroidManifest.xml");
+        list.forEach(item->{
+            System.out.println(item);
+        });
+
+
+
+    }
+
+    /**
+     * 测试authorityService
+     */
+    @Test
+    public void test8(){
+        authorityService.saveAuthority("E:\\BiSheProjects\\APKs\\des\\com.apicloud.A6989430876027");
+
     }
 
 }

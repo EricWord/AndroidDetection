@@ -103,7 +103,8 @@
     values (#{authorityId,jdbcType=INTEGER}, #{authorityContent,jdbcType=VARCHAR}, #{authorityMd5,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.eric.bean.Authority">
+  <insert id="insertSelective" parameterType="com.eric.bean.Authority" keyProperty="authorityId"
+          keyColumn="authority_id" useGeneratedKeys="true">
     insert into tb_authority
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="authorityId != null">

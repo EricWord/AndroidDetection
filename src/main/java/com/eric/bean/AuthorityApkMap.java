@@ -5,6 +5,14 @@ public class AuthorityApkMap {
 
     private Integer authorityId;
 
+    public AuthorityApkMap() {
+    }
+
+    public AuthorityApkMap(Integer apkId, Integer authorityId) {
+        this.apkId = apkId;
+        this.authorityId = authorityId;
+    }
+
     public Integer getApkId() {
         return apkId;
     }

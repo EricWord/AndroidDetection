@@ -1,7 +1,6 @@
 package com.eric.tools.AndroidManifestHelper;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -15,16 +14,15 @@ import java.util.List;
 
 public class AndroidManifestAnalyze {
 
-    private String appPackage;
-    private List<String> permissions = new ArrayList();
-    private List<String> activities = new ArrayList();
+
+//    private List<String> activities = new ArrayList();
 
     /**
      * 解析包名
      * @param doc
      * @return
      */
-    public  String findPackage(Document doc){
+ /*   public  String findPackage(Document doc){
         Node node = doc.getFirstChild();
         NamedNodeMap attrs  =node.getAttributes();
         for(int i = 0; i < attrs.getLength(); i++){
@@ -33,14 +31,14 @@ public class AndroidManifestAnalyze {
             }
         }
         return null;
-    }
+    }*/
 
     /**
      * 解析入口activity
      * @param doc
      * @return
      */
-    public  String findLaucherActivity(Document doc){
+ /*   public  String findLaucherActivity(Document doc){
         Node activity = null;
         String sTem = "";
         NodeList categoryList = doc.getElementsByTagName("category");
@@ -65,13 +63,14 @@ public class AndroidManifestAnalyze {
             }
         }
         return sTem;
-    }
+    }*/
 
     /**
      * 解析入口
      * @param filePath
      */
-    public  void xmlHandle(String filePath){
+    public static List<String> xmlHandle(String filePath){
+         List<String> permissions = new ArrayList();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             // 创建DocumentBuilder对象
@@ -80,7 +79,7 @@ public class AndroidManifestAnalyze {
             //加载xml文件
             Document document = db.parse(filePath);
             NodeList permissionList = document.getElementsByTagName("uses-permission");
-            NodeList activityAll = document.getElementsByTagName("activity");
+//            NodeList activityAll = document.getElementsByTagName("activity");
 
             //获取权限列表
             for (int i = 0; i < permissionList.getLength(); i++) {
@@ -89,7 +88,7 @@ public class AndroidManifestAnalyze {
             }
 
             //获取activity列表
-            appPackage = (findPackage(document));
+         /*   appPackage = (findPackage(document));
             for(int i = 0; i < activityAll.getLength(); i++){
                 Node activity = activityAll.item(i);
                 NamedNodeMap attrs  =activity.getAttributes();
@@ -102,26 +101,25 @@ public class AndroidManifestAnalyze {
                         activities.add(sTem);
                     }
                 }
-            }
-            String s = findLaucherActivity(document);
-            if(s.startsWith(".")){
-                s = appPackage+s;
-            }
+            }*/
+//            String s = findLaucherActivity(document);
+//            if(s.startsWith(".")){
+//                s = appPackage+s;
+//            }
             //移动入口类至首位
-            activities.remove(s);
-            activities.add(0, s);
+//            activities.remove(s);
+//            activities.add(0, s);
         } catch (ParserConfigurationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (SAXException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        return permissions;
     }
-    public static void output(AndroidManifestAnalyze a){
+ /*   public static void output(AndroidManifestAnalyze a){
         System.out.println("packageName:"+a.appPackage);
         System.out.println("permissions("+a.permissions.size()+"):");
         for(int i = 0; i < a.permissions.size(); i++){
@@ -132,10 +130,10 @@ public class AndroidManifestAnalyze {
         for(int i = 0; i < a.activities.size(); i++){
             System.out.println(a.activities.get(i));
         }
-    }
+    }*/
     public static void main(String[] args){
         AndroidManifestAnalyze a = new AndroidManifestAnalyze();
         a.xmlHandle("E:\\BiSheProjects\\DeCodeResults\\jinritoutiao\\AndroidManifest.xml");
-        output(a);
+//        output(a);
     }
 }

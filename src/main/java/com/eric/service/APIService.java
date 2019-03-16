@@ -1,18 +1,13 @@
 package com.eric.service;
 
-import com.eric.bean.Api;
-import com.eric.bean.ApiApkMap;
-import com.eric.bean.Apk;
-import com.eric.bean.ApkExample;
+import com.eric.bean.*;
 import com.eric.dao.ApiApkMapMapper;
 import com.eric.dao.ApiMapper;
 import com.eric.dao.ApkMapper;
 import com.eric.tools.MD5.MD5Utils;
 import com.eric.tools.api.APIHelper;
-import com.eric.tools.decode.APKTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -35,7 +30,6 @@ public class APIService {
     ApiApkMapMapper apiApkMapMapper;
 
 
-
     /**
      * 非递归遍历文件夹中的所有文件，提取api存入数据库
      *
@@ -43,27 +37,45 @@ public class APIService {
      * @return 存储是否成功
      */
     public Boolean saveApi(String src) {
-        int apkId=-1;
+        int apkId = -1;
         //获取应用的包名
         String[] split = src.split("\\\\");
         //获取包名
         String packageName = split[split.length - 1];
         Apk apk = new Apk(packageName, 0);
-        if(null!=apkMapper){
+        //在插入之前先判断数据库中有没有
+        ApkExample apkExample = new ApkExample();
+        ApkExample.Criteria apkCriteria = apkExample.createCriteria();
+        apkCriteria.andPackageNameEqualTo(packageName);
+        List<Apk> apks = apkMapper.selectByExample(apkExample);
+        if (apks.size() == 0) {
+            //数据库中没有，插入
+            if (null != apkMapper) {
 
-        apkMapper.insertSelective(apk);
+                apkMapper.insertSelective(apk);
+            } else {
+                System.out.println("apkMapper为空");
+            }
+
+            //获取id
+            if (apk.getApkId() != null) {
+
+                apkId = apk.getApkId();
+
+            } else {
+                System.out.println("返回的id是空");
+            }
+
+
         }else{
-            System.out.println("apkMapper为空");
+            //数据库中已经存在
+            //获取Id
+            Apk apk1 = apks.get(0);
+            apkId=apk1.getApkId();
         }
 
 
-        if(apk.getApkId()!=null){
 
-            apkId = apk.getApkId();
-
-        }else{
-            System.out.println("返回的id是空");
-        }
         File file = new File(src);
         //文件存在
         if (file.exists()) {
@@ -117,14 +129,36 @@ public class APIService {
                             //提取API信息
                             List<String> apiList = APIHelper.handle(filePath);
                             for (String item : apiList) {
-                                String md5Value=MD5Utils.MD5Encode(item, "utf8");
+                                String md5Value = MD5Utils.MD5Encode(item, "utf8");
                                 //先查询数据库中有没有该API
+                                ApiExample apiExample = new ApiExample();
+                                ApiExample.Criteria criteria = apiExample.createCriteria();
+                                criteria.andApiMad5EqualTo(md5Value);
+                                List<Api> apis = apiMapper.selectByExample(apiExample);
                                 Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
-                                apiMapper.insertSelective(api);
-                                Integer apiId = api.getApiId();
-                                //这句注释掉了，记得到时候打开注释
-                                ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-                                apiApkMapMapper.insert(apiApkMap);
+                                //数据库中没有该API
+                                if (apis.size() == 0) {
+                                    apiMapper.insertSelective(api);
+                                    Integer apiId = api.getApiId();
+                                    ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
+                                    apiApkMapMapper.insert(apiApkMap);
+                                } else {
+                                    //数据库中有该记录
+                                    Api api1 = apis.get(0);
+                                    Integer apiId = api1.getApiId();
+                                    //查询映射关系是否在数据库中已经存在
+                                    ApiApkMapExample apiApkMapExample = new ApiApkMapExample();
+                                    ApiApkMapExample.Criteria apiApkCriteria = apiApkMapExample.createCriteria();
+                                    apiApkCriteria.andApiIdEqualTo(apiId);
+                                    apiApkCriteria.andApkIdEqualTo(apkId);
+                                    List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
+                                    if (apiApkMaps.size() == 0) {
+                                        //数据库中没有该映射关系
+                                        ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
+                                        //插入
+                                        apiApkMapMapper.insert(apiApkMap);
+                                    }//否则什么也不做
+                                }
                             }
                         }
                     }

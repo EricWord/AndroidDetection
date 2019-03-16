@@ -7,6 +7,14 @@ public class Authority {
 
     private String authorityMd5;
 
+    public Authority() {
+    }
+
+    public Authority(String authorityContent, String authorityMd5) {
+        this.authorityContent = authorityContent;
+        this.authorityMd5 = authorityMd5;
+    }
+
     public Integer getAuthorityId() {
         return authorityId;
     }
