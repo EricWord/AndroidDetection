@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.3.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-4.3.xsd 
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+    http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- spring 的配置文件，这里主要配置和业务逻辑有关 -->
+	<!-- 数据源 ，事务控制 -->
+	
+	<context:component-scan base-package="com.eric">
+	 	<!-- 不扫描controller，其他都扫描-->
+	 	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	 </context:component-scan> 
+	 
+    <!--引入jdbc配置 -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc_driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc_url}"/>
+        <property name="user" value="${jdbc_username}"/>
+        <property name="password" value="${jdbc_password}"/>
+        <!--连接池中保存的最大连接数目-->
+        <property name="maxPoolSize" value="20"/>
+        <!--连接池中保存的最少连接数目-->
+        <property name="minPoolSize" value="2"/>
+        <!-- 初始化连接大小 -->
+        <property name="initialPoolSize" value="2"/>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxConnectionAge" value="6000"/>
+        <!-- 连接池最大空闲 -->
+        <property name="maxIdleTime" value="60"/>
+    </bean>
+
+    <!-- 整合配置 start -->
+	<!-- 配置和MyBatis的整合,创建sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!--注入数据源-->
+        <property name="dataSource" ref="dataSource"/>
+		<!-- 指定mybatis全局配置文件的位置 -->
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!--用于配置mapper映射xml-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+	</bean>
+
+	<!-- 配置扫描器，将mybatis接口的实现加入到ioc容器中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+          <!-- 扫描所有dao接口的实现，加入到ioc容器中 -->
+          <property name="basePackage" value="com.eric.dao"/>
+    </bean>
+    <!-- 整合配置 end -->
+    
+    <!-- 配置一个可以执行批量的sqlSession -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+    	<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+    	<!-- 执行类型批量 -->
+    	<constructor-arg name="executorType" value="SIMPLE"></constructor-arg>
+    </bean>
+    
+    <!-- 对数据源进行事务管理 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 控制数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+	
+	<!-- 开启基于注解的事务，使用xml形式配置的事务(必要主要的都使用配置事务) -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.eric.service..*(..))" id="txPoint"/>
+		<!-- 配置事务增强 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"/>
+	</aop:config>
+	
+	<!-- 配置事务增强 -->
+	<!-- transaction-manager="transactionManager" 为默认值，如果事务名字不同需修改 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 所有方法都是事务方法 -->
+			<tx:method name="*"/>
+			<!-- 以get开始的所有方法 -->
+			<tx:method name="get*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+</beans>
+

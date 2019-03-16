@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eric.dao.ApkMapper">
+    <resultMap id="BaseResultMap" type="com.eric.bean.Apk">
+        <id column="apk_id" jdbcType="INTEGER" property="apkId"/>
+        <result column="package_name" jdbcType="VARCHAR" property="packageName"/>
+        <result column="apk_attribute" jdbcType="INTEGER" property="apkAttribute"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    apk_id, package_name, apk_attribute
+  </sql>
+    <select id="selectByExample" parameterType="com.eric.bean.ApkExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from tb_apk
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_apk
+        where apk_id = #{apkId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_apk
+    where apk_id = #{apkId,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="com.eric.bean.ApkExample">
+        delete from tb_apk
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.eric.bean.Apk">
+    insert into tb_apk (apk_id, package_name, apk_attribute
+      )
+    values (#{apkId,jdbcType=INTEGER}, #{packageName,jdbcType=VARCHAR}, #{apkAttribute,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.eric.bean.Apk" keyProperty="apkId"
+            keyColumn="apk_id" useGeneratedKeys="true">
+        insert into tb_apk
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="apkId != null">
+                apk_id,
+            </if>
+            <if test="packageName != null">
+                package_name,
+            </if>
+            <if test="apkAttribute != null">
+                apk_attribute,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="apkId != null">
+                #{apkId,jdbcType=INTEGER},
+            </if>
+            <if test="packageName != null">
+                #{packageName,jdbcType=VARCHAR},
+            </if>
+            <if test="apkAttribute != null">
+                #{apkAttribute,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.eric.bean.ApkExample" resultType="java.lang.Long">
+        select count(*) from tb_apk
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update tb_apk
+        <set>
+            <if test="record.apkId != null">
+                apk_id = #{record.apkId,jdbcType=INTEGER},
+            </if>
+            <if test="record.packageName != null">
+                package_name = #{record.packageName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.apkAttribute != null">
+                apk_attribute = #{record.apkAttribute,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update tb_apk
+        set apk_id = #{record.apkId,jdbcType=INTEGER},
+        package_name = #{record.packageName,jdbcType=VARCHAR},
+        apk_attribute = #{record.apkAttribute,jdbcType=INTEGER}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.eric.bean.Apk">
+        update tb_apk
+        <set>
+            <if test="packageName != null">
+                package_name = #{packageName,jdbcType=VARCHAR},
+            </if>
+            <if test="apkAttribute != null">
+                apk_attribute = #{apkAttribute,jdbcType=INTEGER},
+            </if>
+        </set>
+        where apk_id = #{apkId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.eric.bean.Apk">
+    update tb_apk
+    set package_name = #{packageName,jdbcType=VARCHAR},
+      apk_attribute = #{apkAttribute,jdbcType=INTEGER}
+    where apk_id = #{apkId,jdbcType=INTEGER}
+  </update>
+</mapper>
