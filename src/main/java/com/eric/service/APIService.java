@@ -1,17 +1,20 @@
 package com.eric.service;
 
-import com.eric.bean.*;
+import com.eric.bean.Apk;
+import com.eric.bean.ApkExample;
 import com.eric.dao.ApiApkMapMapper;
 import com.eric.dao.ApiMapper;
 import com.eric.dao.ApkMapper;
-import com.eric.tools.MD5.MD5Utils;
 import com.eric.tools.api.APIHelper;
+import com.eric.tools.api.ApiInsertCallable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @ClassName: APIService
@@ -67,13 +70,12 @@ public class APIService {
             }
 
 
-        }else{
+        } else {
             //数据库中已经存在
             //获取Id
             Apk apk1 = apks.get(0);
-            apkId=apk1.getApkId();
+            apkId = apk1.getApkId();
         }
-
 
 
         File file = new File(src);
@@ -96,14 +98,15 @@ public class APIService {
                     if (s.equals(".smali")) {
                         //提取API信息
                         List<String> apiList = APIHelper.handle(filePath);
+                        // 创建一个线程池
+                        ExecutorService pool1 = Executors.newFixedThreadPool(10);
                         for (String item : apiList) {
                             System.out.println(item);
-                            Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
-                            apiMapper.insertSelective(api);
-                            Integer apiId = api.getApiId();
-                            ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-                            apiApkMapMapper.insert(apiApkMap);
+                            ApiInsertCallable task = new ApiInsertCallable(item, apkId);
+                             pool1.submit(task);
                         }
+                        //关闭线程池
+                        pool1.shutdown();
                     }
                 }
             }
@@ -122,44 +125,19 @@ public class APIService {
                         //是文件
                         //文件路径
                         String filePath = f1.getAbsolutePath();
-                        System.out.println(filePath);
+                        //System.out.println(filePath);
                         //该文件是否.smali文件
                         String s = filePath.substring(filePath.length() - 6, filePath.length());
                         if (s.equals(".smali")) {
                             //提取API信息
                             List<String> apiList = APIHelper.handle(filePath);
+                            ExecutorService pool2 = Executors.newFixedThreadPool(10);
                             for (String item : apiList) {
-                                String md5Value = MD5Utils.MD5Encode(item, "utf8");
-                                //先查询数据库中有没有该API
-                                ApiExample apiExample = new ApiExample();
-                                ApiExample.Criteria criteria = apiExample.createCriteria();
-                                criteria.andApiMad5EqualTo(md5Value);
-                                List<Api> apis = apiMapper.selectByExample(apiExample);
-                                Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
-                                //数据库中没有该API
-                                if (apis.size() == 0) {
-                                    apiMapper.insertSelective(api);
-                                    Integer apiId = api.getApiId();
-                                    ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-                                    apiApkMapMapper.insert(apiApkMap);
-                                } else {
-                                    //数据库中有该记录
-                                    Api api1 = apis.get(0);
-                                    Integer apiId = api1.getApiId();
-                                    //查询映射关系是否在数据库中已经存在
-                                    ApiApkMapExample apiApkMapExample = new ApiApkMapExample();
-                                    ApiApkMapExample.Criteria apiApkCriteria = apiApkMapExample.createCriteria();
-                                    apiApkCriteria.andApiIdEqualTo(apiId);
-                                    apiApkCriteria.andApkIdEqualTo(apkId);
-                                    List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
-                                    if (apiApkMaps.size() == 0) {
-                                        //数据库中没有该映射关系
-                                        ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-                                        //插入
-                                        apiApkMapMapper.insert(apiApkMap);
-                                    }//否则什么也不做
-                                }
+                                ApiInsertCallable task = new ApiInsertCallable(item, apkId);
+                                pool2.submit(task);
                             }
+                            //关闭线程池
+                            pool2.shutdown();
                         }
                     }
                 }

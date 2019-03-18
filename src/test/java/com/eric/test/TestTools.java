@@ -105,7 +105,7 @@ public class TestTools {
      */
     @Test
     public void  test6(){
-        File file = new File("E:\\BiSheProjects\\APKs\\APISrc");
+        File file = new File("E:\\BiSheProjects\\APKs\\APISrc2");
         if(file.exists()){
             //文件存在
             //文件是目录
@@ -141,6 +141,16 @@ public class TestTools {
     @Test
     public void test8(){
         authorityService.saveAuthority("E:\\BiSheProjects\\APKs\\des\\com.apicloud.A6989430876027");
+
+    }
+
+    /**
+     * 测试MultiThreadAPIExtract
+
+     */
+    @Test
+    public void test9(){
+       apiService.saveApi("E:\\BiSheProjects\\APKs\\APISrc2");
 
     }
 
