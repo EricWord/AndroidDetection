@@ -92,7 +92,7 @@ public class TestTools {
      * 测试根据api的md5值来查询api(间接地通过Example实现)
      */
     @Test
-    public void test5(){
+    public void test5() {
         ApiExample example = new ApiExample();
         ApiExample.Criteria criteria = example.createCriteria();
         criteria.andApiMad5EqualTo("7c12ae96db72a5c0f78db57b2cbf79a5");
@@ -102,14 +102,15 @@ public class TestTools {
 
     /**
      * 将E:\BiSheProjects\APKs\APISrc文件夹下的文件中的API信息全部提取到数据库
+     * 该方法是测试成功的方法
      */
     @Test
-    public void  test6(){
-        File file = new File("E:\\BiSheProjects\\APKs\\APISrc2");
-        if(file.exists()){
+    public void test6() {
+        File file = new File("E:\\BiSheProjects\\APKs\\des");
+        if (file.exists()) {
             //文件存在
             //文件是目录
-            if(file.isDirectory()){
+            if (file.isDirectory()) {
                 //目录下的所有文件
                 File[] files = file.listFiles();
                 for (File f : files) {
@@ -125,12 +126,11 @@ public class TestTools {
      * 测试权限的提取
      */
     @Test
-    public void test7(){
+    public void test7() {
         List<String> list = AndroidManifestAnalyze.xmlHandle("E:\\BiSheProjects\\APKs\\des\\com.anybeen.mark.app\\AndroidManifest.xml");
-        list.forEach(item->{
+        list.forEach(item -> {
             System.out.println(item);
         });
-
 
 
     }
@@ -139,18 +139,36 @@ public class TestTools {
      * 测试authorityService
      */
     @Test
-    public void test8(){
+    public void test8() {
         authorityService.saveAuthority("E:\\BiSheProjects\\APKs\\des\\com.apicloud.A6989430876027");
 
     }
 
     /**
      * 测试MultiThreadAPIExtract
-
      */
     @Test
-    public void test9(){
-       apiService.saveApi("E:\\BiSheProjects\\APKs\\APISrc2");
+    public void test9() {
+        apiService.saveApi("E:\\BiSheProjects\\APKs\\APISrc2");
+
+    }
+
+    @Test
+    public void test10() {
+
+        File file = new File("E:\\BiSheProjects\\APKs\\des");
+        if (file.exists()) {
+            //文件存在
+            //文件是目录
+            if (file.isDirectory()) {
+                //目录下的所有文件
+                File[] files = file.listFiles();
+                for (File f : files) {
+                    authorityService.saveAuthority(f.getAbsolutePath());
+
+                }
+            }
+        }
 
     }
 

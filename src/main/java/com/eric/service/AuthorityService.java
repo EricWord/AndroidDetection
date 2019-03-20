@@ -1,17 +1,20 @@
 package com.eric.service;
 
-import com.eric.bean.*;
+import com.eric.bean.Apk;
+import com.eric.bean.ApkExample;
 import com.eric.dao.ApkMapper;
 import com.eric.dao.AuthorityApkMapMapper;
 import com.eric.dao.AuthorityMapper;
 import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
-import com.eric.tools.MD5.MD5Utils;
+import com.eric.tools.AndroidManifestHelper.AuthorityInsertCallable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @ClassName: AuthorityService
@@ -98,29 +101,26 @@ public class AuthorityService {
                     //判断是否是AndroidManifest.xml文件
                     if (split[split.length - 1].equals("AndroidManifest.xml")) {
                         //是AndroidManifest.xml文件
-                        List<String> authorityList = AndroidManifestAnalyze.xmlHandle(path);
+                        List<String> authorityList = null;
+                        try {
+                            //这个方法如果读入到的AndroidManifest.xml是乱码的话会
+                            //抛出异常，这里要try一下
+                            authorityList = AndroidManifestAnalyze.xmlHandle(path);
 
-                        for (String au : authorityList) {
-                            System.out.println(au);
-                            //存入数据库
-                            //存之前先判断数据库中有没有
-                            //获取权限MD5值
-                            String md5 = MD5Utils.MD5Encode(au, "utf8");
-                            //查询
-                            AuthorityExample authorityExample = new AuthorityExample();
-                            AuthorityExample.Criteria criteria = authorityExample.createCriteria();
-                            criteria.andAuthorityMd5EqualTo(md5);
-                            List<Authority> authorities = authorityMapper.selectByExample(authorityExample);
-                            if (authorities.size() == 0) {
-                                //数据库中没有,插入
-                                Authority authority = new Authority(au, md5);
-                                authorityMapper.insert(authority);
-                                Integer authorityId = authority.getAuthorityId();
-                                AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId, authorityId);
-                                authorityApkMapMapper.insert(authorityApkMap);
-                            }
+                        } catch (Exception e) {
+                            System.out.println("读取xml文件时出现异常");
 
                         }
+                        //创建线程池
+                        ExecutorService pool = Executors.newFixedThreadPool(10);
+                        for (String au : authorityList) {
+                            System.out.println(au);
+                            AuthorityInsertCallable task = new AuthorityInsertCallable(au, apkId);
+                            pool.submit(task);
+                        }
+
+                        //关闭线程池
+                        pool.shutdown();
 
                     }
 
@@ -148,29 +148,24 @@ public class AuthorityService {
                         String[] split = listFileAbsolutePath.split("\\\\");
                         if (split[split.length - 1].equals("AndroidManifest.xml")) {
                             //是AndroidManifest.xml文件
-                            List<String> authorityList2 = AndroidManifestAnalyze.xmlHandle(listFileAbsolutePath);
-                            for (String au2 : authorityList2) {
-                                System.out.println(au2);
-                                //存入数据库
-                                //存之前先判断数据库中有没有
-                                //获取权限MD5值
-                                String md5 = MD5Utils.MD5Encode(au2, "utf8");
-                                //查询
-                                AuthorityExample authorityExample = new AuthorityExample();
-                                AuthorityExample.Criteria criteria = authorityExample.createCriteria();
-                                criteria.andAuthorityMd5EqualTo(md5);
-                                List<Authority> authorities = authorityMapper.selectByExample(authorityExample);
-                                if (authorities.size() == 0) {
-                                    //数据库中没有,插入
-                                    Authority authority = new Authority(au2, md5);
-                                    authorityMapper.insert(authority);
-                                    Integer authorityId = authority.getAuthorityId();
-                                    AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId, authorityId);
-                                    authorityApkMapMapper.insert(authorityApkMap);
-                                }
+                            //创建线程池
+                            ExecutorService pool2 = Executors.newFixedThreadPool(10);
+                            List<String> authorityList2 = null;
+                            try {
+                                //这个方法如果读入到的AndroidManifest.xml是乱码的话会
+                                //抛出异常，这里要try一下
+                                authorityList2 = AndroidManifestAnalyze.xmlHandle(listFileAbsolutePath);
 
+                            } catch (Exception e) {
 
                             }
+                            for (String au2 : authorityList2) {
+                                System.out.println(au2);
+                                AuthorityInsertCallable task = new AuthorityInsertCallable(au2, apkId);
+                                pool2.submit(task);
+                            }
+                            //关闭线程池，不要忘记
+                            pool2.shutdown();
                         }
                     }
                 }
