@@ -1,13 +1,15 @@
 package com.eric.bean;
 
+import java.util.List;
+
 public class Apk {
     private Integer apkId;
 
     private String packageName;
 
     private Integer apkAttribute;
-//    private Api api;
-//    private Authority authority;
+   private List<Api> apiList;
+   private List<Authority> authorityList;
 
     public Apk() {
     }
@@ -41,23 +43,22 @@ public class Apk {
         this.apkAttribute = apkAttribute;
     }
 
-/*
-    public Api getApi() {
-        return api;
+
+    public List<Api> getApiList() {
+        return apiList;
     }
 
-    public void setApi(Api api) {
-        this.api = api;
+    public void setApiList(List<Api> apiList) {
+        this.apiList = apiList;
     }
 
-    public Authority getAuthority() {
-        return authority;
+    public List<Authority> getAuthorityList() {
+        return authorityList;
     }
 
-    public void setAuthority(Authority authority) {
-        this.authority = authority;
+    public void setAuthorityList(List<Authority> authorityList) {
+        this.authorityList = authorityList;
     }
-*/
 
     @Override
     public String toString() {
@@ -65,6 +66,8 @@ public class Apk {
                 "apkId=" + apkId +
                 ", packageName='" + packageName + '\'' +
                 ", apkAttribute=" + apkAttribute +
+                ", apiList=" + apiList +
+                ", authorityList=" + authorityList +
                 '}';
     }
 }
