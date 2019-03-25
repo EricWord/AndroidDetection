@@ -31,9 +31,10 @@ public class ApiInsertCallable implements Callable<Integer> {
     private ApiMapper apiMapper;
     //----------------解决注入非controller或service文件使用@autowired注解注入mapper文件无效的问题
     public static ApiInsertCallable apiInsertCallable;
+
     @PostConstruct
-    public void init(){
-        apiInsertCallable=this;
+    public void init() {
+        apiInsertCallable = this;
 
     }
 
@@ -47,7 +48,7 @@ public class ApiInsertCallable implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        int n=0;
+        int n = 0;
 
         String md5Value = MD5Utils.MD5Encode(item, "utf8");
         //先查询数据库中有没有该API
@@ -55,11 +56,9 @@ public class ApiInsertCallable implements Callable<Integer> {
         ApiExample.Criteria criteria = apiExample.createCriteria();
         criteria.andApiMad5EqualTo(md5Value);
         List<Api> apis = null;
-        if(apiInsertCallable.apiMapper==null){
+        if (apiInsertCallable.apiMapper == null) {
             System.out.println("ApiInsertCallable中的apiMapper是空");
-        }else{
-            
-        
+        } else {
             apis = apiInsertCallable.apiMapper.selectByExample(apiExample);
         }
         Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
@@ -70,22 +69,28 @@ public class ApiInsertCallable implements Callable<Integer> {
             ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
             apiInsertCallable.apiApkMapMapper.insertSelective(apiApkMap);
         } else {
+            Api api1 = null;
             //数据库中有该记录
-            Api api1 = apis.get(0);
-            Integer apiId = api1.getApiId();
-            //查询映射关系是否在数据库中已经存在
-            ApiApkMapExample apiApkMapExample = new ApiApkMapExample();
-            ApiApkMapExample.Criteria apiApkCriteria = apiApkMapExample.createCriteria();
-            apiApkCriteria.andApiIdEqualTo(apiId);
-            apiApkCriteria.andApkIdEqualTo(apkId);
-            List<ApiApkMap> apiApkMaps = apiInsertCallable.apiApkMapMapper.selectByExample(apiApkMapExample);
-            if (apiApkMaps.size() == 0) {
-                //数据库中没有该映射关系
-                ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-                //插入
+            if (apis.size() == 1) {
+                api1 = apis.get(0);
+                Integer apiId = api1.getApiId();
+                //查询映射关系是否在数据库中已经存在
+                ApiApkMapExample apiApkMapExample = new ApiApkMapExample();
+                ApiApkMapExample.Criteria apiApkCriteria = apiApkMapExample.createCriteria();
+                apiApkCriteria.andApiIdEqualTo(apiId);
+                apiApkCriteria.andApkIdEqualTo(apkId);
+                List<ApiApkMap> apiApkMaps = apiInsertCallable.apiApkMapMapper.selectByExample(apiApkMapExample);
+                if (apiApkMaps.size() == 0) {
+                    //数据库中没有该映射关系
+                    ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
+                    //插入
+                    n = apiInsertCallable.apiApkMapMapper.insertSelective(apiApkMap);
+                }//否则什么也不做
+            } else {
+                System.out.println("数据库中有多条重复的api");
 
-                n = apiInsertCallable.apiApkMapMapper.insertSelective(apiApkMap);
-            }//否则什么也不做
+            }
+
         }
         return n;
     }
