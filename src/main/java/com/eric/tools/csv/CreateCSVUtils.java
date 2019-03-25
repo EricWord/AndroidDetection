@@ -70,11 +70,13 @@ public class CreateCSVUtils {
                 }
             }
             csvWrite.flush();
+            csvWrite2.flush();
         } catch (IOException e) {
             throw new IOException("文件生成失败");
         } finally {
             try {
                 csvWrite.close();
+                csvWrite2.close();
 
             } catch (IOException e) {
 
