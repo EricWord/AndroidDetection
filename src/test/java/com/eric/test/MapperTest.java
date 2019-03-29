@@ -50,7 +50,7 @@ public class MapperTest {
 
     @Test
     public void testCreateCSV() {
-        List<Apk> dataList=new ArrayList<>();
+        List<Apk> dataList = new ArrayList<>();
         Integer apiId = -1;
         List<Apk> apks = apkMapper.selectByExample(null);
         for (Apk apk : apks) {
@@ -61,7 +61,7 @@ public class MapperTest {
             ApiApkMapExample.Criteria apiApkMapExampleCriteria = apiApkMapExample.createCriteria();
             apiApkMapExampleCriteria.andApkIdEqualTo(apkId);
             List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
-            List<Api> apiList=new ArrayList<>();
+            List<Api> apiList = new ArrayList<>();
             if (apiApkMaps.size() > 0) {
                 //遍历
                 for (ApiApkMap apiApkMap : apiApkMaps) {
@@ -69,19 +69,15 @@ public class MapperTest {
                     //根据apiid查询api
                     Api api = apiMapper.selectByPrimaryKey(apiId);
                     apiList.add(api);
-
-
                 }
                 apk.setApiList(apiList);
-
-
             }
             //根据apkId来查询与之关联的权限信息
             AuthorityApkMapExample authorityApkMapExample = new AuthorityApkMapExample();
             AuthorityApkMapExample.Criteria authorityApkMapExampleCriteria = authorityApkMapExample.createCriteria();
             authorityApkMapExampleCriteria.andApkIdEqualTo(apkId);
             List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
-            List<Authority> authorityList=new ArrayList<>();
+            List<Authority> authorityList = new ArrayList<>();
             //遍历authorityApkMaps
             for (AuthorityApkMap authorityApkMap : authorityApkMaps) {
                 //获取authorityId
@@ -96,7 +92,7 @@ public class MapperTest {
 
         }
         try {
-            CreateCSVUtils.createCSVFile(dataList, FileConstantUtils.API_HEAD_LIST,FileConstantUtils.AU_HEAD_LIST);
+            CreateCSVUtils.createCSVFile(dataList, FileConstantUtils.API_HEAD_LIST, FileConstantUtils.AU_HEAD_LIST);
         } catch (IOException e) {
             e.printStackTrace();
         }

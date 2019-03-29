@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
  */
 public class FileHelper {
     //线程数
-    private static final Integer TASK_SIZE = 3;
+    private static final Integer TASK_SIZE = 10;
 
     /**
      * 多线程反编译APK文件
@@ -68,7 +68,7 @@ public class FileHelper {
      * @param src  源路径
      * @param dest 反编译文件输出路径
      */
-    public  void batchDecompileOnRunnable(String src, String dest) {
+    public  static void batchDecompileOnRunnable(String src, String dest) {
         FileRunnable task = new FileRunnable(src, dest);
         //创建线程池
         ExecutorService pool = Executors.newFixedThreadPool(5);
