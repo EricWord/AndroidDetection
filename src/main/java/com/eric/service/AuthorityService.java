@@ -132,6 +132,7 @@ public class AuthorityService {
                     if (null != authorityList) {
                         int finalApkId = apkId;
                         authorityList.parallelStream().forEach(au -> {
+                            System.out.println("线程："+Thread.currentThread().getName()+"开始执行,正在提取权限的应用名称为:"+packageName);
                             authorityOperate(finalApkId, au, packageName);
                         });
                     }

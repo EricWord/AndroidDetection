@@ -66,12 +66,12 @@ public class ServiceTest {
         apiService.batchSaveApi("D:\\cgs\\File\\data\\goodApkTest",0);
 
     }
-    @Test
+/*    @Test
     public void testAuthorityService(){
         authorityService.saveAuthority("D:\\cgs\\File\\data\\goodAPKSDeCompileResult");
 
 
-    }
+    }*/
 
     /**
      * 测试批量反编译
@@ -80,6 +80,15 @@ public class ServiceTest {
     public void testDeCompileService(){
         deCompileService.batchDeCompile("","");
 
+
+    }
+
+    /**
+     * 测试权限批量提取
+     */
+    @Test
+    public  void testAuthorityService(){
+        authorityService.saveAuthority("");
 
     }
 
