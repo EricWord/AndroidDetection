@@ -45,9 +45,7 @@ public class AuthorityService {
     public void saveAuthority(String src) {
         int apkId = -1;
         //获取包名
-        String[] packageNamSplits = src.split("\\\\");
-        String packageName = packageNamSplits[packageNamSplits.length - 1];
-        System.out.println(packageName);
+        String packageName = getPackageName(src);
         Apk apk = new Apk(packageName, 0);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = new ApkExample();
@@ -121,11 +119,8 @@ public class AuthorityService {
 
                         //关闭线程池
                         pool.shutdown();
-
                     }
-
                 }
-
             }
             File temp;
             //队列不空
@@ -139,7 +134,6 @@ public class AuthorityService {
                     if (listFile.isDirectory()) {
                         //加入队列
                         list.add(listFile);
-
                     } else {
                         //是文件
                         //获取文件路径
@@ -170,13 +164,19 @@ public class AuthorityService {
                     }
                 }
             }
-
-
         } else {
             //文件不存在
             return;
         }
+    }
 
-
+    /**
+     * 获取包名
+     * @param src 应用包文件夹
+     * @return
+     */
+    public String getPackageName(String src) {
+        String[] packageNamSplits = src.split("\\\\");
+        return packageNamSplits[packageNamSplits.length - 1];
     }
 }

@@ -60,7 +60,7 @@ public class ServiceTest {
          * 多线程那块出了点问题
          * 2019.03.29 17:06修复了问题，进行测试
          */
-        apiService.batchSaveApi("E:\\7BiShe\\DeCompileResults\\goodApksApiExtractTest",0);
+        apiService.batchSaveApi("D:\\cgs\\File\\data\\goodApkTest",0);
 
     }
     @Test

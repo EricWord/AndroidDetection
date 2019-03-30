@@ -56,14 +56,6 @@ public class TestTools {
 
     }
 
-    @Test
-    public void test2() {
-        Boolean res = null;
-        if (apiService != null) {
-            res = apiService.saveApi("E:\\BiSheProjects\\APKs\\des\\com.anybeen.mark.app",0);
-        }
-        System.out.println(res);
-    }
 
 
     @Test
@@ -115,7 +107,7 @@ public class TestTools {
                 //目录下的所有文件
                 File[] files = file.listFiles();
                 for (File f : files) {
-                    apiService.saveApi(f.getAbsolutePath(),0);
+//                    apiService.saveApi(f.getAbsolutePath(),0);
 
                 }
             }
@@ -150,7 +142,7 @@ public class TestTools {
      */
     @Test
     public void test9() {
-        apiService.saveApi("E:\\BiSheProjects\\APKs\\APISrc2",0);
+//        apiService.saveApi("E:\\BiSheProjects\\APKs\\APISrc2",0);
 
     }
 
