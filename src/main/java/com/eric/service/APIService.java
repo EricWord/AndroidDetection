@@ -322,7 +322,7 @@ public class APIService {
                                         } else {
                                             apis = apiMapper.selectByExample(apiExample);
                                         }
-                                        //数据库中没有该API
+                                        //数据库中没有该API记录
                                         if (apis.size() == 0) {
                                             //构建要插入数据库中的api对象
                                             Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
@@ -332,7 +332,7 @@ public class APIService {
                                             apiApkMapMapper.insertSelective(apiApkMap);
                                         } else {
                                             Api api1 = null;
-                                            //数据库中有该记录
+                                            //数据库中有一条该记录
                                             if (apis.size() == 1) {
                                                 api1 = apis.get(0);
                                                 //获取api id
