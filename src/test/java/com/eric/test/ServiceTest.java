@@ -9,6 +9,7 @@ package com.eric.test;/*
 import com.eric.service.APIService;
 import com.eric.service.ApkBatchDecompileService;
 import com.eric.service.AuthorityService;
+import com.eric.service.DeCompileService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class ServiceTest {
     @Autowired
     AuthorityService authorityService;
 
+    @Autowired
+    DeCompileService deCompileService;
     /**
      * 测试批量反编译
      */
@@ -66,6 +69,16 @@ public class ServiceTest {
     @Test
     public void testAuthorityService(){
         authorityService.saveAuthority("D:\\cgs\\File\\data\\goodAPKSDeCompileResult");
+
+
+    }
+
+    /**
+     * 测试批量反编译
+     */
+    @Test
+    public void testDeCompileService(){
+        deCompileService.batchDeCompile("","");
 
 
     }
