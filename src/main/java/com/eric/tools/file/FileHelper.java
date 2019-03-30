@@ -20,16 +20,20 @@ import java.util.concurrent.Future;
  * @Date: 2019/3/5 0005
  * @Email: xiao_cui_vip@163.com
  */
+//该类暂时已经用不到了，如果后续确认不在需要该类时可以将其删除
+/*
 public class FileHelper {
     //线程数
     private static final Integer TASK_SIZE = 10;
 
-    /**
+    */
+/**
      * 多线程反编译APK文件
      *
      * @param src  文件来源路径
      * @param dest 反编译结果输出路径
-     */
+     *//*
+
     public static void batchDeCompile(String src, String dest) {
         Instant start = Instant.now();
         System.out.println("----程序开始运行----");
@@ -62,12 +66,14 @@ public class FileHelper {
 
     }
 
-    /**
+    */
+/**
      * 调用基于实现unnable接口实现的多线程进行反编译
      *
      * @param src  源路径
      * @param dest 反编译文件输出路径
-     */
+     *//*
+
     public  static void batchDecompileOnRunnable(String src, String dest) {
         FileRunnable task = new FileRunnable(src, dest);
         //创建线程池
@@ -94,4 +100,5 @@ public class FileHelper {
         pool.shutdown();
     }
 }
+*/
 

@@ -16,6 +16,9 @@ import java.util.concurrent.Callable;
  * @Date: 2019/3/5 0005
  * @Email: xiao_cui_vip@163.com
  */
+
+//该类暂时已经用不到了，如果后续确认不在需要该类时可以将其删除
+/*
 public class FileCallable implements Callable<Integer> {
     //任务数量(编号)
     private String taskNum;
@@ -93,3 +96,4 @@ public class FileCallable implements Callable<Integer> {
         return fs.length;
     }
 }
+*/

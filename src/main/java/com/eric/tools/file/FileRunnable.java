@@ -14,6 +14,9 @@ import java.time.Instant;
  * @Date: 2019/3/7 0007
  * @Email: xiao_cui_vip@163.com
  */
+
+//该类暂时已经用不到了，如果后续确认不在需要该类时可以将其删除
+/*
 public class FileRunnable implements Runnable {
     //APK文件源路径(文件夹)
     private String src;
@@ -54,3 +57,4 @@ public class FileRunnable implements Runnable {
         this.des = des;
     }
 }
+*/
