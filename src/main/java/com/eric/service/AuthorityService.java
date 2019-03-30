@@ -5,17 +5,13 @@ import com.eric.dao.ApkMapper;
 import com.eric.dao.AuthorityApkMapMapper;
 import com.eric.dao.AuthorityMapper;
 import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
-import com.eric.tools.AndroidManifestHelper.AuthorityInsertCallable;
 import com.eric.tools.MD5.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @ClassName: AuthorityService
@@ -46,8 +42,95 @@ public class AuthorityService {
         //设置线程池的大小为20
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         int apkId = -1;
-        //获取包名
-        String packageName = getPackageName(src);
+        //创建文件
+        File file = new File(src);
+        //文件存在
+        if (file.exists()) {
+            LinkedList<File> list = new LinkedList<>();
+            //列出当前目录下的文件
+            File[] files = file.listFiles();
+            //这个地方才能获取到正确的包名
+            String currentPackageName = "";
+            for (File f : files) {
+                //获取目录的绝对路径
+                String absolutePath = f.getAbsolutePath();
+                //按照斜线分割
+                String[] split = absolutePath.split("\\\\");
+                //包名
+                currentPackageName = split[split.length - 1];
+                apkId = checkBeforeInsert(apkId, currentPackageName);
+                fileOperate(apkId, list, currentPackageName, f);
+            }
+
+            File temp;
+            //队列不空
+            while (!list.isEmpty()) {
+                //选取List的第一个文件
+                temp = list.removeFirst();
+                File[] listFiles = temp.listFiles();
+                for (File listFile : listFiles) {
+                    //遍历每一个文件
+                    fileOperate(apkId, list, currentPackageName, listFile);
+                }
+            }
+        } else {
+            //文件不存在
+            return;
+        }
+    }
+
+    /**
+     * 遍历每一个文件
+     *
+     * @param apkId              应用id
+     * @param list               文件目录列表
+     * @param currentPackageName 当前包名
+     * @param f                  当前文件
+     */
+    public void fileOperate(int apkId, LinkedList<File> list, String currentPackageName, File f) {
+        //是目录
+        if (f.isDirectory()) {
+            //将文件夹加入队列
+            list.add(f);
+        } else {
+            //是文件
+            //获取文件路径
+            String path = f.getAbsolutePath();
+            //按照斜线分割
+            String[] pathArr = path.split("\\\\");
+            //判断是否是AndroidManifest.xml文件
+            if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
+                //是AndroidManifest.xml文件
+                List<String> authorityList = null;
+                try {
+                    //这个方法如果读入到的AndroidManifest.xml是乱码的话会
+                    //抛出异常，这里要try一下
+                    authorityList = AndroidManifestAnalyze.xmlHandle(path);
+                } catch (Exception e) {
+                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + currentPackageName + ":读取xml文件时出现异常");
+                }
+                if (null != authorityList) {
+                    int finalApkId = apkId;
+                    String finalCurrentPackageName = currentPackageName;
+                    authorityList.parallelStream().forEach(au -> {
+                        System.out.println("线程：" + Thread.currentThread().getName() + "开始执行,正在提取权限的应用名称为:" + finalCurrentPackageName);
+                        authorityOperate(finalApkId, au, finalCurrentPackageName);
+                    });
+                }
+
+            }
+        }
+    }
+
+    /**
+     * 插入前先进行检查
+     *
+     * @param apkId       应用id
+     * @param packageName 包名
+     * @return 应用id
+     */
+
+    public int checkBeforeInsert(int apkId, String packageName) {
         Apk apk = new Apk(packageName, 0);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);
@@ -75,28 +158,7 @@ public class AuthorityService {
             Apk apk1 = apks.get(0);
             apkId = apk1.getApkId();
         }
-        //创建文件
-        File file = new File(src);
-        //文件存在
-        if (file.exists()) {
-            LinkedList<File> list = new LinkedList<>();
-            //列出当前目录下的文件
-            File[] files = file.listFiles();
-            //遍历每一个文件
-            FileOperate(apkId, list, files, packageName);
-            File temp;
-            //队列不空
-            while (!list.isEmpty()) {
-                //选取List的第一个文件
-                temp = list.removeFirst();
-                File[] listFiles = temp.listFiles();
-                //遍历
-                FileOperate(apkId, list, listFiles, packageName);
-            }
-        } else {
-            //文件不存在
-            return;
-        }
+        return apkId;
     }
 
     /**
@@ -108,37 +170,7 @@ public class AuthorityService {
      */
     public void FileOperate(int apkId, LinkedList<File> list, File[] files, String packageName) {
         for (File f : files) {
-            //是目录
-            if (f.isDirectory()) {
-                //将文件夹加入队列
-                list.add(f);
-            } else {
-                //是文件
-                //获取文件路径
-                String path = f.getAbsolutePath();
-                //按照斜线分割
-                String[] split = path.split("\\\\");
-                //判断是否是AndroidManifest.xml文件
-                if (split[split.length - 1].equals("AndroidManifest.xml")) {
-                    //是AndroidManifest.xml文件
-                    List<String> authorityList = null;
-                    try {
-                        //这个方法如果读入到的AndroidManifest.xml是乱码的话会
-                        //抛出异常，这里要try一下
-                        authorityList = AndroidManifestAnalyze.xmlHandle(path);
-                    } catch (Exception e) {
-                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":读取xml文件时出现异常");
-                    }
-                    if (null != authorityList) {
-                        int finalApkId = apkId;
-                        authorityList.parallelStream().forEach(au -> {
-                            System.out.println("线程："+Thread.currentThread().getName()+"开始执行,正在提取权限的应用名称为:"+packageName);
-                            authorityOperate(finalApkId, au, packageName);
-                        });
-                    }
 
-                }
-            }
         }
     }
 
@@ -239,14 +271,5 @@ public class AuthorityService {
         return apkExample;
     }
 
-    /**
-     * 获取包名
-     *
-     * @param src 应用包文件夹
-     * @return
-     */
-    public String getPackageName(String src) {
-        String[] packageNamSplits = src.split("\\\\");
-        return packageNamSplits[packageNamSplits.length - 1];
-    }
+
 }
