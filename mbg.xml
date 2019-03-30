@@ -12,7 +12,7 @@
 
 		<!-- 配置数据库连接 -->
 		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
-			connectionURL="jdbc:mysql://localhost:3306/androidchecker" userId="root"
+			connectionURL="jdbc:mysql://localhost:3306/androidchecker&amp;useSSL=false" userId="root"
 			password="123456">
 		</jdbcConnection>
 

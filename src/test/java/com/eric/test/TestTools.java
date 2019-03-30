@@ -60,7 +60,7 @@ public class TestTools {
     public void test2() {
         Boolean res = null;
         if (apiService != null) {
-            res = apiService.saveApi("E:\\BiSheProjects\\APKs\\des\\com.anybeen.mark.app");
+            res = apiService.saveApi("E:\\BiSheProjects\\APKs\\des\\com.anybeen.mark.app",0);
         }
         System.out.println(res);
     }
@@ -103,6 +103,7 @@ public class TestTools {
     /**
      * 将E:\BiSheProjects\APKs\APISrc文件夹下的文件中的API信息全部提取到数据库
      * 该方法是测试成功的方法
+     * 批量提取
      */
     @Test
     public void test6() {
@@ -114,7 +115,7 @@ public class TestTools {
                 //目录下的所有文件
                 File[] files = file.listFiles();
                 for (File f : files) {
-                    apiService.saveApi(f.getAbsolutePath());
+                    apiService.saveApi(f.getAbsolutePath(),0);
 
                 }
             }
@@ -149,7 +150,7 @@ public class TestTools {
      */
     @Test
     public void test9() {
-        apiService.saveApi("E:\\BiSheProjects\\APKs\\APISrc2");
+        apiService.saveApi("E:\\BiSheProjects\\APKs\\APISrc2",0);
 
     }
 

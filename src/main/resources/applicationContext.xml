@@ -30,11 +30,11 @@
         <property name="user" value="${jdbc_username}"/>
         <property name="password" value="${jdbc_password}"/>
         <!--连接池中保存的最大连接数目-->
-        <property name="maxPoolSize" value="20"/>
+        <property name="maxPoolSize" value="50"/>
         <!--连接池中保存的最少连接数目-->
-        <property name="minPoolSize" value="2"/>
+        <property name="minPoolSize" value="10"/>
         <!-- 初始化连接大小 -->
-        <property name="initialPoolSize" value="2"/>
+        <property name="initialPoolSize" value="10"/>
         <!-- 获取连接最大等待时间 -->
         <property name="maxConnectionAge" value="6000"/>
         <!-- 连接池最大空闲 -->
