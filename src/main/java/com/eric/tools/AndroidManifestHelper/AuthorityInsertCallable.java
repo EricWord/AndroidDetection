@@ -21,7 +21,7 @@ import java.util.concurrent.Callable;
  * @Date: 2019/3/17 0017
  * @Email: xiao_cui_vip@163.com
  */
-@Component  //这个注解不要忘掉
+/*@Component  //这个注解不要忘掉
 public class AuthorityInsertCallable implements Callable<Integer> {
     private String au;
     private Integer apkId;
@@ -94,4 +94,4 @@ public class AuthorityInsertCallable implements Callable<Integer> {
         }
         return n;
     }
-}
+}*/

@@ -6,16 +6,15 @@ package com.eric.service;/*
  *@Date:2019/3/29
  */
 
-import com.eric.tools.file.FileHelper;
 import org.springframework.stereotype.Service;
 
-@Service
+/*@Service
 public class ApkBatchDecompileService {
-    /**
+    *//**
      * 批量反编译文件
      * @param src 源路径
      * @param des 目标路径
-     */
+     *//*
     public void batchDecompileApk(String src,String des){
         FileHelper.batchDeCompile(src,des);
 
@@ -23,4 +22,4 @@ public class ApkBatchDecompileService {
     }
 
 
-}
+}*/
