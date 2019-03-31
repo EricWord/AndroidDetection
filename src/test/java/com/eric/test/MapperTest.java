@@ -92,7 +92,7 @@ public class MapperTest {
 
         }
         try {
-            CreateCSVUtils.createCSVFile(dataList, FileConstantUtils.API_HEAD_LIST, FileConstantUtils.AU_HEAD_LIST);
+            CreateCSVUtils.createCSVFile(dataList, FileConstantUtils.HEAD_LIST);
         } catch (IOException e) {
             e.printStackTrace();
         }

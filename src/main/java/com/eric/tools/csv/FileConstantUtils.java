@@ -13,22 +13,44 @@ import java.util.List;
  */
 public class FileConstantUtils {
 
-    public final static List<String> API_HEAD_LIST = Arrays.asList(
-            "API编号",
-            "API内容",
-            "应用属性",
-            "APK编号",
-            "应用名称"
+    public final static List<String> HEAD_LIST = Arrays.asList(
+            "API_Content",
+            "Authority_Content",
+            "APK_Attribute"
     );
-    public final static List<String> AU_HEAD_LIST = Arrays.asList(
-            "权限编号",
-            "权限特征",
-            "应用属性",
-            "APK编号",
-            "应用名称"
+    //tb_apk表的表头
+    public final static List<String> TABLE_APK_LIST = Arrays.asList(
+            "apk_id",
+            "package_name",
+            "apk_attribute"
     );
 
-    // 导出文件路径   E:\BiSheProjects\CSV
-    public final static String DOWNLOAD_FILE_PATH = "E:" + File.separator + "BiSheProjects" + File.separator + "CSV" + File.separator;
+    //tb_api表的表头
+    public final static List<String> TABLE_API_LIST = Arrays.asList(
+            "api_id",
+            "api_content",
+            "api_mad5"
+    );
+
+    //tb_authority表的表头
+    public final static List<String> TABLE_AUTHORITY_LIST = Arrays.asList(
+            "authority_id",
+            "authority_content",
+            "authority_md5"
+    );
+
+    //tb_api_apk_map表的表头
+    public final static List<String> TABLE_API_APK_MAP_LIST = Arrays.asList(
+            "apk_id",
+            "api_id"
+    );
+
+    //tb_authority_apk_map表的表头
+    public final static List<String> TABLE_AUTHORITY_APK_MAP_LIST = Arrays.asList(
+            "apk_id",
+            "authority_id"
+    );
+    // 导出文件路径   D:\cgs\File\CSV\
+    public final static String DOWNLOAD_FILE_PATH = "D:" + File.separator + "cgs" + File.separator + "File" + File.separator + "CSV" + File.separator;
     public final static String FILE_NAME = "Android数据集";
 }
