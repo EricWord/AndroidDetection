@@ -7,7 +7,6 @@ package com.eric.test;/*
  */
 
 import com.eric.service.APIService;
-import com.eric.service.ApkBatchDecompileService;
 import com.eric.service.AuthorityService;
 import com.eric.service.DeCompileService;
 import org.junit.Test;
@@ -21,8 +20,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ServiceTest {
 
     //批量反编译服务类
-    @Autowired
-    ApkBatchDecompileService apkBatchDecompileService;
+//    @Autowired
+//    ApkBatchDecompileService apkBatchDecompileService;
     //批量提取api 特征服务类
     @Autowired
     APIService apiService;
@@ -38,7 +37,7 @@ public class ServiceTest {
     @Test
     public void testApkBatchDe(){
 //        apkBatchDecompileService.batchDecompileApk("D:\\cgs\\File\\data\\badApkTest","D:\\cgs\\File\\data\\badApkTestResult");
-        apkBatchDecompileService.batchDecompileApk("E:\\7BiShe\\goodAPKs\\301-600","E:\\7BiShe\\DeCompileResults\\goodApksDecompileResult\\301-600");
+//        apkBatchDecompileService.batchDecompileApk("E:\\7BiShe\\goodAPKs\\301-600","E:\\7BiShe\\DeCompileResults\\goodApksDecompileResult\\301-600");
 
     }
 
@@ -48,7 +47,7 @@ public class ServiceTest {
     @Test
     public void testApkBatchDeBadApks(){
 //        apkBatchDecompileService.batchDecompileApk("D:\\cgs\\File\\data\\badApkTest","D:\\cgs\\File\\data\\badApkTestResult");
-        apkBatchDecompileService.batchDecompileApk("E:\\7BiShe\\badAPKs\\12","E:\\7BiShe\\DeCompileResults\\badApksDecompileResult\\901-1200");
+//        apkBatchDecompileService.batchDecompileApk("E:\\7BiShe\\badAPKs\\12","E:\\7BiShe\\DeCompileResults\\badApksDecompileResult\\901-1200");
 
     }
 
