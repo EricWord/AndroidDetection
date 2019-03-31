@@ -3,14 +3,15 @@ package com.eric.service;
 
 import com.eric.bean.*;
 import com.eric.dao.*;
-import com.eric.tools.csv.CreateCSVUtils;
+import com.eric.tools.csv.CSVUtils;
 import com.eric.tools.csv.FileConstantUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /*
  *@description:生成CSV格式文件的服务层
@@ -33,82 +34,102 @@ public class CSVService {
     AuthorityApkMapMapper authorityApkMapMapper;
 
     /**
-     * 创建CSV格式的文件
+     * 将数据库中的表转为CSV格式的文件，该方法只需要执行一次即可
      */
     public void createCSVFile() {
-        List<Apk> dataList = new ArrayList<>();
-        Integer apiId = -1;
-        //获取数据库中已有的apk记录
+        DateTime dateTime = new DateTime();
+        //当前时间
+        String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
+        //查询数tb_apk表中的所有记录
         List<Apk> apks = apkMapper.selectByExample(null);
-        //遍历每一个apk记录
+        //将apk的字段转储到List中
+        List<List<String>> dataList = new ArrayList<>();
+        //遍历每一个apk
+        List<String> tableFiledList =new ArrayList<>();
         for (Apk apk : apks) {
-            //获取每一个apk的id
-            Integer apkId = apk.getApkId();
-            //根据apk id来查询与之关联的api信息
-            ApiApkMapExample apiApkMapExample = getApiApkMapExample(apkId);
-            List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
-            List<Api> apiList = new ArrayList<>();
-            //获取到的api记录数不为0
-            if (apiApkMaps.size() > 0) {
-                //遍历
-                apiApkMapOperate(apiApkMaps, apiList);
-                apk.setApiList(apiList);
-            }
-            //根据apkId来查询与之关联的权限信息
-            AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(apkId);
-            List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
-            List<Authority> authorityList = new ArrayList<>();
-            //遍历authorityApkMaps
-            authorityApkMapsOperate(authorityApkMaps, authorityList);
-            apk.setAuthorityList(authorityList);
-            dataList.add(apk);
+            tableFiledList.add(apk.getApkId().toString());
+            tableFiledList.add(apk.getPackageName());
+            tableFiledList.add(apk.getApkAttribute().toString());
+            dataList.add(tableFiledList);
 
         }
-        try {
-            CreateCSVUtils.createCSVFile(dataList, FileConstantUtils.HEAD_LIST);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        System.out.println(">>>>>dataList的大小为："+dataList.size());
+        //将tb_apk数据库转为CSV格式的文件
+        CSVUtils.createCSVFile(FileConstantUtils.TABLE_APK_LIST, dataList, "D:\\cgs\\File\\CSV", "tb_apk_" + stringDate);
+        dataList.clear();
 
-    public void apiApkMapOperate(List<ApiApkMap> apiApkMaps, List<Api> apiList) {
-        Integer apiId;
+        //--------------------------------------------------------
+        List<Api> apis = apiMapper.selectByExample(null);
+        //将api的字段转储到List中
+        List<List<String>> apiDataList = new ArrayList<>();
+        //遍历每一个api
+        List<String> apiTableFiledList = new ArrayList<>();
+        for (Api api : apis) {
+            apiTableFiledList.add(api.getApiId().toString());
+            apiTableFiledList.add(api.getApiContent());
+            apiTableFiledList.add(api.getApiMad5());
+            apiDataList.add(apiTableFiledList);
+        }
+        System.out.println(">>>>>>>apiDataList的大小为："+apiDataList.size());
+        //将tb_api数据库表转为CSV格式的文件
+        CSVUtils.createCSVFile(FileConstantUtils.TABLE_API_LIST, apiDataList, "D:\\cgs\\File\\CSV", "tb_api_" + stringDate);
+        apiDataList.clear();
+
+        //--------------------------------------------------------
+
+        List<Authority> authorities = authorityMapper.selectByExample(null);
+        //将authority的字段转储到List中
+        List<List<String>> authorityDataList = new ArrayList<>();
+        //遍历每一个authority
+        List<String> authorityTableFiledList = new ArrayList<>();
+        for (Authority authority : authorities) {
+
+            authorityTableFiledList.add(authority.getAuthorityId().toString());
+            authorityTableFiledList.add(authority.getAuthorityContent());
+            authorityTableFiledList.add(authority.getAuthorityMd5());
+            authorityDataList.add(authorityTableFiledList);
+        }
+
+        System.out.println(">>>>>>authorityDataList的大小为："+authorityDataList.size());
+
+        //将tb_authority数据库表转为CSV格式的文件
+        CSVUtils.createCSVFile(FileConstantUtils.TABLE_AUTHORITY_LIST, authorityDataList, "D:\\cgs\\File\\CSV", "tb_authority_" + stringDate);
+        //释放空间，防止堆溢出
+        authorityDataList.clear();
+
+        //--------------------------------------------------------
+        List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(null);
+        //将apiApkMap字段转储到List中
+        List<List<String>> apiApkMapsDataList = new ArrayList<>();
+        //遍历每一个apiApkMaps
+        List<String> apiApkMapsTableFiledList = new ArrayList<>();
         for (ApiApkMap apiApkMap : apiApkMaps) {
-            apiId = apiApkMap.getApiId();
-            //根据apiid查询api
-            Api api = apiMapper.selectByPrimaryKey(apiId);
-            apiList.add(api);
+            apiApkMapsTableFiledList.add(apiApkMap.getApiId().toString());
+            apiApkMapsTableFiledList.add(apiApkMap.getApkId().toString());
+            apiApkMapsDataList.add(apiApkMapsTableFiledList);
         }
-    }
+        System.out.println(">>>>>>>apiApkMapsDataList的大小为："+apiApkMapsDataList.size());
+        //将tb_api_apk_map数据库表转为CSV格式的文件
+        CSVUtils.createCSVFile(FileConstantUtils.TABLE_API_APK_MAP_LIST, apiApkMapsDataList, "D:\\cgs\\File\\CSV", "tb_api_apk_map_" + stringDate);
+        apiApkMapsDataList.clear();
 
-    /**
-     * 遍历authorityApkMaps
-     * @param authorityApkMaps
-     * @param authorityList
-     */
-    public void authorityApkMapsOperate(List<AuthorityApkMap> authorityApkMaps, List<Authority> authorityList) {
+        //--------------------------------------------------------
+
+        //tb_authority_apk_map
+        List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(null);
+        //将authorityApkMap字段转储到List中
+        List<List<String>> authorityApkMapsDataList = new ArrayList<>();
+        //遍历每一个authorityApkMap
+        List<String> authorityApkMapTableFiledList = new ArrayList<>();
         for (AuthorityApkMap authorityApkMap : authorityApkMaps) {
-            //获取authorityId
-            Integer authorityId = authorityApkMap.getAuthorityId();
-            //根据authorityId来获取权限信息
-            Authority authority = authorityMapper.selectByPrimaryKey(authorityId);
-            authorityList.add(authority);
-
+            authorityApkMapTableFiledList.add(authorityApkMap.getAuthorityId().toString());
+            authorityApkMapTableFiledList.add(authorityApkMap.getApkId().toString());
+            authorityApkMapsDataList.add(authorityApkMapTableFiledList);
         }
-    }
-
-    public AuthorityApkMapExample getAuthorityApkMapExample(Integer apkId) {
-        AuthorityApkMapExample authorityApkMapExample = new AuthorityApkMapExample();
-        AuthorityApkMapExample.Criteria authorityApkMapExampleCriteria = authorityApkMapExample.createCriteria();
-        authorityApkMapExampleCriteria.andApkIdEqualTo(apkId);
-        return authorityApkMapExample;
-    }
-
-    public ApiApkMapExample getApiApkMapExample(Integer apkId) {
-        ApiApkMapExample apiApkMapExample = new ApiApkMapExample();
-        ApiApkMapExample.Criteria apiApkMapExampleCriteria = apiApkMapExample.createCriteria();
-        apiApkMapExampleCriteria.andApkIdEqualTo(apkId);
-        return apiApkMapExample;
+        System.out.println(">>>>>>authorityApkMapsDataList的大小为:"+authorityApkMapsDataList.size());
+        //将tb_authority_apk_map数据库表转为CSV格式的文件
+        CSVUtils.createCSVFile(FileConstantUtils.TABLE_AUTHORITY_APK_MAP_LIST, authorityApkMapsDataList, "D:\\cgs\\File\\CSV", "tb_authority_apk_map_" + stringDate);
+        authorityApkMapsDataList.clear();
     }
 
 

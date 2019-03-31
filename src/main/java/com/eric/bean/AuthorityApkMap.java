@@ -28,4 +28,9 @@ public class AuthorityApkMap {
     public void setAuthorityId(Integer authorityId) {
         this.authorityId = authorityId;
     }
+
+    @Override
+    public String toString() {
+        return apkId+":"+authorityId;
+    }
 }

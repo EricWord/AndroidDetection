@@ -62,12 +62,6 @@ public class Apk {
 
     @Override
     public String toString() {
-        return "Apk{" +
-                "apkId=" + apkId +
-                ", packageName='" + packageName + '\'' +
-                ", apkAttribute=" + apkAttribute +
-                ", apiList=" + apiList +
-                ", authorityList=" + authorityList +
-                '}';
+        return apkId+":"+packageName+":"+apkAttribute;
     }
 }

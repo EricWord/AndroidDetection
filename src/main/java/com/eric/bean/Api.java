@@ -38,4 +38,9 @@ public class Api {
     public void setApiMad5(String apiMad5) {
         this.apiMad5 = apiMad5 == null ? null : apiMad5.trim();
     }
+
+    @Override
+    public String toString() {
+        return apiId + ":" + apiContent + ":" + apiMad5;
+    }
 }

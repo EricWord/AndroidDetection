@@ -20,7 +20,7 @@ public class CSVUtils {
      * @param filename
      * @return
      */
-    public static File createCSVFile(List<Object> head, List<List<Object>> dataList,
+    public static File createCSVFile(List<String> head, List<List<String>> dataList,
                                      String outPutPath, String filename) {
         File csvFile = null;
         BufferedWriter csvWtriter = null;
@@ -37,7 +37,7 @@ public class CSVUtils {
             // 写入文件头部
             writeRow(head, csvWtriter);
             // 写入文件内容
-            for (List<Object> row : dataList) {
+            for (List<String> row : dataList) {
                 writeRow(row, csvWtriter);
             }
             csvWtriter.flush();
@@ -60,13 +60,15 @@ public class CSVUtils {
      * @param csvWriter
      * @throws IOException
      */
-    private static void writeRow(List<Object> row, BufferedWriter csvWriter) throws IOException {
+    private static void writeRow(List<String> row, BufferedWriter csvWriter) throws IOException {
         // 写入文件头部
-        for (Object data : row) {
+        for (String data : row) {
             StringBuffer sb = new StringBuffer();
-            String rowStr = sb.append("\"").append(data).append("\",").toString();
+            String rowStr = sb.append(",").append(data).append(",").toString();
             csvWriter.write(rowStr);
+            csvWriter.flush();
         }
         csvWriter.newLine();
+
     }
 }

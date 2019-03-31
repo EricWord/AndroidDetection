@@ -1,3 +1,4 @@
+/*
 package com.eric.tools.csv;
 
 import com.eric.bean.Api;
@@ -9,20 +10,24 @@ import java.io.*;
 import java.util.List;
 import java.util.Locale;
 
+*/
 /**
  * @ClassName: CreateCSVUtils
  * @Description: 创建csv文件
  * @Author: Eric
  * @Date: 2019/3/24 0024
  * @Email: xiao_cui_vip@163.com
- */
+ *//*
+
 public class CreateCSVUtils {
-    /**
+    */
+/**
      *      * 创建CSV文件类型
      *      * @param dataLists
      *      * @return
      *      
-     */
+     *//*
+
     public static File createCSVFile(List<Apk> dataLists, List<String> headList) throws IOException {
 
         File csvFile = null;
@@ -118,14 +123,16 @@ public class CreateCSVUtils {
     }
 
 
-    /**
+    */
+/**
      *      * 将数据按行写入数据
      *      *
      *      * @param dataList
      *      * @param csvWreite
      *      * @throws IOException
      *      
-     */
+     *//*
+
     private static void writeData(Apk apk, BufferedWriter csvWreite) throws IOException {
         //获取apk id
         Integer apkId = apk.getApkId();
@@ -177,3 +184,4 @@ public class CreateCSVUtils {
     }
 
 }
+*/

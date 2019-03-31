@@ -28,4 +28,9 @@ public class ApiApkMap {
     public void setApiId(Integer apiId) {
         this.apiId = apiId;
     }
+
+    @Override
+    public String toString() {
+        return apkId+":"+apiId;
+    }
 }

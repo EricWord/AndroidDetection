@@ -38,4 +38,9 @@ public class Authority {
     public void setAuthorityMd5(String authorityMd5) {
         this.authorityMd5 = authorityMd5 == null ? null : authorityMd5.trim();
     }
+
+    @Override
+    public String toString() {
+        return authorityId+":"+authorityContent+":"+authorityMd5;
+    }
 }

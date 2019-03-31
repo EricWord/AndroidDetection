@@ -6,14 +6,23 @@ package com.eric.test;/*
  *@Date:2019/3/29
  */
 
+import com.eric.bean.Apk;
+import com.eric.dao.ApkMapper;
 import com.eric.service.APIService;
 import com.eric.service.AuthorityService;
+import com.eric.service.CSVService;
 import com.eric.service.DeCompileService;
+import com.eric.tools.csv.CSVUtils;
+import com.eric.tools.csv.FileConstantUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
@@ -25,12 +34,16 @@ public class ServiceTest {
     //批量提取api 特征服务类
     @Autowired
     APIService apiService;
+    @Autowired
+    ApkMapper apkMapper;
 
     @Autowired
     AuthorityService authorityService;
 
     @Autowired
     DeCompileService deCompileService;
+    @Autowired
+    CSVService csvService;
     /**
      * 测试批量反编译
      */
@@ -88,6 +101,27 @@ public class ServiceTest {
     @Test
     public  void testAuthorityService(){
         authorityService.saveAuthority("");
+
+    }
+
+    @Test
+    public void testCSV(){
+        List<Apk> apks = apkMapper.selectByExample(null);
+        List<List<String>> dataList=new ArrayList<>();
+        for (Apk apk : apks) {
+            String[] tableFiled = apk.toString().split(":");
+            List<String> tableFiledList = Arrays.asList(tableFiled);
+            dataList.add(tableFiledList);
+
+        }
+
+        CSVUtils.createCSVFile(FileConstantUtils.TABLE_APK_LIST,dataList,"D:\\cgs\\File\\CSV","tb_apk");
+
+
+    }
+    @Test
+    public void testCSVService(){
+        csvService.createCSVFile();
 
     }
 

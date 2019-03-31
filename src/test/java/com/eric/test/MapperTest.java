@@ -2,15 +2,12 @@ package com.eric.test;
 
 import com.eric.bean.*;
 import com.eric.dao.*;
-import com.eric.tools.csv.CreateCSVUtils;
-import com.eric.tools.csv.FileConstantUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,11 +88,11 @@ public class MapperTest {
             dataList.add(apk);
 
         }
-        try {
+        /*try {
             CreateCSVUtils.createCSVFile(dataList, FileConstantUtils.HEAD_LIST);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
