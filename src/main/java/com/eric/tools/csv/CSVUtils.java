@@ -20,7 +20,9 @@ public class CSVUtils {
      * @param filename
      * @return
      */
-    public static File createCSVFile(List<String> head, List<List<String>> dataList,
+
+
+    public static File createCSVFile(List<String> head, List<String> dataList,
                                      String outPutPath, String filename) {
         File csvFile = null;
         BufferedWriter csvWtriter = null;
@@ -35,12 +37,9 @@ public class CSVUtils {
             csvWtriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     csvFile), "UTF-8"), 1024);
             // 写入文件头部
-            writeRow(head, csvWtriter);
-            // 写入文件内容
-            for (List<String> row : dataList) {
-                writeRow(row, csvWtriter);
-            }
+            writeHead(head, csvWtriter);
             csvWtriter.flush();
+            writeRow(dataList, csvWtriter, head.size());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -54,21 +53,52 @@ public class CSVUtils {
     }
 
     /**
+     * 写入表头
+     *
+     * @param row
+     * @param csvWriter
+     * @throws IOException
+     */
+    private static void writeHead(List<String> row, BufferedWriter csvWriter) throws IOException {
+        // 写入文件头部
+        for (int i = 0; i < row.size(); i++) {
+            if (i != row.size() - 1) {
+                csvWriter.write(row.get(i) + ",");
+
+            } else {
+                csvWriter.write(row.get(i));
+            }
+        }
+    }
+
+    /**
      * 写一行数据方法
      *
      * @param row
      * @param csvWriter
      * @throws IOException
      */
-    private static void writeRow(List<String> row, BufferedWriter csvWriter) throws IOException {
-        // 写入文件头部
-        for (String data : row) {
-            StringBuffer sb = new StringBuffer();
-            String rowStr = sb.append(",").append(data).append(",").toString();
-            csvWriter.write(rowStr);
-            csvWriter.flush();
-        }
-        csvWriter.newLine();
+    private static void writeRow(List<String> row, BufferedWriter csvWriter, int headLength) throws IOException {
+        // 写入文件内容
 
+        for (int i = 0; i < row.size(); i++) {
+            //第一行数据要先写入一个换行
+            if(i==0){
+                csvWriter.newLine();
+            }
+            if (i != row.size() - 1) {
+                csvWriter.write(row.get(i) + ",");
+                //换行逻辑判断
+                if ((i+1) % headLength == 0) {
+                    //写入换行
+                    csvWriter.newLine();
+                }
+            } else {
+                csvWriter.write(row.get(i));
+            }
+        }
+        //写入换行
+        csvWriter.newLine();
+        csvWriter.flush();
     }
 }

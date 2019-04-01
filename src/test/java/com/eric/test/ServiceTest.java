@@ -12,8 +12,6 @@ import com.eric.service.APIService;
 import com.eric.service.AuthorityService;
 import com.eric.service.CSVService;
 import com.eric.service.DeCompileService;
-import com.eric.tools.csv.CSVUtils;
-import com.eric.tools.csv.FileConstantUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +113,7 @@ public class ServiceTest {
 
         }
 
-        CSVUtils.createCSVFile(FileConstantUtils.TABLE_APK_LIST,dataList,"D:\\cgs\\File\\CSV","tb_apk");
+//        CSVUtils.createCSVFile(FileConstantUtils.TABLE_APK_LIST,dataList,"D:\\cgs\\File\\CSV","tb_apk");
 
 
     }
