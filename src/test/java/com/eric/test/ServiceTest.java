@@ -88,7 +88,7 @@ public class ServiceTest {
      */
     @Test
     public void testDeCompileService(){
-        deCompileService.batchDeCompile("","");
+        deCompileService.batchDeCompile("D:\\cgs\\File\\data\\testAPK","D:\\cgs\\File\\data\\testAPKDecompileOutput");
 
 
     }

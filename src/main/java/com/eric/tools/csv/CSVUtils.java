@@ -35,7 +35,7 @@ public class CSVUtils {
             csvFile.createNewFile();
             // GB2312使正确读取分隔符","
             csvWtriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    csvFile), "UTF-8"), 1024);
+                    csvFile), "GB2312"), 1024);
             // 写入文件头部
             writeHead(head, csvWtriter);
             csvWtriter.flush();
