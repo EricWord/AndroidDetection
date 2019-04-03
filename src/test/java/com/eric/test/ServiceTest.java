@@ -8,10 +8,7 @@ package com.eric.test;/*
 
 import com.eric.bean.Apk;
 import com.eric.dao.ApkMapper;
-import com.eric.service.APIService;
-import com.eric.service.AuthorityService;
-import com.eric.service.CSVService;
-import com.eric.service.DeCompileService;
+import com.eric.service.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +39,8 @@ public class ServiceTest {
     DeCompileService deCompileService;
     @Autowired
     CSVService csvService;
+    @Autowired
+    AuthorityService2 authorityService2;
 
     /**
      * 测试批量反编译
@@ -99,7 +98,7 @@ public class ServiceTest {
      */
     @Test
     public void testAuthorityService() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 
@@ -125,22 +124,23 @@ public class ServiceTest {
 
     }
 
+
     //--------------------------2019.04.03新增批量提取权限测试方法
     @Test
     public void testAuthorityService1() {
-        authorityService.saveAuthority2("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
+        authorityService.saveAuthority2("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 
     @Test
     public void testAuthorityService2() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 
     @Test
     public void testAuthorityService3() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 
@@ -153,16 +153,41 @@ public class ServiceTest {
         apiService.batchSaveApi("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
+
     @Test
     public void testGoodApksAPIService2() {
         apiService.batchSaveApi("", 0);
 
     }
+
     @Test
     public void testGoodApksAPIService3() {
         apiService.batchSaveApi("", 0);
 
     }
 
+    @Test
+    public void testGetId() {
+        List<String> androidManifestXmlList = authorityService.getAndroidManifestXmlList("D:\\cgs\\File\\data\\goodAPKSDeCompileResult");
+        for (String xmlPath : androidManifestXmlList) {
+            System.out.println(xmlPath);
+           /* String[] tempPath = xmlPath.split("\\\\");
+            String packageName = "";
+            for (int i = 0; i < tempPath.length; i++) {
+                if (SimpleStringUtil.countCharInString(tempPath[i], ".") > 2) {
+                    packageName = tempPath[i-1];
+                }
+
+            }
+
+            System.out.println(packageName);*/
+        }
+
+    }
+
+    @Test
+    public void test99() {
+        authorityService2.saveAuthority("", 0);
+    }
 
 }

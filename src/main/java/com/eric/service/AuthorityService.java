@@ -33,9 +33,139 @@ public class AuthorityService {
     AuthorityApkMapMapper authorityApkMapMapper;
 
 
+
+
+
+
+    public void saveAuthorityNew(String path,int apkAttribute){
+        int apkId=0;
+        List<String> androidManifestXmlList = getAndroidManifestXmlList(path);
+        androidManifestXmlList.parallelStream().forEach(xmlPath->{
+            List<String> authorityList = AndroidManifestAnalyze.xmlHandle(xmlPath);
+            for (String au : authorityList) {
+                //获取权限的md5值
+                String auMd5 = MD5Utils.MD5Encode(au, "utf8");
+                //先查询数据库中有没有该权限
+                AuthorityExample authorityExample = getAuthorityExample(auMd5);
+                List<Authority> authorities = null;
+                if (null == authorityMapper) {
+//                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":authorityMapper为空");
+                } else {
+                    authorities = authorityMapper.selectByExample(authorityExample);
+
+                }
+                //数据库中没有该权限
+                if (authorities.size() == 0) {
+//                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该权限记录,正在执行插入操作....");
+                    Authority authority = new Authority(au, auMd5);
+                    authorityMapper.insertSelective(authority);
+//                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限记录插入成功，正在插入权限-apk关系...");
+                    Integer authorityId = authority.getAuthorityId();
+                    AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId, authorityId);
+                    authorityApkMapMapper.insertSelective(authorityApkMap);
+//                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk关系插入成功");
+                } else if (authorities.size() == 1) {
+                    //数据库中有1条权限记录
+//                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在1条该权限记录，正在查询权限-apk映射关系是否存在....");
+                    Authority authority = authorities.get(0);
+                    Integer authorityId = authority.getAuthorityId();
+                    //查询映射关系是否在数据库中已经存在
+                    AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId);
+                    List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
+                    //数据库中没有该映射关系
+                    if (authorityApkMaps.size() == 0) {
+//                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中不存在权限-apk映射关系,正在插入该映射关系....");
+                        //插入该映射关系
+                        AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId, authorityId);
+                        authorityApkMapMapper.insertSelective(authorityApkMap);
+//                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk映射关系插入完成");
+                    } else if (authorityApkMaps.size() == 1) {
+//                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在一条权限-apk映射关系记录，本次未执行插入操作");
+
+                    } else if (authorityApkMaps.size() > 1) {
+                        //理论上不可能大于1
+//                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>数据库中存在多条相同的权限-apk映射关系");
+                    }
+
+                } else if (authorities.size() > 1) {
+                    //存在多余1条的权限，理论上不可能
+//                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>>数据库中存在多条相同的权限记录");
+
+                }
+
+            }
+
+
+        });
+
+    }
+
+
+
+    /**
+     * 获取getAndroidManifestXml列表
+     *
+     * @param path 路径
+     * @return 权限清单列表
+     */
+
+
+    public List<String> getAndroidManifestXmlList(String path) {
+        List<String> androidManifestXmlList = new ArrayList<>();
+        File file = new File(path);
+        if (file.exists()) {
+            LinkedList<File> list = new LinkedList<File>();
+            File[] files = file.listFiles();
+            for (File file2 : files) {
+                if (file2.isDirectory()) {
+                    //是文件夹
+                    list.add(file2);
+                } else {
+                    //不是文件夹，判断是否是AndroidManifest.xml文件
+                    //获取文件路径
+                    String currentFilePath = file2.getAbsolutePath();
+                    //按照斜线分割
+                    String[] pathArr = currentFilePath.split("\\\\");
+                    //判断是否是AndroidManifest.xml文件
+                    if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
+                        androidManifestXmlList.add(currentFilePath);
+                    }
+                }
+            }
+            File temp_file;
+            while (!list.isEmpty()) {
+                temp_file = list.removeFirst();
+                files = temp_file.listFiles();
+                for (File file2 : files) {
+                    if (file2.isDirectory()) {
+                        //是文件夹
+                        list.add(file2);
+                    } else {
+                        //不是文件夹，判断是否是AndroidManifest.xml文件
+                        //获取文件路径
+                        String currentFilePath = file2.getAbsolutePath();
+                        //按照斜线分割
+                        String[] pathArr = currentFilePath.split("\\\\");
+                        //判断是否是AndroidManifest.xml文件
+                        if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
+                            androidManifestXmlList.add(currentFilePath);
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("文件不存在!");
+        }
+
+        return androidManifestXmlList;
+
+
+    }
+
+
     public void saveAuthority2(String src, int apkAttribute) {
         List<String> androidManifestXmlList = new ArrayList<>();
-        LinkedList<File> list = new LinkedList<>();
+
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         int apkId = -1;
         String currentPackageName = "";
@@ -43,6 +173,7 @@ public class AuthorityService {
         File file = new File(src);
         //文件存在
         if (file.exists()) {
+            LinkedList<File> list = new LinkedList<>();
 
             //列出当前目录下的文件
             File[] files = file.listFiles();
@@ -54,7 +185,33 @@ public class AuthorityService {
                 String[] split = absolutePath.split("\\\\");
                 //包名
                 currentPackageName = split[split.length - 1];
-                apkId = checkBeforeInsert(apkId, currentPackageName, apkAttribute);
+                Apk apk = new Apk(currentPackageName, apkAttribute);
+                //在插入之前先判断数据库中有没有
+                ApkExample apkExample = getApkExample(currentPackageName);
+                List<Apk> apks = apkMapper.selectByExample(apkExample);
+                if (apks.size() == 0) {
+                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + currentPackageName + ":数据库中没有该apk记录，正在执行插入....");
+                    //数据库中没有，插入
+                    if (null != apkMapper) {
+                        apkMapper.insertSelective(apk);
+                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + currentPackageName + ":apk记录插入完成");
+                    } else {
+                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + currentPackageName + ":apkMapper为空");
+                    }
+                    //获取id
+                    if (apk.getApkId() != null) {
+                        apkId = apk.getApkId();
+
+                    } else {
+                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + currentPackageName + ":返回的id是空");
+                    }
+                } else {
+                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + currentPackageName + ":数据库已经存在该apk记录，记录数为：" + apks.size());
+                    //数据库中已经存在
+                    //获取Id
+                    Apk apk1 = apks.get(0);
+                    apkId = apk1.getApkId();
+                }
                 //是目录
                 if (f.isDirectory()) {
                     //将文件夹加入队列
