@@ -136,6 +136,7 @@ public class AuthorityService {
 
 
     public List<String> getAndroidManifestXmlList(String path) {
+        int total=0;
         System.out.println(">>>>>>开始获取AndroidManifest.xml文件列表........");
         List<String> androidManifestXmlList = new ArrayList<>();
         File file = new File(path);
@@ -155,6 +156,9 @@ public class AuthorityService {
                     //判断是否是AndroidManifest.xml文件
                     if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
                         androidManifestXmlList.add(currentFilePath);
+                        total++;
+                        System.out.println("当前获取到的AndroidManifest.xml文件总数为："+total);
+
                     }
                 }
             }
@@ -175,6 +179,8 @@ public class AuthorityService {
                         //判断是否是AndroidManifest.xml文件
                         if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
                             androidManifestXmlList.add(currentFilePath);
+                            total++;
+                            System.out.println("当前获取到的AndroidManifest.xml文件总数为："+total);
                         }
                     }
                 }
@@ -190,7 +196,7 @@ public class AuthorityService {
     }
 
 
-    public void saveAuthority2(String src, int apkAttribute) {
+/*    public void saveAuthority2(String src, int apkAttribute) {
         List<String> androidManifestXmlList = new ArrayList<>();
 
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
@@ -311,7 +317,7 @@ public class AuthorityService {
         }
 
 
-    }
+    }*/
 
 
     //将所有的AndroidManifest.xml文件路径都存储到队列中
@@ -337,7 +343,7 @@ public class AuthorityService {
      * @param src          应用包所在路径
      * @param apkAttribute 应用属性
      */
-    public void saveAuthority(String src, int apkAttribute) {
+/*    public void saveAuthority(String src, int apkAttribute) {
         List<String> androidManifestXmlList = new ArrayList<>();
         LinkedList<File> list = new LinkedList<>();
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
@@ -382,7 +388,7 @@ public class AuthorityService {
             //文件不存在
             return;
         }
-    }
+    }*/
 
     /**
      * 提取权限然后插入
@@ -390,7 +396,7 @@ public class AuthorityService {
      * @param apkId              应用id
      * @param currentPackageName 当前包名
      */
-    public void getAuthorityAndInsert(int apkId, String currentPackageName, List<String> androidManifestXmlList) {
+ /*   public void getAuthorityAndInsert(int apkId, String currentPackageName, List<String> androidManifestXmlList) {
         String finalCurrentPackageName = currentPackageName;
         int finalApkId = apkId;
         androidManifestXmlList.parallelStream().forEach(p -> {
@@ -411,7 +417,7 @@ public class AuthorityService {
             }
 
         });
-    }
+    }*/
 
     /**
      * 遍历每一个文件
@@ -420,7 +426,7 @@ public class AuthorityService {
      * @param list  文件目录列表
      * @param f     当前文件
      */
-    public void fileOperate(int apkId, LinkedList<File> list, File f, List<String> androidManifestXmlList) {
+    /*public void fileOperate(int apkId, LinkedList<File> list, File f, List<String> androidManifestXmlList) {
         //是目录
         if (f.isDirectory()) {
             //将文件夹加入队列
@@ -436,7 +442,7 @@ public class AuthorityService {
                 androidManifestXmlList.add(path);
             }
         }
-    }
+    }*/
 
     /**
      * 插入前先进行检查
@@ -446,7 +452,7 @@ public class AuthorityService {
      * @return 应用id
      */
 
-    public int checkBeforeInsert(int apkId, String packageName, int apkAtrribute) {
+  /*  public int checkBeforeInsert(int apkId, String packageName, int apkAtrribute) {
         Apk apk = new Apk(packageName, apkAtrribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);
@@ -475,7 +481,7 @@ public class AuthorityService {
             apkId = apk1.getApkId();
         }
         return apkId;
-    }
+    }*/
 
 
     /**
@@ -484,7 +490,7 @@ public class AuthorityService {
      * @param apkId 应用id
      * @param au    权限
      */
-    public void authorityOperate(int apkId, String au, String packageName) {
+/*    public void authorityOperate(int apkId, String au, String packageName) {
         //获取权限的md5值
         String auMd5 = MD5Utils.MD5Encode(au, "utf8");
         //先查询数据库中有没有该权限
@@ -534,7 +540,7 @@ public class AuthorityService {
             System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>>数据库中存在多条相同的权限记录");
 
         }
-    }
+    }*/
 
     /**
      * 获取根据id查询数据库中是否已经存在相应的权限记录的example
