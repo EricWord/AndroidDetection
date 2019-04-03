@@ -1,0 +1,14 @@
+查询数据库中的记录数：
+
+USE androidchecker;
+SELECT COUNT(*) FROM tb_apk;
+
+SELECT COUNT(*) FROM tb_api;
+
+SELECT COUNT(*) FROM tb_authority;
+
+SELECT COUNT(*) FROM tb_api_apk_map;
+
+SELECT COUNT(*) FROM tb_authority_apk_map;
+
+

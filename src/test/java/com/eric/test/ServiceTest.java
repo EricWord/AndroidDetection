@@ -42,11 +42,12 @@ public class ServiceTest {
     DeCompileService deCompileService;
     @Autowired
     CSVService csvService;
+
     /**
      * 测试批量反编译
      */
     @Test
-    public void testApkBatchDe(){
+    public void testApkBatchDe() {
 //        apkBatchDecompileService.batchDecompileApk("D:\\cgs\\File\\data\\badApkTest","D:\\cgs\\File\\data\\badApkTestResult");
 //        apkBatchDecompileService.batchDecompileApk("E:\\7BiShe\\goodAPKs\\301-600","E:\\7BiShe\\DeCompileResults\\goodApksDecompileResult\\301-600");
 
@@ -56,7 +57,7 @@ public class ServiceTest {
      * 测试批量反编译恶意应用
      */
     @Test
-    public void testApkBatchDeBadApks(){
+    public void testApkBatchDeBadApks() {
 //        apkBatchDecompileService.batchDecompileApk("D:\\cgs\\File\\data\\badApkTest","D:\\cgs\\File\\data\\badApkTestResult");
 //        apkBatchDecompileService.batchDecompileApk("E:\\7BiShe\\badAPKs\\12","E:\\7BiShe\\DeCompileResults\\badApksDecompileResult\\901-1200");
 
@@ -67,13 +68,13 @@ public class ServiceTest {
      * 这个没有修复，遇到了栈溢出的异常
      */
     @Test
-    public void testAPIService(){
+    public void testAPIService() {
         //良性应用前300个
         /**
          * 多线程那块出了点问题
          * 2019.03.29 17:06修复了问题，进行测试
          */
-        apiService.batchSaveApi("D:\\cgs\\File\\data\\goodApkTest",0);
+        apiService.batchSaveApi("D:\\cgs\\File\\data\\goodApkTest", 0);
 
     }
 /*    @Test
@@ -87,8 +88,8 @@ public class ServiceTest {
      * 测试批量反编译
      */
     @Test
-    public void testDeCompileService(){
-        deCompileService.batchDeCompile("D:\\cgs\\File\\data\\testAPK","D:\\cgs\\File\\data\\testAPKDecompileOutput");
+    public void testDeCompileService() {
+        deCompileService.batchDeCompile("D:\\cgs\\File\\data\\testAPK", "D:\\cgs\\File\\data\\testAPKDecompileOutput");
 
 
     }
@@ -97,15 +98,15 @@ public class ServiceTest {
      * 测试权限批量提取
      */
     @Test
-    public  void testAuthorityService(){
-        authorityService.saveAuthority("");
+    public void testAuthorityService() {
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
 
     }
 
     @Test
-    public void testCSV(){
+    public void testCSV() {
         List<Apk> apks = apkMapper.selectByExample(null);
-        List<List<String>> dataList=new ArrayList<>();
+        List<List<String>> dataList = new ArrayList<>();
         for (Apk apk : apks) {
             String[] tableFiled = apk.toString().split(":");
             List<String> tableFiledList = Arrays.asList(tableFiled);
@@ -117,9 +118,49 @@ public class ServiceTest {
 
 
     }
+
     @Test
-    public void testCSVService(){
+    public void testCSVService() {
         csvService.createCSVFile();
+
+    }
+
+    //--------------------------2019.04.03新增批量提取权限测试方法
+    @Test
+    public void testAuthorityService1() {
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
+
+    }
+
+    @Test
+    public void testAuthorityService2() {
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
+
+    }
+
+    @Test
+    public void testAuthorityService3() {
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
+
+    }
+
+
+    //--------------------------2019.04.03新增批量提取API测试方法,正常应用的API提取
+    //如果是恶意应用记得将属性字段更换为1
+
+    @Test
+    public void testGoodApksAPIService1() {
+        apiService.batchSaveApi("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+
+    }
+    @Test
+    public void testGoodApksAPIService2() {
+        apiService.batchSaveApi("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+
+    }
+    @Test
+    public void testGoodApksAPIService3() {
+        apiService.batchSaveApi("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 

@@ -39,8 +39,9 @@ public class AuthorityService {
      * @param src 源路径，到达包名那一级别
      */
     public void saveAuthority(String src) {
-        //设置线程池的大小为20
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
+        //设置线程池的大小为6，因为每个线程操作的对象是一个AndroidManifest.xml文件，而一个应用反编译后基本该文件不会超过6个
+        //所以线程池的数量开到6就可以了
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "6");
         int apkId = -1;
         //创建文件
         File file = new File(src);

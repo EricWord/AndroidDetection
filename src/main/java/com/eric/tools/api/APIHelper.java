@@ -52,7 +52,7 @@ public class APIHelper {
      * @param apkAttribute 应用属性，0表示正常应用 1表示恶意应用
      * @return 存储是否成功
      */
-    public  Boolean saveApi(String src, int apkAttribute) {
+    public Boolean saveApi(String src, int apkAttribute) {
         int apkId = -1;
         //获取应用的包名
         String[] split = src.split("\\\\");

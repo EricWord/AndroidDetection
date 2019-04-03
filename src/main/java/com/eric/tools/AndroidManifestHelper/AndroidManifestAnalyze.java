@@ -27,12 +27,10 @@ public class AndroidManifestAnalyze {
             //加载xml文件
             Document document = null;
             try {
-
                 //这个地方可能会有异常
                 document = db.parse(filePath);
             } catch (Exception e) {
                 System.out.println(Thread.currentThread().getName() + ":解析xml文件时出现异常");
-
             }
             NodeList permissionList = document.getElementsByTagName("uses-permission");
             //获取权限列表
@@ -43,7 +41,6 @@ public class AndroidManifestAnalyze {
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
-
         return permissions;
     }
 }

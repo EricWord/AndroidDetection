@@ -32,14 +32,12 @@ public class DeCompileService {
         //将数组转为List
         List<File> fileList = Arrays.asList(fs);
         //这个地方多线程反编译需要try一下，防止因为出现异常而终止所有进程
-
         fileList.parallelStream().forEach(f -> {
             //当前线程名称
             String currentThreadName = Thread.currentThread().getName();
             System.out.println("线程：" + currentThreadName + "开始执行.......");
             //不是目录的话就是apk文件了
             try {
-
                 if (!f.isDirectory()) {
                     //每个APK文件反编译后对应自己的文件夹(名称为包名去掉后面的".apk")
                     String[] split = f.toString().split("\\\\");
