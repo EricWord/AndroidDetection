@@ -31,6 +31,105 @@ public class AuthorityService {
     ApkMapper apkMapper;
     @Autowired
     AuthorityApkMapMapper authorityApkMapMapper;
+
+
+    public void saveAuthority2(String src, int apkAttribute) {
+        List<String> androidManifestXmlList = new ArrayList<>();
+        LinkedList<File> list = new LinkedList<>();
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
+        int apkId = -1;
+        String currentPackageName = "";
+        //创建文件
+        File file = new File(src);
+        //文件存在
+        if (file.exists()) {
+
+            //列出当前目录下的文件
+            File[] files = file.listFiles();
+            //这个地方才能获取到正确的包名
+            for (File f : files) {
+                //获取目录的绝对路径
+                String absolutePath = f.getAbsolutePath();
+                //按照斜线分割
+                String[] split = absolutePath.split("\\\\");
+                //包名
+                currentPackageName = split[split.length - 1];
+                apkId = checkBeforeInsert(apkId, currentPackageName, apkAttribute);
+                //是目录
+                if (f.isDirectory()) {
+                    //将文件夹加入队列
+                    list.add(f);
+                } else {
+                    //是文件
+                    //获取文件路径
+                    String path = f.getAbsolutePath();
+                    //按照斜线分割
+                    String[] pathArr = path.split("\\\\");
+                    //判断是否是AndroidManifest.xml文件
+                    if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
+                        androidManifestXmlList.add(path);
+                    }
+                }
+            }
+
+            File temp;
+            //队列不空
+            while (!list.isEmpty()) {
+                //选取List的第一个文件
+                temp = list.removeFirst();
+                File[] listFiles = temp.listFiles();
+                for (File listFile : listFiles) {
+                    //遍历每一个文件
+                    //是目录
+                    if (listFile.isDirectory()) {
+                        //将文件夹加入队列
+                        list.add(listFile);
+                    } else {
+                        //是文件
+                        //获取文件路径
+                        String path = listFile.getAbsolutePath();
+                        //按照斜线分割
+                        String[] pathArr = path.split("\\\\");
+                        //判断是否是AndroidManifest.xml文件
+                        if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
+                            androidManifestXmlList.add(path);
+                        }
+                    }
+                }
+            }
+
+            if (androidManifestXmlList.size() > 0) {
+                System.err.println("执行执行了吗？");
+                String finalCurrentPackageName = currentPackageName;
+                int finalApkId = apkId;
+                androidManifestXmlList.parallelStream().forEach(p -> {
+                    File androidManifestXml = new File(p);
+                    List<String> authorityList = null;
+                    try {
+                        //这个方法如果读入到的AndroidManifest.xml是乱码的话会
+                        //抛出异常，这里要try一下
+                        authorityList = AndroidManifestAnalyze.xmlHandle(androidManifestXml.getAbsolutePath());
+                    } catch (Exception e) {
+                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + finalCurrentPackageName + ":读取xml文件时出现异常");
+                    }
+                    if (null != authorityList) {
+                        System.out.println("线程：" + Thread.currentThread().getName() + "开始执行,正在提取权限的应用名称为:" + finalCurrentPackageName);
+                        for (String au : authorityList) {
+                            authorityOperate(finalApkId, au, finalCurrentPackageName);
+                        }
+                    }
+
+                });
+            }
+        } else {
+            //文件不存在
+            return;
+        }
+
+
+    }
+
+
     //将所有的AndroidManifest.xml文件路径都存储到队列中
 
 
@@ -56,6 +155,7 @@ public class AuthorityService {
      */
     public void saveAuthority(String src, int apkAttribute) {
         List<String> androidManifestXmlList = new ArrayList<>();
+        LinkedList<File> list = new LinkedList<>();
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         int apkId = -1;
         String currentPackageName = "";
@@ -63,7 +163,7 @@ public class AuthorityService {
         File file = new File(src);
         //文件存在
         if (file.exists()) {
-            LinkedList<File> list = new LinkedList<>();
+
             //列出当前目录下的文件
             File[] files = file.listFiles();
             //这个地方才能获取到正确的包名
@@ -75,7 +175,7 @@ public class AuthorityService {
                 //包名
                 currentPackageName = split[split.length - 1];
                 apkId = checkBeforeInsert(apkId, currentPackageName, apkAttribute);
-                fileOperate(apkId, list, f,androidManifestXmlList);
+                fileOperate(apkId, list, f, androidManifestXmlList);
             }
 
             File temp;
@@ -86,13 +186,13 @@ public class AuthorityService {
                 File[] listFiles = temp.listFiles();
                 for (File listFile : listFiles) {
                     //遍历每一个文件
-                    fileOperate(apkId, list, listFile,androidManifestXmlList);
+                    fileOperate(apkId, list, listFile, androidManifestXmlList);
                 }
             }
 
             if (androidManifestXmlList.size() > 0) {
                 System.err.println("执行执行了吗？");
-                getAuthorityAndInsert(apkId, currentPackageName,androidManifestXmlList);
+                getAuthorityAndInsert(apkId, currentPackageName, androidManifestXmlList);
             }
         } else {
             //文件不存在
@@ -106,7 +206,7 @@ public class AuthorityService {
      * @param apkId              应用id
      * @param currentPackageName 当前包名
      */
-    public void getAuthorityAndInsert(int apkId, String currentPackageName,List<String>androidManifestXmlList) {
+    public void getAuthorityAndInsert(int apkId, String currentPackageName, List<String> androidManifestXmlList) {
         String finalCurrentPackageName = currentPackageName;
         int finalApkId = apkId;
         androidManifestXmlList.parallelStream().forEach(p -> {
@@ -132,11 +232,11 @@ public class AuthorityService {
     /**
      * 遍历每一个文件
      *
-     * @param apkId              应用id
-     * @param list               文件目录列表
-     * @param f                  当前文件
+     * @param apkId 应用id
+     * @param list  文件目录列表
+     * @param f     当前文件
      */
-    public void fileOperate(int apkId, LinkedList<File> list, File f,List<String> androidManifestXmlList) {
+    public void fileOperate(int apkId, LinkedList<File> list, File f, List<String> androidManifestXmlList) {
         //是目录
         if (f.isDirectory()) {
             //将文件夹加入队列
