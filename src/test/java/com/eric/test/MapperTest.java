@@ -88,11 +88,14 @@ public class MapperTest {
             dataList.add(apk);
 
         }
-        /*try {
-            CreateCSVUtils.createCSVFile(dataList, FileConstantUtils.HEAD_LIST);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+
+
+    }
+
+    @Test
+    public void testApkInsert(){
+        int num = apkMapper.insertSelective(new Apk("com.anybeen.mark.app", 0));
+        System.out.println(num);
 
     }
 

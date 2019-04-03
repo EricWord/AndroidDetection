@@ -99,7 +99,7 @@ public class ServiceTest {
      */
     @Test
     public void testAuthorityService() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
 
     }
 
@@ -128,19 +128,19 @@ public class ServiceTest {
     //--------------------------2019.04.03新增批量提取权限测试方法
     @Test
     public void testAuthorityService1() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
 
     }
 
     @Test
     public void testAuthorityService2() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
 
     }
 
     @Test
     public void testAuthorityService3() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput");
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput",0);
 
     }
 
@@ -155,12 +155,12 @@ public class ServiceTest {
     }
     @Test
     public void testGoodApksAPIService2() {
-        apiService.batchSaveApi("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+        apiService.batchSaveApi("", 0);
 
     }
     @Test
     public void testGoodApksAPIService3() {
-        apiService.batchSaveApi("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+        apiService.batchSaveApi("", 0);
 
     }
 

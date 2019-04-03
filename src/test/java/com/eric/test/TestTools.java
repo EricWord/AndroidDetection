@@ -133,7 +133,7 @@ public class TestTools {
      */
     @Test
     public void test8() {
-        authorityService.saveAuthority("E:\\BiSheProjects\\APKs\\des\\com.apicloud.A6989430876027");
+        authorityService.saveAuthority("E:\\BiSheProjects\\APKs\\des\\com.apicloud.A6989430876027",0);
 
     }
 
@@ -157,7 +157,7 @@ public class TestTools {
                 //目录下的所有文件
                 File[] files = file.listFiles();
                 for (File f : files) {
-                    authorityService.saveAuthority(f.getAbsolutePath());
+//                    authorityService.saveAuthority(f.getAbsolutePath());
 
                 }
             }

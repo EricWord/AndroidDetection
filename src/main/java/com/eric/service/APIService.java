@@ -6,9 +6,8 @@ import com.eric.dao.ApiMapper;
 import com.eric.dao.ApkMapper;
 import com.eric.tools.MD5.MD5Utils;
 import com.eric.tools.api.APIHelper;
-import com.eric.tools.api.ApiInsertCallable;
-import com.eric.tools.threadPool.ThreadPoolUtil;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +15,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 /**
  * @ClassName: APIService
@@ -29,6 +25,8 @@ import java.util.logging.Logger;
  */
 @Service
 public class APIService {
+
+    private static  final Logger logger= LoggerFactory.getLogger(APIService.class);
     @Autowired
     ApkMapper apkMapper;
     @Autowired
@@ -212,11 +210,20 @@ public class APIService {
             System.out.println(Thread.currentThread().getName()+"当前正在操作的文件是："+path+":数据库中没有当前api记录，开始插入该api记录....");
             //构建要插入数据库中的api对象
             Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
-            apiMapper.insertSelective(api);
-            System.out.println(Thread.currentThread().getName()+"当前正在操作的文件是："+path+":插入api记录完成....,开始插入api-apk映射关系");
+            //返回值是插入到数据库中的api的数量
+            int apiNum = apiMapper.insertSelective(api);
+            //是否插入成功的判断
+            String isApiInsertSuccess=(apiNum>0)?"成功":"失败";
+            System.out.println(Thread.currentThread().getName()+":api记录映射关系记录插入"+isApiInsertSuccess);
+//            logger.info("{}:api记录插入{}",Thread.currentThread().getName(),isApiInsertSuccess);
+            System.out.println(Thread.currentThread().getName()+"当前正在操作的文件是："+path+":开始插入api-apk映射关系");
             Integer apiId = api.getApiId();
             ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-            apiApkMapMapper.insertSelective(apiApkMap);
+            //插入的api 和apk的映射关系的条数
+            int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
+            String isApiApkInsertSuccess=(apiApkMapNum>0)?"成功":"失败";
+//            logger.info("{}:api-apk映射关系记录插入{}",Thread.currentThread().getName(),isApiApkInsertSuccess);
+            System.out.println(Thread.currentThread().getName()+":api-apk映射关系记录插入"+isApiApkInsertSuccess);
             System.out.println(Thread.currentThread().getName()+"当前正在操作的文件是："+path+"当前正在操作的文件是："+path+":插入api-apk映射关系完成");
         } else if (apis.size() == 1) {
             //数据库中有一条该记录
@@ -234,6 +241,12 @@ public class APIService {
                 ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
                 //插入
                 apiApkMapMapper.insertSelective(apiApkMap);
+                //插入的api 和apk的映射关系的条数
+                int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
+                String isApiApkInsertSuccess=(apiApkMapNum>0)?"成功":"失败";
+
+//                logger.info("{}:api-apk映射关系记录插入{}",Thread.currentThread().getName(),isApiApkInsertSuccess);
+                System.out.println(Thread.currentThread().getName()+":api-apk映射关系记录插入"+isApiApkInsertSuccess);
                 System.out.println(Thread.currentThread().getName()+"当前正在操作的文件是："+path+":api-apk映射关系插入完成....");
             } else if (apiApkMaps.size() == 1) {
                 //数据库中已经存在一条api-apk映射关系

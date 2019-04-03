@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,19 +32,35 @@ public class AuthorityService {
     ApkMapper apkMapper;
     @Autowired
     AuthorityApkMapMapper authorityApkMapMapper;
+    //将所有的AndroidManifest.xml文件路径都存储到队列中
+    List<String> androidManifestXmlList = new ArrayList<>();
 
     /**
-     * 提取权限信息并存入数据库
-     * 注意 一般情况下AndroidManifest.xml只在包名根目录下，但是也存在在其他目录或者包含多个AndroidManifest.xml
-     * 的情形，所以遍历目录的时候不能只遍历一层
+     * 获取id
      *
-     * @param src 源路径，到达包名那一级别
+     * @param apks 应用list
+     * @return id
      */
-    public void saveAuthority(String src) {
+    public int getApkId(List<Apk> apks) {
+        int apkId;//数据库中已经存在
+        //获取Id
+        Apk apk1 = apks.get(0);
+        apkId = apk1.getApkId();
+        return apkId;
+    }
+
+    /**
+     * 存储权限
+     *
+     * @param src          应用包所在路径
+     * @param apkAttribute 应用属性
+     */
+    public void saveAuthority(String src, int apkAttribute) {
         //设置线程池的大小为6，因为每个线程操作的对象是一个AndroidManifest.xml文件，而一个应用反编译后基本该文件不会超过6个
         //所以线程池的数量开到6就可以了
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "6");
         int apkId = -1;
+        String currentPackageName = "";
         //创建文件
         File file = new File(src);
         //文件存在
@@ -51,7 +69,7 @@ public class AuthorityService {
             //列出当前目录下的文件
             File[] files = file.listFiles();
             //这个地方才能获取到正确的包名
-            String currentPackageName = "";
+            List<File> fileList = Arrays.asList(files);
             for (File f : files) {
                 //获取目录的绝对路径
                 String absolutePath = f.getAbsolutePath();
@@ -59,7 +77,7 @@ public class AuthorityService {
                 String[] split = absolutePath.split("\\\\");
                 //包名
                 currentPackageName = split[split.length - 1];
-                apkId = checkBeforeInsert(apkId, currentPackageName);
+                apkId = checkBeforeInsert(apkId, currentPackageName, apkAttribute);
                 fileOperate(apkId, list, currentPackageName, f);
             }
 
@@ -74,10 +92,43 @@ public class AuthorityService {
                     fileOperate(apkId, list, currentPackageName, listFile);
                 }
             }
+
+            if (androidManifestXmlList.size() > 0) {
+                getAuthorityAndInsert(apkId, currentPackageName);
+            }
         } else {
             //文件不存在
             return;
         }
+    }
+
+    /**
+     * 提取权限然后插入
+     *
+     * @param apkId              应用id
+     * @param currentPackageName 当前包名
+     */
+    public void getAuthorityAndInsert(int apkId, String currentPackageName) {
+        String finalCurrentPackageName = currentPackageName;
+        int finalApkId = apkId;
+        androidManifestXmlList.parallelStream().forEach(p -> {
+            File androidManifestXml = new File(p);
+            List<String> authorityList = null;
+            try {
+                //这个方法如果读入到的AndroidManifest.xml是乱码的话会
+                //抛出异常，这里要try一下
+                authorityList = AndroidManifestAnalyze.xmlHandle(androidManifestXml.getAbsolutePath());
+            } catch (Exception e) {
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + finalCurrentPackageName + ":读取xml文件时出现异常");
+            }
+            if (null != authorityList) {
+                System.out.println("线程：" + Thread.currentThread().getName() + "开始执行,正在提取权限的应用名称为:" + finalCurrentPackageName);
+                for (String au : authorityList) {
+                    authorityOperate(finalApkId, au, finalCurrentPackageName);
+                }
+            }
+
+        });
     }
 
     /**
@@ -101,24 +152,7 @@ public class AuthorityService {
             String[] pathArr = path.split("\\\\");
             //判断是否是AndroidManifest.xml文件
             if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
-                //是AndroidManifest.xml文件
-                List<String> authorityList = null;
-                try {
-                    //这个方法如果读入到的AndroidManifest.xml是乱码的话会
-                    //抛出异常，这里要try一下
-                    authorityList = AndroidManifestAnalyze.xmlHandle(path);
-                } catch (Exception e) {
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + currentPackageName + ":读取xml文件时出现异常");
-                }
-                if (null != authorityList) {
-                    int finalApkId = apkId;
-                    String finalCurrentPackageName = currentPackageName;
-                    authorityList.parallelStream().forEach(au -> {
-                        System.out.println("线程：" + Thread.currentThread().getName() + "开始执行,正在提取权限的应用名称为:" + finalCurrentPackageName);
-                        authorityOperate(finalApkId, au, finalCurrentPackageName);
-                    });
-                }
-
+                androidManifestXmlList.add(path);
             }
         }
     }
@@ -131,8 +165,8 @@ public class AuthorityService {
      * @return 应用id
      */
 
-    public int checkBeforeInsert(int apkId, String packageName) {
-        Apk apk = new Apk(packageName, 0);
+    public int checkBeforeInsert(int apkId, String packageName, int apkAtrribute) {
+        Apk apk = new Apk(packageName, apkAtrribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);
         List<Apk> apks = apkMapper.selectByExample(apkExample);
@@ -162,18 +196,6 @@ public class AuthorityService {
         return apkId;
     }
 
-    /**
-     * 遍历文件夹下的所有文件
-     *
-     * @param apkId 应用id
-     * @param list  文件列表
-     * @param files 文件名称数组
-     */
-    public void FileOperate(int apkId, LinkedList<File> list, File[] files, String packageName) {
-        for (File f : files) {
-
-        }
-    }
 
     /**
      * 权限操作方法
