@@ -9,6 +9,7 @@ package com.eric.test;/*
 import com.eric.bean.Apk;
 import com.eric.dao.ApkMapper;
 import com.eric.service.*;
+import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,7 @@ public class ServiceTest {
     DeCompileService deCompileService;
     @Autowired
     CSVService csvService;
-    @Autowired
-    AuthorityService2 authorityService2;
+
 
     /**
      * 测试批量反编译
@@ -128,7 +128,7 @@ public class ServiceTest {
     //--------------------------2019.04.03新增批量提取权限测试方法
     @Test
     public void testAuthorityService1() {
-        authorityService.saveAuthority2("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+        authorityService.saveAuthorityNew("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 
@@ -185,9 +185,15 @@ public class ServiceTest {
 
     }
 
+    /**
+     * 测试获取包名
+     */
     @Test
     public void test99() {
-        authorityService2.saveAuthority("", 0);
+        String name = AndroidManifestAnalyze.findPackage("D:\\cgs\\File\\data\\goodAPKSDeCompileResult\\com.borderxlab.bieyang\\AndroidManifest.xml");
+        System.out.println(name);
+
+
     }
 
 }
