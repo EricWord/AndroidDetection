@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class AuthorityService {
     @Autowired
     AuthorityApkMapMapper authorityApkMapMapper;
     //将所有的AndroidManifest.xml文件路径都存储到队列中
-    List<String> androidManifestXmlList = new ArrayList<>();
+
 
     /**
      * 获取id
@@ -56,9 +55,8 @@ public class AuthorityService {
      * @param apkAttribute 应用属性
      */
     public void saveAuthority(String src, int apkAttribute) {
-        //设置线程池的大小为6，因为每个线程操作的对象是一个AndroidManifest.xml文件，而一个应用反编译后基本该文件不会超过6个
-        //所以线程池的数量开到6就可以了
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "6");
+        List<String> androidManifestXmlList = new ArrayList<>();
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         int apkId = -1;
         String currentPackageName = "";
         //创建文件
@@ -69,7 +67,6 @@ public class AuthorityService {
             //列出当前目录下的文件
             File[] files = file.listFiles();
             //这个地方才能获取到正确的包名
-            List<File> fileList = Arrays.asList(files);
             for (File f : files) {
                 //获取目录的绝对路径
                 String absolutePath = f.getAbsolutePath();
@@ -78,7 +75,7 @@ public class AuthorityService {
                 //包名
                 currentPackageName = split[split.length - 1];
                 apkId = checkBeforeInsert(apkId, currentPackageName, apkAttribute);
-                fileOperate(apkId, list, currentPackageName, f);
+                fileOperate(apkId, list, f,androidManifestXmlList);
             }
 
             File temp;
@@ -89,12 +86,12 @@ public class AuthorityService {
                 File[] listFiles = temp.listFiles();
                 for (File listFile : listFiles) {
                     //遍历每一个文件
-                    fileOperate(apkId, list, currentPackageName, listFile);
+                    fileOperate(apkId, list, listFile,androidManifestXmlList);
                 }
             }
 
             if (androidManifestXmlList.size() > 0) {
-                getAuthorityAndInsert(apkId, currentPackageName);
+                getAuthorityAndInsert(apkId, currentPackageName,androidManifestXmlList);
             }
         } else {
             //文件不存在
@@ -108,7 +105,7 @@ public class AuthorityService {
      * @param apkId              应用id
      * @param currentPackageName 当前包名
      */
-    public void getAuthorityAndInsert(int apkId, String currentPackageName) {
+    public void getAuthorityAndInsert(int apkId, String currentPackageName,List<String>androidManifestXmlList) {
         String finalCurrentPackageName = currentPackageName;
         int finalApkId = apkId;
         androidManifestXmlList.parallelStream().forEach(p -> {
@@ -136,10 +133,9 @@ public class AuthorityService {
      *
      * @param apkId              应用id
      * @param list               文件目录列表
-     * @param currentPackageName 当前包名
      * @param f                  当前文件
      */
-    public void fileOperate(int apkId, LinkedList<File> list, String currentPackageName, File f) {
+    public void fileOperate(int apkId, LinkedList<File> list, File f,List<String> androidManifestXmlList) {
         //是目录
         if (f.isDirectory()) {
             //将文件夹加入队列
