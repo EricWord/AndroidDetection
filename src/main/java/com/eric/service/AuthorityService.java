@@ -91,6 +91,7 @@ public class AuthorityService {
             }
 
             if (androidManifestXmlList.size() > 0) {
+                System.err.println("执行执行了吗？");
                 getAuthorityAndInsert(apkId, currentPackageName,androidManifestXmlList);
             }
         } else {
