@@ -136,6 +136,7 @@ public class AuthorityService {
 
 
     public List<String> getAndroidManifestXmlList(String path) {
+        System.out.println(">>>>>>开始获取AndroidManifest.xml文件列表........");
         List<String> androidManifestXmlList = new ArrayList<>();
         File file = new File(path);
         if (file.exists()) {
@@ -182,6 +183,7 @@ public class AuthorityService {
             System.out.println("文件不存在!");
         }
 
+        System.out.println(">>>>>>获取AndroidManifest.xml文件列表完成........");
         return androidManifestXmlList;
 
 
