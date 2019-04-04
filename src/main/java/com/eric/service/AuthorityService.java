@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -128,36 +129,29 @@ public class AuthorityService {
      * @return 权限清单列表
      */
     public List<String> getAndroidManifestXmlList(String path) {
-        int total = 0;
+        final int[] total = {0};
         System.out.println(">>>>>>开始获取AndroidManifest.xml文件列表........");
         List<String> androidManifestXmlList = new ArrayList<>();
         File file = new File(path);
         if (file.exists()) {
             LinkedList<File> list = new LinkedList<File>();
             File[] files = file.listFiles();
-            for (File file2 : files) {
-                if (file2.isDirectory()) {
-                    //是文件夹
-                    list.add(file2);
-                } else {
-                    //不是文件夹，判断是否是AndroidManifest.xml文件
-                    total = getTotal(total, androidManifestXmlList, file2);
-                }
-            }
+            List<File> rootFileList1 = Arrays.asList(files);
+            rootFileList1.parallelStream().forEach(file2 -> {
+                addFile2List(total, androidManifestXmlList, list, file2);
+
+            });
+
             File temp_file;
             while (!list.isEmpty()) {
                 temp_file = list.removeFirst();
                 files = temp_file.listFiles();
-                for (File file2 : files) {
-                    if (file2.isDirectory()) {
-                        //是文件夹
-                        list.add(file2);
-                    } else {
-                        //不是文件夹，判断是否是AndroidManifest.xml文件
-                        //获取文件路径
-                        total = getTotal(total, androidManifestXmlList, file2);
-                    }
-                }
+                List<File> rootFileList2 = Arrays.asList(files);
+                rootFileList2.parallelStream().forEach(file2 -> {
+                    addFile2List(total, androidManifestXmlList, list, file2);
+
+                });
+
             }
             System.out.println(">>>>>>获取AndroidManifest.xml文件列表完成........");
             return androidManifestXmlList;
@@ -167,11 +161,23 @@ public class AuthorityService {
         }
     }
 
+    public void addFile2List(int[] total, List<String> androidManifestXmlList, LinkedList<File> list, File file2) {
+        if (file2.isDirectory()) {
+            //是文件夹
+            list.add(file2);
+        } else {
+            //不是文件夹，判断是否是AndroidManifest.xml文件
+            //获取文件路径
+            total[0] = getTotal(total[0], androidManifestXmlList, file2);
+        }
+    }
+
     /**
      * 获取队列中的AndroidManifest.xml总数
-     * @param total xml文件总数
+     *
+     * @param total                  xml文件总数
      * @param androidManifestXmlList 文件列表
-     * @param file2 文件
+     * @param file2                  文件
      * @return 返回总数
      */
     public int getTotal(int total, List<String> androidManifestXmlList, File file2) {
