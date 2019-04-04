@@ -148,7 +148,7 @@ public class AuthorityService {
             for (File file2 : files) {
                 //搜寻xml文件的多线程名称
                 String finXmlThreadName = Thread.currentThread().getName();
-                addFile2List(total, androidManifestXmlList, list, file2, finXmlThreadName);
+                total= addFile2List(total, androidManifestXmlList, list, file2, finXmlThreadName);
 
             }
 
@@ -159,7 +159,7 @@ public class AuthorityService {
                 for (File file2 : files) {
                     //搜寻xml文件的多线程名称
                     String finXmlThreadName = Thread.currentThread().getName();
-                    addFile2List(total, androidManifestXmlList, list, file2, finXmlThreadName);
+                    total=addFile2List(total, androidManifestXmlList, list, file2, finXmlThreadName);
 
                 }
 
@@ -172,7 +172,7 @@ public class AuthorityService {
         }
     }
 
-    public void addFile2List(int total, List<String> androidManifestXmlList, LinkedList<File> list, File file2, String finXmlThreadName) {
+    public int addFile2List(int total, List<String> androidManifestXmlList, LinkedList<File> list, File file2, String finXmlThreadName) {
         //当前搜寻路径
         String file2AbsolutePath = file2.getAbsolutePath();
         //System.out.println(finXmlThreadName + ":当前正在搜寻的路径为:" + file2AbsolutePath);
@@ -184,6 +184,7 @@ public class AuthorityService {
             //获取文件路径
             total = getTotal(total, androidManifestXmlList, file2, finXmlThreadName);
         }
+        return total;
     }
 
     /**
