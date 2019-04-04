@@ -146,12 +146,6 @@ public class AuthorityService {
             while (!list.isEmpty()) {
                 temp_file = list.removeFirst();
                 files = temp_file.listFiles();
-              /*  List<File> rootFileList2 = Arrays.asList(files);
-                rootFileList2.parallelStream().forEach(file2 -> {
-                    addFile2List(total, androidManifestXmlList, list, file2);
-
-                });*/
-
                 for (File file2 : files) {
                     addFile2List(total, androidManifestXmlList, list, file2);
 
@@ -167,6 +161,9 @@ public class AuthorityService {
     }
 
     public void addFile2List(int[] total, List<String> androidManifestXmlList, LinkedList<File> list, File file2) {
+        //当前搜寻路径
+        String file2AbsolutePath = file2.getAbsolutePath();
+        System.out.println(Thread.currentThread().getName()+":当前正在搜寻的路径为:"+file2AbsolutePath);
         if (file2.isDirectory()) {
             //是文件夹
             list.add(file2);
