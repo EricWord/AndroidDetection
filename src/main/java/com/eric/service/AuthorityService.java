@@ -146,11 +146,16 @@ public class AuthorityService {
             while (!list.isEmpty()) {
                 temp_file = list.removeFirst();
                 files = temp_file.listFiles();
-                List<File> rootFileList2 = Arrays.asList(files);
+              /*  List<File> rootFileList2 = Arrays.asList(files);
                 rootFileList2.parallelStream().forEach(file2 -> {
                     addFile2List(total, androidManifestXmlList, list, file2);
 
-                });
+                });*/
+
+                for (File file2 : files) {
+                    addFile2List(total, androidManifestXmlList, list, file2);
+
+                }
 
             }
             System.out.println(">>>>>>获取AndroidManifest.xml文件列表完成........");
