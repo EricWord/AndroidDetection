@@ -205,6 +205,16 @@ public class ServiceTest {
 
     }
 
+    @Test
+    public void test101(){
+        List<String> list = authorityService.getAndroidManifestXmlList("D:\\cgs\\File\\data\\goodAPKSDeCompileResult");
+        for (String s : list) {
+            System.out.println(s);
+
+        }
+
+    }
+
 
 
 }

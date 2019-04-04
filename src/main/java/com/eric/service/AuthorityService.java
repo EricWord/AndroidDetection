@@ -37,12 +37,19 @@ public class AuthorityService {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         final int[] apkId = {-1};
-        List<String> androidManifestXmlList = getAndroidManifestXmlList(path);
-        androidManifestXmlList.parallelStream().forEach(xmlPath -> {
+        List<String> amxList = getAndroidManifestXmlList(path);
+        amxList.parallelStream().forEach(xmlPath -> {
             //当前线程名称
             String currentThreadName = Thread.currentThread().getName();
             System.out.println("-------------" + currentThreadName + "线程开始启动-----------");
-            List<String> authorityList = AndroidManifestAnalyze.xmlHandle(xmlPath);
+            List<String> authorityList = null;
+            try{
+                
+                authorityList = AndroidManifestAnalyze.xmlHandle(xmlPath);
+            }catch (Exception e){
+                System.out.println(currentThreadName+":解析xml时出现异常....");
+                
+            }
             //包名
             String packageName = AndroidManifestAnalyze.findPackage(xmlPath);
             Apk apk = new Apk(packageName, apkAttribute);
@@ -131,7 +138,7 @@ public class AuthorityService {
      * @return 权限清单列表
      */
     public List<String> getAndroidManifestXmlList(String path) {
-        final int[] total = {0};
+        int total=0;
         System.out.println(">>>>>>开始获取AndroidManifest.xml文件列表........");
         List<String> androidManifestXmlList = new ArrayList<>();
         File file = new File(path);
@@ -144,13 +151,6 @@ public class AuthorityService {
                 addFile2List(total, androidManifestXmlList, list, file2, finXmlThreadName);
 
             }
-           /* List<File> rootFileList1 = Arrays.asList(files);
-            rootFileList1.parallelStream().forEach(file2 -> {
-                //搜寻xml文件的多线程名称
-                String finXmlThreadName=Thread.currentThread().getName();
-                addFile2List(total, androidManifestXmlList, list, file2,finXmlThreadName);
-
-            });*/
 
             File temp_file;
             while (!list.isEmpty()) {
@@ -172,7 +172,7 @@ public class AuthorityService {
         }
     }
 
-    public void addFile2List(int[] total, List<String> androidManifestXmlList, LinkedList<File> list, File file2, String finXmlThreadName) {
+    public void addFile2List(int total, List<String> androidManifestXmlList, LinkedList<File> list, File file2, String finXmlThreadName) {
         //当前搜寻路径
         String file2AbsolutePath = file2.getAbsolutePath();
         //System.out.println(finXmlThreadName + ":当前正在搜寻的路径为:" + file2AbsolutePath);
@@ -182,7 +182,7 @@ public class AuthorityService {
         } else {
             //不是文件夹，判断是否是AndroidManifest.xml文件
             //获取文件路径
-            total[0] = getTotal(total[0], androidManifestXmlList, file2, finXmlThreadName);
+            total = getTotal(total, androidManifestXmlList, file2, finXmlThreadName);
         }
     }
 
