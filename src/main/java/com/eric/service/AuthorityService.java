@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,8 +40,8 @@ public class AuthorityService {
         List<String> androidManifestXmlList = getAndroidManifestXmlList(path);
         androidManifestXmlList.parallelStream().forEach(xmlPath -> {
             //当前线程名称
-            String currentThreadName=Thread.currentThread().getName();
-            System.out.println("-------------"+currentThreadName+"线程开始启动-----------");
+            String currentThreadName = Thread.currentThread().getName();
+            System.out.println("-------------" + currentThreadName + "线程开始启动-----------");
             List<String> authorityList = AndroidManifestAnalyze.xmlHandle(xmlPath);
             //包名
             String packageName = AndroidManifestAnalyze.findPackage(xmlPath);
@@ -139,13 +138,19 @@ public class AuthorityService {
         if (file.exists()) {
             LinkedList<File> list = new LinkedList<File>();
             File[] files = file.listFiles();
-            List<File> rootFileList1 = Arrays.asList(files);
+            for (File file2 : files) {
+                //搜寻xml文件的多线程名称
+                String finXmlThreadName = Thread.currentThread().getName();
+                addFile2List(total, androidManifestXmlList, list, file2, finXmlThreadName);
+
+            }
+           /* List<File> rootFileList1 = Arrays.asList(files);
             rootFileList1.parallelStream().forEach(file2 -> {
                 //搜寻xml文件的多线程名称
                 String finXmlThreadName=Thread.currentThread().getName();
                 addFile2List(total, androidManifestXmlList, list, file2,finXmlThreadName);
 
-            });
+            });*/
 
             File temp_file;
             while (!list.isEmpty()) {
@@ -153,8 +158,8 @@ public class AuthorityService {
                 files = temp_file.listFiles();
                 for (File file2 : files) {
                     //搜寻xml文件的多线程名称
-                    String finXmlThreadName=Thread.currentThread().getName();
-                    addFile2List(total, androidManifestXmlList, list, file2,finXmlThreadName);
+                    String finXmlThreadName = Thread.currentThread().getName();
+                    addFile2List(total, androidManifestXmlList, list, file2, finXmlThreadName);
 
                 }
 
@@ -167,17 +172,17 @@ public class AuthorityService {
         }
     }
 
-    public void addFile2List(int[] total, List<String> androidManifestXmlList, LinkedList<File> list, File file2,String finXmlThreadName) {
+    public void addFile2List(int[] total, List<String> androidManifestXmlList, LinkedList<File> list, File file2, String finXmlThreadName) {
         //当前搜寻路径
         String file2AbsolutePath = file2.getAbsolutePath();
-        System.out.println(finXmlThreadName+":当前正在搜寻的路径为:"+file2AbsolutePath);
+        System.out.println(finXmlThreadName + ":当前正在搜寻的路径为:" + file2AbsolutePath);
         if (file2.isDirectory()) {
             //是文件夹
             list.add(file2);
         } else {
             //不是文件夹，判断是否是AndroidManifest.xml文件
             //获取文件路径
-            total[0] = getTotal(total[0], androidManifestXmlList, file2,finXmlThreadName);
+            total[0] = getTotal(total[0], androidManifestXmlList, file2, finXmlThreadName);
         }
     }
 
@@ -189,7 +194,7 @@ public class AuthorityService {
      * @param file2                  文件
      * @return 返回总数
      */
-    public int getTotal(int total, List<String> androidManifestXmlList, File file2,String finXmlThreadName) {
+    public int getTotal(int total, List<String> androidManifestXmlList, File file2, String finXmlThreadName) {
         //获取文件路径
         String currentFilePath = file2.getAbsolutePath();
         //按照斜线分割
@@ -198,7 +203,7 @@ public class AuthorityService {
         if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
             androidManifestXmlList.add(currentFilePath);
             total++;
-            System.out.println(finXmlThreadName+"当前获取到的AndroidManifest.xml文件总数为：" + total);
+            System.out.println(finXmlThreadName + "当前获取到的AndroidManifest.xml文件总数为：" + total);
 
         }
         return total;

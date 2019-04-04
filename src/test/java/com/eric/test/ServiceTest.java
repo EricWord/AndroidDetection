@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -195,5 +196,15 @@ public class ServiceTest {
 
 
     }
+
+    @Test
+    public void test100(){
+        List<String> list=new LinkedList<>();
+        String s = ((LinkedList<String>) list).removeFirst();
+        System.out.println(s);
+
+    }
+
+
 
 }

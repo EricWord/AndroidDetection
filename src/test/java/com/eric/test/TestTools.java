@@ -133,7 +133,7 @@ public class TestTools {
      */
     @Test
     public void test8() {
-        authorityService.saveAuthority("E:\\BiSheProjects\\APKs\\des\\com.apicloud.A6989430876027",0);
+//        authorityService.saveAuthority("E:\\BiSheProjects\\APKs\\des\\com.apicloud.A6989430876027",0);
 
     }
 
