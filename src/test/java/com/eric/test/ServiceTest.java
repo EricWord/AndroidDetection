@@ -98,7 +98,7 @@ public class ServiceTest {
      */
     @Test
     public void testAuthorityService() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+//        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 
@@ -134,13 +134,13 @@ public class ServiceTest {
 
     @Test
     public void testAuthorityService2() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+//        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 
     @Test
     public void testAuthorityService3() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+//        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
 
     }
 

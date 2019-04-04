@@ -34,6 +34,8 @@ public class AuthorityService {
 
 
     public void saveAuthorityNew(String path, int apkAttribute) {
+        //设置线程池的大小为10
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         final int[] apkId = {-1};
         List<String> androidManifestXmlList = getAndroidManifestXmlList(path);
         androidManifestXmlList.parallelStream().forEach(xmlPath -> {
@@ -56,7 +58,6 @@ public class AuthorityService {
                 //获取id
                 if (apk.getApkId() != null) {
                     apkId[0] = apk.getApkId();
-
                 } else {
                     System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":返回的id是空");
                 }
@@ -67,7 +68,6 @@ public class AuthorityService {
                 Apk apk1 = apks.get(0);
                 apkId[0] = apk1.getApkId();
             }
-
             for (String au : authorityList) {
                 //获取权限的md5值
                 String auMd5 = MD5Utils.MD5Encode(au, "utf8");
@@ -78,7 +78,6 @@ public class AuthorityService {
                     System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":authorityMapper为空");
                 } else {
                     authorities = authorityMapper.selectByExample(authorityExample);
-
                 }
                 //数据库中没有该权限
                 if (authorities.size() == 0) {
@@ -107,7 +106,6 @@ public class AuthorityService {
                         System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk映射关系插入完成");
                     } else if (authorityApkMaps.size() == 1) {
                         System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在一条权限-apk映射关系记录，本次未执行插入操作");
-
                     } else if (authorityApkMaps.size() > 1) {
                         //理论上不可能大于1
                         System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>数据库中存在多条相同的权限-apk映射关系");
@@ -118,12 +116,8 @@ public class AuthorityService {
                     System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>>数据库中存在多条相同的权限记录");
 
                 }
-
             }
-
-
         });
-
     }
 
 
@@ -133,8 +127,6 @@ public class AuthorityService {
      * @param path 路径
      * @return 权限清单列表
      */
-
-
     public List<String> getAndroidManifestXmlList(String path) {
         int total = 0;
         System.out.println(">>>>>>开始获取AndroidManifest.xml文件列表........");
@@ -149,17 +141,7 @@ public class AuthorityService {
                     list.add(file2);
                 } else {
                     //不是文件夹，判断是否是AndroidManifest.xml文件
-                    //获取文件路径
-                    String currentFilePath = file2.getAbsolutePath();
-                    //按照斜线分割
-                    String[] pathArr = currentFilePath.split("\\\\");
-                    //判断是否是AndroidManifest.xml文件
-                    if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
-                        androidManifestXmlList.add(currentFilePath);
-                        total++;
-                        System.out.println("当前获取到的AndroidManifest.xml文件总数为：" + total);
-
-                    }
+                    total = getTotal(total, androidManifestXmlList, file2);
                 }
             }
             File temp_file;
@@ -173,15 +155,7 @@ public class AuthorityService {
                     } else {
                         //不是文件夹，判断是否是AndroidManifest.xml文件
                         //获取文件路径
-                        String currentFilePath = file2.getAbsolutePath();
-                        //按照斜线分割
-                        String[] pathArr = currentFilePath.split("\\\\");
-                        //判断是否是AndroidManifest.xml文件
-                        if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
-                            androidManifestXmlList.add(currentFilePath);
-                            total++;
-                            System.out.println("当前获取到的AndroidManifest.xml文件总数为：" + total);
-                        }
+                        total = getTotal(total, androidManifestXmlList, file2);
                     }
                 }
             }
@@ -191,10 +165,28 @@ public class AuthorityService {
             System.out.println("文件不存在!");
             return null;
         }
+    }
 
+    /**
+     * 获取队列中的AndroidManifest.xml总数
+     * @param total xml文件总数
+     * @param androidManifestXmlList 文件列表
+     * @param file2 文件
+     * @return 返回总数
+     */
+    public int getTotal(int total, List<String> androidManifestXmlList, File file2) {
+        //获取文件路径
+        String currentFilePath = file2.getAbsolutePath();
+        //按照斜线分割
+        String[] pathArr = currentFilePath.split("\\\\");
+        //判断是否是AndroidManifest.xml文件
+        if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
+            androidManifestXmlList.add(currentFilePath);
+            total++;
+            System.out.println("当前获取到的AndroidManifest.xml文件总数为：" + total);
 
-
-
+        }
+        return total;
     }
 
     /**
@@ -250,6 +242,5 @@ public class AuthorityService {
         apkCriteria.andPackageNameEqualTo(packageName);
         return apkExample;
     }
-
 
 }
