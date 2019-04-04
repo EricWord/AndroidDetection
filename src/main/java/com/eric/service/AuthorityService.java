@@ -175,7 +175,7 @@ public class AuthorityService {
     public void addFile2List(int[] total, List<String> androidManifestXmlList, LinkedList<File> list, File file2, String finXmlThreadName) {
         //当前搜寻路径
         String file2AbsolutePath = file2.getAbsolutePath();
-        System.out.println(finXmlThreadName + ":当前正在搜寻的路径为:" + file2AbsolutePath);
+        //System.out.println(finXmlThreadName + ":当前正在搜寻的路径为:" + file2AbsolutePath);
         if (file2.isDirectory()) {
             //是文件夹
             list.add(file2);
