@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -210,6 +211,25 @@ public class ServiceTest {
         List<String> list = authorityService.getAndroidManifestXmlList("D:\\cgs\\File\\data\\goodAPKSDeCompileResult");
         for (String s : list) {
             System.out.println(s);
+
+        }
+
+    }
+
+    /**
+     * 针对批量提取权限效率较高的情况，专门设计的测试方法
+     */
+
+    @Test
+    public void bestBatchInsertAuthority(){
+        File file = new File("");
+        if(file.isDirectory()){
+            File[] currentFiles = file.listFiles();
+            for (File currentFile : currentFiles) {
+                if(currentFile.isDirectory()){
+                    authorityService.saveAuthorityNew(currentFile.getAbsolutePath(),0);
+                }
+            }
 
         }
 
