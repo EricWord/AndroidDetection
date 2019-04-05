@@ -201,7 +201,7 @@ public class AuthorityService {
         //按照斜线分割
         String[] pathArr = currentFilePath.split("\\\\");
         //判断是否是AndroidManifest.xml文件
-        if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")) {
+        if (pathArr[pathArr.length - 1].equals("AndroidManifest.xml")&&!pathArr[pathArr.length - 2].equals("original")) {
             androidManifestXmlList.add(currentFilePath);
             total++;
             System.out.println(finXmlThreadName + "当前获取到的AndroidManifest.xml文件总数为：" + total);

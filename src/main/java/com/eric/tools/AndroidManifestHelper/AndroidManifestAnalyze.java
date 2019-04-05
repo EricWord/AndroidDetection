@@ -1,6 +1,5 @@
 package com.eric.tools.AndroidManifestHelper;
 
-import com.eric.tools.cmd.CMDHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -21,9 +20,9 @@ public class AndroidManifestAnalyze {
      * @param filePath
      */
     public static List<String> xmlHandle(String filePath) {
-        String newPath = filePath.replace("AndroidManifest.xml", "AndroidManifestNew.xml");
+//        String newPath = filePath.replace("AndroidManifest.xml", "AndroidManifestNew.xml");
 
-        CMDHelper.exeCmd("java -jar D:/cgs/software/jar/AXMLPrinter2.jar "+filePath,newPath);
+//        CMDHelper.exeCmd("java -jar D:/cgs/software/jar/AXMLPrinter2.jar "+filePath,newPath);
         List<String> permissions = new ArrayList();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -33,7 +32,7 @@ public class AndroidManifestAnalyze {
             Document document = null;
             try {
                 //这个地方可能会有异常
-                document = db.parse(newPath);
+                document = db.parse(filePath);
             } catch (Exception e) {
                 System.out.println(Thread.currentThread().getName() + ":解析xml文件时出现异常");
             }
