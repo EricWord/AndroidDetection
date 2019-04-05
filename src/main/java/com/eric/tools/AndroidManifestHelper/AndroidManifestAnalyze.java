@@ -62,11 +62,21 @@ public class AndroidManifestAnalyze {
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
-        Node node = doc.getFirstChild();
-        NamedNodeMap attrs = node.getAttributes();
-        for (int i = 0; i < attrs.getLength(); i++) {
-            if (attrs.item(i).getNodeName() == "package") {
-                return attrs.item(i).getNodeValue();
+        Node node = null;
+        if (doc.getFirstChild() != null) {
+
+            node = doc.getFirstChild();
+        }
+        NamedNodeMap attrs = null;
+        if (null != node) {
+
+            attrs = node.getAttributes();
+        }
+        if (null != attrs) {
+            for (int i = 0; i < attrs.getLength(); i++) {
+                if (attrs.item(i).getNodeName() == "package") {
+                    return attrs.item(i).getNodeValue();
+                }
             }
         }
         return null;
