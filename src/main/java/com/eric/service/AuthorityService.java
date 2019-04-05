@@ -105,7 +105,7 @@ public class AuthorityService {
                     Authority authority = authorities.get(0);
                     Integer authorityId = authority.getAuthorityId();
                     //查询映射关系是否在数据库中已经存在
-                    AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId);
+                    AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId,apkId[0]);
                     List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
                     //数据库中没有该映射关系
                     if (authorityApkMaps.size() == 0) {
@@ -231,10 +231,11 @@ public class AuthorityService {
      * @param authorityId 权限id
      * @return example
      */
-    public AuthorityApkMapExample getAuthorityApkMapExample(Integer authorityId) {
+    public AuthorityApkMapExample getAuthorityApkMapExample(Integer authorityId,int apkId) {
         AuthorityApkMapExample authorityApkMapExample = new AuthorityApkMapExample();
         AuthorityApkMapExample.Criteria authorityApkMapCriteria = authorityApkMapExample.createCriteria();
         authorityApkMapCriteria.andAuthorityIdEqualTo(authorityId);
+        authorityApkMapCriteria.andApkIdEqualTo(apkId);
         return authorityApkMapExample;
     }
 
