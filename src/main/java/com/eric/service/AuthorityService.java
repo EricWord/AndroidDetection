@@ -37,7 +37,8 @@ public class AuthorityService {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         final int[] apkId = {-1};
-        List<String> amxList = getAndroidManifestXmlList(path);
+//        List<String> amxList = getAndroidManifestXmlList(path);
+        List<String> amxList = getSimpleAndroidManifestXmlList(path);
         if(amxList!=null&&amxList.size()>0) amxList.parallelStream().forEach(xmlPath -> {
             //当前线程名称
             String currentThreadName = Thread.currentThread().getName();
@@ -170,6 +171,42 @@ public class AuthorityService {
             System.out.println("文件不存在!");
             return null;
         }
+    }
+
+
+    public List<String> getSimpleAndroidManifestXmlList(String path) {
+        int total=0;
+        System.out.println(">>>>>>开始获取AndroidManifest.xml文件列表........");
+        List<String> androidManifestXmlList = new ArrayList<>();
+        File file = new File(path);
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                if(f.isDirectory()){
+                    File[] currentFiles = f.listFiles();
+                    for (File currentFile : currentFiles) {
+                        if(!currentFile.isDirectory()){
+                            String currentFileAbsolutePath = currentFile.getAbsolutePath();
+                            String[] arr = currentFileAbsolutePath.split("\\\\");
+                            if(arr[arr.length-1].equals("AndroidManifest.xml")){
+                                androidManifestXmlList.add(currentFileAbsolutePath);
+                                total++;
+                                System.out.println("当前获取到的AndroidManifest.xml数量为："+total);
+
+
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+        return  null;
+
     }
 
     public int addFile2List(int total, List<String> androidManifestXmlList, LinkedList<File> list, File file2, String finXmlThreadName) {
