@@ -17,4 +17,11 @@ public class CMDTest {
         CMDHelper.exeCmd("java -jar D:/cgs/software/jar/AXMLPrinter2.jar D:\\cgs\\File\\data\\goodAPKSDeCompileResult\\com.boetech.xiangread\\original\\AndroidManifest.xml","D:\\cgs\\File\\data\\goodAPKSDeCompileResult\\com.boetech.xiangread\\original\\AndroidManifestNew.xml");
 
     }
+    @Test
+    public  void test2(){
+        String s="abc";
+        String newS = s.replace("b", "e");
+        System.out.println("newS="+newS+",s="+s);
+
+    }
 }
