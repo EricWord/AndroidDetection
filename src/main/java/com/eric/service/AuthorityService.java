@@ -205,7 +205,7 @@ public class AuthorityService {
 
         }
 
-        return  null;
+        return  androidManifestXmlList;
 
     }
 
