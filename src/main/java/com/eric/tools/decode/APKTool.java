@@ -28,6 +28,7 @@ public class APKTool {
         }
         ApkDecoder decoder = new ApkDecoder();
         decoder.setApkFile(new File(src));
+//        decoder.
         try {
             decoder.setOutDir(new File(dest));
             decoder.decode();

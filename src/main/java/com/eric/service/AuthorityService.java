@@ -38,8 +38,7 @@ public class AuthorityService {
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
         final int[] apkId = {-1};
         List<String> amxList = getAndroidManifestXmlList(path);
-        if(amxList!=null&&amxList.size()>0)
-        amxList.parallelStream().forEach(xmlPath -> {
+        if(amxList!=null&&amxList.size()>0) amxList.parallelStream().forEach(xmlPath -> {
             //当前线程名称
             String currentThreadName = Thread.currentThread().getName();
             System.out.println("-------------" + currentThreadName + "线程开始启动-----------");
