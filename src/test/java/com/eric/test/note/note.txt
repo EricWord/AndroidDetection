@@ -12,3 +12,4 @@ SELECT COUNT(*) FROM tb_api_apk_map;
 SELECT COUNT(*) FROM tb_authority_apk_map;
 
 
+SELECT api_content,COUNT(*) AS num FROM tb_api GROUP BY api_content HAVING num>1;
