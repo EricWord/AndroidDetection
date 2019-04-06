@@ -126,7 +126,7 @@ public class APIService {
         //文件路径
         String filePath = newCurrentFile.getAbsolutePath();
         //该文件是否.smali文件
-        int len=filePath.length();
+        int len = filePath.length();
         String s = filePath.substring(filePath.length() - 6, len);
         if (s.equals(".smali")) {
             //提取API信息
@@ -156,37 +156,41 @@ public class APIService {
         ApkExample.Criteria apkCriteria = apkExample.createCriteria();
         apkCriteria.andPackageNameEqualTo(packageName);
         apkCriteria.andApkAttributeEqualTo(apkAttribute);
-        List<Apk> apks = apkMapper.selectByExample(apkExample);
-        if (apks.size() == 0) {
-            //数据库中没有，插入
-            if (null != apkMapper) {
-                System.out.println(Thread.currentThread().getName() + ":数据库中没有该apk记录，正在执行插入....");
 
-                //插入成功的apk记录数
-                int apkInsertNum = apkMapper.insertSelective(apk);
-                if (apkInsertNum > 0) {
-                    System.out.println(Thread.currentThread().getName() + ":apk记录插入成功");
+        //加锁保证线程安全
+        synchronized (this) {
+            List<Apk> apks = apkMapper.selectByExample(apkExample);
+            if (apks.size() == 0) {
+                //数据库中没有，插入
+                if (null != apkMapper) {
+                    System.out.println(Thread.currentThread().getName() + ":数据库中没有该apk记录，正在执行插入....");
+
+                    //插入成功的apk记录数
+                    int apkInsertNum = apkMapper.insertSelective(apk);
+                    if (apkInsertNum > 0) {
+                        System.out.println(Thread.currentThread().getName() + ":apk记录插入成功");
+
+                    } else {
+                        System.err.println(Thread.currentThread().getName() + ":apk记录插入失败");
+                    }
+                } else {
+                    System.out.println(Thread.currentThread().getName() + ":apkMapper为空");
+                }
+
+                //获取id
+                if (apk.getApkId() != null) {
+
+                    apkId = apk.getApkId();
 
                 } else {
-                    System.err.println(Thread.currentThread().getName() + ":apk记录插入失败");
+                    System.out.println(Thread.currentThread().getName() + ":返回的id是空");
                 }
-            } else {
-                System.out.println(Thread.currentThread().getName() + ":apkMapper为空");
-            }
 
-            //获取id
-            if (apk.getApkId() != null) {
-
-                apkId = apk.getApkId();
 
             } else {
-                System.out.println(Thread.currentThread().getName() + ":返回的id是空");
+                //数据库中已经存在与当前api相同的记录
+                apkId = getApkId(apks);
             }
-
-
-        } else {
-            //数据库中已经存在与当前api相同的记录
-            apkId = getApkId(apks);
         }
         return apkId;
     }
@@ -213,69 +217,76 @@ public class APIService {
      * @param s2    提示信息
      */
     public void apiOperate(int apkId, String item, String s2, String path) {
-        String md5Value = MD5Utils.MD5Encode(item, "utf8");
-        //先查询数据库中有没有该API
-        ApiExample apiExample = getApiExample(md5Value);
-        List<Api> apis = null;
-        if (apiMapper == null) {
-            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":ApiService中的apiMapper是空");
-        } else {
-            apis = apiMapper.selectByExample(apiExample);
-        }
-        //数据库中没有该API记录
-        if (apis.size() == 0) {
-            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中没有当前api记录，开始插入该api记录....");
-            //构建要插入数据库中的api对象
-            Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
-            //返回值是插入到数据库中的api的数量
-            int apiNum = apiMapper.insertSelective(api);
-            //是否插入成功的判断
-            String isApiInsertSuccess = (apiNum > 0) ? "成功" : "失败";
-            System.out.println(Thread.currentThread().getName() + ":api记录映射关系记录插入" + isApiInsertSuccess);
-            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":开始插入api-apk映射关系");
-            Integer apiId = api.getApiId();
-            ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-            //插入的api 和apk的映射关系的条数
-            int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
-            String isApiApkInsertSuccess = (apiApkMapNum > 0) ? "成功" : "失败";
-            System.out.println(Thread.currentThread().getName() + ":api-apk映射关系记录插入" + isApiApkInsertSuccess);
-            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + "当前正在操作的文件是：" + path + ":插入api-apk映射关系完成");
-        } else if (apis.size() == 1) {
-            //数据库中有一条该记录
-            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中存在当前api记录，正在查询api-apk映射关系是否存在....");
-            Api api1 = null;
-            api1 = apis.get(0);
-            //获取api id
-            Integer apiId = api1.getApiId();
-            //查询映射关系是否在数据库中已经存在
-            ApiApkMapExample apiApkMapExample = getApiApkMapExample(apkId, apiId);
-            List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
-            if (apiApkMaps.size() == 0) {
-                //数据库中没有该映射关系
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中不存在当前api-apk映射关系，正在插入该映射关系...");
+        //当多线程向数据库中插入数据时肯定会存在线程安全问题，所以在进行插入操作时一定要加锁
+        //虽然每个线程操作的对象是包名
+        //但是多线程可能会同时调用这个方法，进而导致线程安全问题
+        //至于加锁的粒度，感觉只能这个粒度了，再小就不能保证线程安全了
+        //插入权限时也是同样的问题
+        synchronized (this) {
+            String md5Value = MD5Utils.MD5Encode(item, "utf8");
+            //先查询数据库中有没有该API
+            ApiExample apiExample = getApiExample(md5Value);
+            List<Api> apis = null;
+            if (apiMapper == null) {
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":ApiService中的apiMapper是空");
+            } else {
+                apis = apiMapper.selectByExample(apiExample);
+            }
+            //数据库中没有该API记录
+            if (apis.size() == 0) {
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中没有当前api记录，开始插入该api记录....");
+                //构建要插入数据库中的api对象
+                Api api = new Api(item, MD5Utils.MD5Encode(item, "utf8"));
+                //返回值是插入到数据库中的api的数量
+                int apiNum = apiMapper.insertSelective(api);
+                //是否插入成功的判断
+                String isApiInsertSuccess = (apiNum > 0) ? "成功" : "失败";
+                System.out.println(Thread.currentThread().getName() + ":api记录映射关系记录插入" + isApiInsertSuccess);
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":开始插入api-apk映射关系");
+                Integer apiId = api.getApiId();
                 ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-                //插入
-                apiApkMapMapper.insertSelective(apiApkMap);
                 //插入的api 和apk的映射关系的条数
                 int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
                 String isApiApkInsertSuccess = (apiApkMapNum > 0) ? "成功" : "失败";
-
                 System.out.println(Thread.currentThread().getName() + ":api-apk映射关系记录插入" + isApiApkInsertSuccess);
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":api-apk映射关系插入完成....");
-            } else if (apiApkMaps.size() == 1) {
-                //数据库中已经存在一条api-apk映射关系
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中已经存在一条api-apk映射关系，本次未进行插入操作");
-            } else if (apiApkMaps.size() > 1) {
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + "当前正在操作的文件是：" + path + ":插入api-apk映射关系完成");
+            } else if (apis.size() == 1) {
+                //数据库中有一条该记录
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中存在当前api记录，正在查询api-apk映射关系是否存在....");
+                Api api1 = null;
+                api1 = apis.get(0);
+                //获取api id
+                Integer apiId = api1.getApiId();
+                //查询映射关系是否在数据库中已经存在
+                ApiApkMapExample apiApkMapExample = getApiApkMapExample(apkId, apiId);
+                List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
+                if (apiApkMaps.size() == 0) {
+                    //数据库中没有该映射关系
+                    System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中不存在当前api-apk映射关系，正在插入该映射关系...");
+                    ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
+                    //插入
+                    apiApkMapMapper.insertSelective(apiApkMap);
+                    //插入的api 和apk的映射关系的条数
+                    int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
+                    String isApiApkInsertSuccess = (apiApkMapNum > 0) ? "成功" : "失败";
+
+                    System.out.println(Thread.currentThread().getName() + ":api-apk映射关系记录插入" + isApiApkInsertSuccess);
+                    System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":api-apk映射关系插入完成....");
+                } else if (apiApkMaps.size() == 1) {
+                    //数据库中已经存在一条api-apk映射关系
+                    System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中已经存在一条api-apk映射关系，本次未进行插入操作");
+                } else if (apiApkMaps.size() > 1) {
+                    //数据库中存在多条相同的映射关系
+                    //理论上不可能
+                    System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中存在多条相同的api-apk映射关系记录，记录数为:" + apiApkMaps.size());
+                }
+            } else if (apis.size() > 1) {
+                //数据库中有多余一条记录
                 //数据库中存在多条相同的映射关系
                 //理论上不可能
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中存在多条相同的api-apk映射关系记录，记录数为:" + apiApkMaps.size());
-            }
-        } else if (apis.size() > 1) {
-            //数据库中有多余一条记录
-            //数据库中存在多条相同的映射关系
-            //理论上不可能
-            System.out.println(Thread.currentThread().getName() + ":" + s2 + apis.size());
+                System.out.println(Thread.currentThread().getName() + ":" + s2 + apis.size());
 
+            }
         }
     }
 
