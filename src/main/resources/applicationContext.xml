@@ -34,7 +34,7 @@
         <!--连接池中保存的最少连接数目-->
         <property name="minPoolSize" value="10"/>
         <!-- 初始化连接大小 -->
-        <property name="initialPoolSize" value="10"/>
+        <property name="initialPoolSize" value="20"/>
         <!-- 获取连接最大等待时间 -->
         <property name="maxConnectionAge" value="6000"/>
         <!-- 连接池最大空闲 -->

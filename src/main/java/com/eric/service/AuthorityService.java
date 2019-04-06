@@ -9,6 +9,7 @@ import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import com.eric.tools.MD5.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
@@ -24,7 +25,7 @@ import java.util.List;
  * @Email: xiao_cui_vip@163.com
  */
 @Service
-@Transactional
+
 public class AuthorityService {
 
     @Autowired
@@ -36,6 +37,7 @@ public class AuthorityService {
     AuthorityApkMapMapper authorityApkMapMapper;
 
 
+    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
     public void saveAuthority(String path, int apkAttribute) {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "30");
