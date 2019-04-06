@@ -33,9 +33,9 @@ public class AuthorityService {
     AuthorityApkMapMapper authorityApkMapMapper;
 
 
-    public void saveAuthorityNew(String path, int apkAttribute) {
+    public void saveAuthority(String path, int apkAttribute) {
         //设置线程池的大小为10
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "20");
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "30");
         final int[] apkId = {-1};
 //        List<String> amxList = getAndroidManifestXmlList(path);
         List<String> amxList = getSimpleAndroidManifestXmlList(path);

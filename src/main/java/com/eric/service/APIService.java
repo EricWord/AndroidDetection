@@ -42,7 +42,7 @@ public class APIService {
      */
     public void batchSaveApi(String src, int apkAttribute) {
         //设置线程池的大小为10
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "10");
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "50");
         File file = new File(src);
         //判断文件是否存在
         if (file.exists()) {
