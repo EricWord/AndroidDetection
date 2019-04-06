@@ -130,6 +130,11 @@ public class MapperTest {
                 for (ApiApkMap apkMap : apiApkMapList) {
                     System.out.println(apkMap.getApkId() + "--" + apkMap.getApiId());
                 }
+            }else{
+                for (ApiApkMap apkMap : apiApkMapList) {
+                    System.out.println("apkId="+apkMap.getApkId() + ":apiId=" + apkMap.getApiId());
+                }
+
             }
         }
 
@@ -140,7 +145,26 @@ public class MapperTest {
      * 测试获取第一个元素
      */
     @Test
-    public void testGetFirst(){
+    public void testApiApkMap(){
+        ApiApkMapExample apiApkMapExample = new ApiApkMapExample();
+        ApiApkMapExample.Criteria criteria = apiApkMapExample.createCriteria();
+        criteria.andApiIdEqualTo(301);
+        criteria.andApkIdEqualTo(1);
+        List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
+        if(apiApkMaps.size()>=2){
+            System.out.println("数据库中存在多条相同记录");
+        }
+        if(apiApkMaps.size()==1){
+            System.out.println("数据库中已经由一条记录，未执行任何操作...");
+
+        }
+        if(apiApkMaps.size()==0){
+            ApiApkMap apiApkMap = new ApiApkMap(1,301);
+            int i = apiApkMapMapper.insertSelective(apiApkMap);
+            System.out.println("成功插入"+i+"条记录");
+
+        }
+
 
 
     }

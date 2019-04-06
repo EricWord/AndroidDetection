@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,9 +56,7 @@ public class APIService {
                 LinkedList<File> list = new LinkedList<>();
                 //目录下的所有文件
                 File[] files = file.listFiles();
-                //转为list，为了使用jdk8中的多线程并发，见其下面的那行代码
-                List<File> fileList = Arrays.asList(files);
-                fileList.parallelStream().forEach(f -> {
+                for (File f : files) {
                     //获取当前正在执行的线程的名称
                     String currentThreadName = Thread.currentThread().getName();
                     //输出当前开始执行的线程名称
@@ -108,7 +105,13 @@ public class APIService {
                         }
                     }
                     System.out.println("--------------线程" + currentThreadName + "执行结束------------");
-                });
+
+                }
+                //转为list，为了使用jdk8中的多线程并发，见其下面的那行代码
+              /*  List<File> fileList = Arrays.asList(files);
+                fileList.parallelStream().forEach(f -> {
+
+                });*/
             } else {
                 //不是目录
                 System.out.println(Thread.currentThread().getName() + ":>>>>>>>>>>>>请输入包含应用包名的路径！");
