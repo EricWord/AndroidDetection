@@ -99,5 +99,19 @@ public class MapperTest {
 
     }
 
+    /**
+     * 测试如果数据库不存在要查询的记录，返回结果是什么
+     */
+    @Test
+    public  void testSelectByExample(){
+        ApkExample apkExample = new ApkExample();
+        ApkExample.Criteria apkCriteria = apkExample.createCriteria();
+        apkCriteria.andPackageNameEqualTo("packageName20190406");
+        apkCriteria.andApkAttributeEqualTo(3);
+        List<Apk> apks = apkMapper.selectByExample(apkExample);
+        System.out.println(apks.size());
+
+    }
+
 
 }

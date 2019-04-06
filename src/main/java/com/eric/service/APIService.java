@@ -155,6 +155,7 @@ public class APIService {
         ApkExample apkExample = new ApkExample();
         ApkExample.Criteria apkCriteria = apkExample.createCriteria();
         apkCriteria.andPackageNameEqualTo(packageName);
+        apkCriteria.andApkAttributeEqualTo(apkAttribute);
         List<Apk> apks = apkMapper.selectByExample(apkExample);
         if (apks.size() == 0) {
             //数据库中没有，插入
@@ -184,6 +185,7 @@ public class APIService {
 
 
         } else {
+            //数据库中已经存在与当前api相同的记录
             apkId = getApkId(apks);
         }
         return apkId;
@@ -216,7 +218,7 @@ public class APIService {
         ApiExample apiExample = getApiExample(md5Value);
         List<Api> apis = null;
         if (apiMapper == null) {
-            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":ApiInsertCallable中的apiMapper是空");
+            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":ApiService中的apiMapper是空");
         } else {
             apis = apiMapper.selectByExample(apiExample);
         }
