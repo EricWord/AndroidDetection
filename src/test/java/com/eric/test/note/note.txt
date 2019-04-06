@@ -13,3 +13,5 @@ SELECT COUNT(*) FROM tb_authority_apk_map;
 
 
 SELECT api_content,COUNT(*) AS num FROM tb_api GROUP BY api_content HAVING num>1;
+#查询重复的记录数
+SELECT api_content,COUNT(*) AS total FROM tb_api GROUP BY api_content HAVING COUNT(1)>1;
