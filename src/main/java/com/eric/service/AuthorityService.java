@@ -9,6 +9,7 @@ import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import com.eric.tools.MD5.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
  * @Email: xiao_cui_vip@163.com
  */
 @Service
+@Transactional
 public class AuthorityService {
 
     @Autowired
@@ -88,17 +90,13 @@ public class AuthorityService {
             } else {
                 authorities = authorityMapper.selectByExample(authorityExample);
             }
-            //数据库中没有该权限
-            if (authorities.size() == 0) {
-                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该权限记录,正在执行插入操作....");
-                Authority authority = new Authority(au, auMd5);
-                authorityMapper.insertSelective(authority);
-                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限记录插入成功，正在插入权限-apk关系...");
-                Integer authorityId = authority.getAuthorityId();
-                AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
-                authorityApkMapMapper.insertSelective(authorityApkMap);
-                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk关系插入成功");
+
+            if (authorities.size() > 1) {
+                //存在多余1条的权限，理论上不可能,出现则抛出异常
+                new MultipleDuplicateValuesInDatabaseException("数据库中存在" + authorities.size() + "条相同的权限信息");
+
             }
+
             if (authorities.size() == 1) {
                 //数据库中有1条权限记录
                 System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在1条该权限记录，正在查询权限-apk映射关系是否存在....");
@@ -124,12 +122,20 @@ public class AuthorityService {
                 }
 
             }
-            if (authorities.size() > 1) {
-                //存在多余1条的权限，理论上不可能,出现则抛出异常
-//                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>>数据库中存在多条相同的权限记录");
-                new MultipleDuplicateValuesInDatabaseException("数据库中存在" + authorities.size() + "条相同的权限信息");
 
+            //数据库中没有该权限
+            if (authorities.size() == 0) {
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该权限记录,正在执行插入操作....");
+                Authority authority = new Authority(au, auMd5);
+                authorityMapper.insertSelective(authority);
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限记录插入成功，正在插入权限-apk关系...");
+                Integer authorityId = authority.getAuthorityId();
+                AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
+                authorityApkMapMapper.insertSelective(authorityApkMap);
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk关系插入成功");
             }
+
+
         }
     }
 
@@ -145,6 +151,19 @@ public class AuthorityService {
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);
         List<Apk> apks = apkMapper.selectByExample(apkExample);
+        if (apks.size() >= 2) {
+            //理论上不可能，出现就抛出异常
+            throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apks.size() + "条相同的apk记录");
+
+        }
+        //数据库中已经存在一条相同的apk记录
+        if (apks.size() == 1) {
+            System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库已经存在该apk记录，记录数为：" + apks.size());
+            //获取Id
+            Apk apk1 = apks.get(0);
+            apkId[0] = apk1.getApkId();
+        }
+
         if (apks.size() == 0) {
             System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该apk记录，正在执行插入....");
             //数据库中没有，插入
@@ -161,18 +180,8 @@ public class AuthorityService {
                 System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":返回的id是空");
             }
         }
-        //数据库中已经存在一条相同的apk记录
-        if (apks.size() == 1) {
-            System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库已经存在该apk记录，记录数为：" + apks.size());
-            //获取Id
-            Apk apk1 = apks.get(0);
-            apkId[0] = apk1.getApkId();
-        }
-        if (apks.size() >= 2) {
-            //理论上不可能，出现就抛出异常
-            throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apks.size() + "条相同的apk记录");
 
-        }
+
     }
 
 

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import java.util.List;
  * @Email: xiao_cui_vip@163.com
  */
 @Service
+@Transactional
 public class APIService {
 
     private static final Logger logger = LoggerFactory.getLogger(APIService.class);
@@ -43,7 +45,7 @@ public class APIService {
      */
     public void batchSaveApi(String src, int apkAttribute) {
         //设置线程池的大小为10
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "50");
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "15");
         File file = new File(src);
         //判断文件是否存在
         if (file.exists()) {
@@ -64,15 +66,11 @@ public class APIService {
                     String path = f.getAbsolutePath();
                     int apkId = -1;
                     apkId = checkBeforeInsertApi(apkAttribute, path, apkId);
-                    //当前操作的文件
-//                    File currentFile = new File(path);
                     //文件存在
                     if (f.exists()) {
                         //判断是文件还是文件夹
                         //如果是文件夹
                         if (f.isDirectory()) {
-
-
                             File[] currentFileArray = f.listFiles();
                             //遍历每一个文件
                             for (File newCurrentFile : currentFileArray) {
@@ -150,7 +148,7 @@ public class APIService {
      * @param apkId        应用id
      * @return 当前应用id
      */
-    public int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
+    public synchronized int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
         //获取应用的包名
         String[] split = path.split("\\\\");
         //获取包名
@@ -162,8 +160,6 @@ public class APIService {
         apkCriteria.andPackageNameEqualTo(packageName);
         apkCriteria.andApkAttributeEqualTo(apkAttribute);
 
-        //加锁保证线程安全
-        synchronized (this) {
             List<Apk> apks = apkMapper.selectByExample(apkExample);
             if (apks.size() == 0) {
                 //数据库中没有，插入
@@ -196,7 +192,6 @@ public class APIService {
                 //数据库中已经存在与当前api相同的记录
                 apkId = getApkId(apks);
             }
-        }
         return apkId;
     }
 
@@ -236,6 +231,49 @@ public class APIService {
         } else {
             apis = apiMapper.selectByExample(apiExample);
         }
+        if (apis.size() > 1) {
+            //数据库中有多余一条记录
+            //数据库中存在多条相同的映射关系
+            //理论上不可能,如果出现，直接抛出异常
+            throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apis.size() + "条重复的api记录");
+
+        }
+
+        if (apis.size() == 1) {
+            //数据库中有一条该记录
+            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中存在当前api记录，正在查询api-apk映射关系是否存在....");
+            Api api1 = null;
+            api1 = apis.get(0);
+            //获取api id
+            Integer apiId = api1.getApiId();
+            //查询映射关系是否在数据库中已经存在
+            ApiApkMapExample apiApkMapExample = getApiApkMapExample(apkId, apiId);
+            List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
+            if (apiApkMaps.size() == 0) {
+                //数据库中没有该映射关系
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中不存在当前api-apk映射关系，正在插入该映射关系...");
+                ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
+                //插入
+                apiApkMapMapper.insertSelective(apiApkMap);
+                //插入的api 和apk的映射关系的条数
+                int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
+                String isApiApkInsertSuccess = (apiApkMapNum > 0) ? "成功" : "失败";
+
+                System.out.println(Thread.currentThread().getName() + ":api-apk映射关系记录插入" + isApiApkInsertSuccess);
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":api-apk映射关系插入完成....");
+            }
+            if (apiApkMaps.size() == 1) {
+                //数据库中已经存在一条api-apk映射关系
+                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中已经存在一条api-apk映射关系，本次未进行插入操作");
+            }
+            if (apiApkMaps.size() > 1) {
+                //数据库中存在多条相同的映射关系
+                //理论上不可能，出现直接抛出异常
+//                    System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中存在多条相同的api-apk映射关系记录，记录数为:" + apiApkMaps.size());
+                throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apiApkMaps.size() + "条重复的api-apk映射关系记录");
+            }
+        }
+
         //数据库中没有该API记录
         if (apis.size() == 0) {
             System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中没有当前api记录，开始插入该api记录....");
@@ -264,55 +302,14 @@ public class APIService {
                 System.out.println(Thread.currentThread().getName() + ":api-apk映射关系记录插入" + isApiApkInsertSuccess);
                 System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":插入api-apk映射关系完成");
             }
-            if (apiApkMaps.size() == 1) {
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中已经存在该api-apk记录，本次未进行插入操作");
-            }
-            if (apiApkMaps.size() >= 2) {
-                new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apiApkMaps.size() + "条相同的api-apk记录");
-            }
-        } else if (apis.size() == 1) {
-            //数据库中有一条该记录
-            System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中存在当前api记录，正在查询api-apk映射关系是否存在....");
-            Api api1 = null;
-            api1 = apis.get(0);
-            //获取api id
-            Integer apiId = api1.getApiId();
-            //查询映射关系是否在数据库中已经存在
-            ApiApkMapExample apiApkMapExample = getApiApkMapExample(apkId, apiId);
-            List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(apiApkMapExample);
-            if (apiApkMaps.size() == 0) {
-                //数据库中没有该映射关系
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中不存在当前api-apk映射关系，正在插入该映射关系...");
-                ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
-                //插入
-                apiApkMapMapper.insertSelective(apiApkMap);
-                //插入的api 和apk的映射关系的条数
-                int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
-                String isApiApkInsertSuccess = (apiApkMapNum > 0) ? "成功" : "失败";
-
-                System.out.println(Thread.currentThread().getName() + ":api-apk映射关系记录插入" + isApiApkInsertSuccess);
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":api-apk映射关系插入完成....");
-            } else if (apiApkMaps.size() == 1) {
-                //数据库中已经存在一条api-apk映射关系
-                System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中已经存在一条api-apk映射关系，本次未进行插入操作");
-            } else if (apiApkMaps.size() > 1) {
-                //数据库中存在多条相同的映射关系
-                //理论上不可能，出现直接抛出异常
-//                    System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中存在多条相同的api-apk映射关系记录，记录数为:" + apiApkMaps.size());
-                throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apiApkMaps.size() + "条重复的api-apk映射关系记录");
-            }
-        } else if (apis.size() > 1) {
-            //数据库中有多余一条记录
-            //数据库中存在多条相同的映射关系
-            //理论上不可能,如果出现，直接抛出异常
-//                System.out.println(Thread.currentThread().getName() + ":" + s2 + apis.size());
-            throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apis.size() + "条重复的api记录");
 
         }
+
+
     }
 
     /**
-     * 获取用户根据example进行数据库查询的example，主要用户判断数据库中是否已经存在相同记录
+     * 获取用户根据example进行数据库查询的example，主要用来判断数据库中是否已经存在相同记录
      *
      * @param apkId 应用id
      * @param apiId api id
