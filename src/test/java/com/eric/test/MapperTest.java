@@ -93,7 +93,7 @@ public class MapperTest {
     }
 
     @Test
-    public void testApkInsert(){
+    public void testApkInsert() {
         int num = apkMapper.insertSelective(new Apk("com.anybeen.mark.app", 0));
         System.out.println(num);
 
@@ -103,13 +103,36 @@ public class MapperTest {
      * 测试如果数据库不存在要查询的记录，返回结果是什么
      */
     @Test
-    public  void testSelectByExample(){
+    public void testSelectByExample() {
         ApkExample apkExample = new ApkExample();
         ApkExample.Criteria apkCriteria = apkExample.createCriteria();
         apkCriteria.andPackageNameEqualTo("packageName20190406");
         apkCriteria.andApkAttributeEqualTo(3);
         List<Apk> apks = apkMapper.selectByExample(apkExample);
         System.out.println(apks.size());
+
+    }
+
+
+    /**
+     * 查询数据库中重复的api_apk映射关系
+     */
+    @Test
+    public void testFindRepeatedApi() {
+        List<ApiApkMap> apiApkMaps = apiApkMapMapper.selectByExample(null);
+        for (ApiApkMap apiApkMap : apiApkMaps) {
+            ApiApkMapExample apiApkMapExample = new ApiApkMapExample();
+            ApiApkMapExample.Criteria criteria = apiApkMapExample.createCriteria();
+            criteria.andApiIdEqualTo(apiApkMap.getApiId());
+            criteria.andApkIdEqualTo(apiApkMap.getApkId());
+            List<ApiApkMap> apiApkMapList = apiApkMapMapper.selectByExample(apiApkMapExample);
+            if (apiApkMapList.size() >= 2) {
+                for (ApiApkMap apkMap : apiApkMapList) {
+                    System.out.println(apkMap.getApkId() + "--" + apkMap.getApiId());
+                }
+            }
+        }
+
 
     }
 
