@@ -4,6 +4,7 @@ import com.eric.bean.*;
 import com.eric.dao.ApkMapper;
 import com.eric.dao.AuthorityApkMapMapper;
 import com.eric.dao.AuthorityMapper;
+import com.eric.exception.MultipleDuplicateValuesInDatabaseException;
 import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import com.eric.tools.MD5.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,11 @@ public class AuthorityService {
 
                     packageName = AndroidManifestAnalyze.findPackage(xmlPath);
                 }
-                checkBeforeInsertAuthority(apkAttribute, apkId, packageName);
+                try {
+                    checkBeforeInsertAuthority(apkAttribute, apkId, packageName);
+                } catch (MultipleDuplicateValuesInDatabaseException e) {
+                    e.printStackTrace();
+                }
                 insertAuthority(apkId, authorityList, packageName);
             });
         }
@@ -71,57 +76,59 @@ public class AuthorityService {
      * @param authorityList 权限列表
      * @param packageName   包名
      */
-    public void insertAuthority(int[] apkId, List<String> authorityList, String packageName) {
+    public synchronized void insertAuthority(int[] apkId, List<String> authorityList, String packageName) {
         for (String au : authorityList) {
             //获取权限的md5值
             String auMd5 = MD5Utils.MD5Encode(au, "utf8");
             //先查询数据库中有没有该权限
             AuthorityExample authorityExample = getAuthorityExample(auMd5);
             List<Authority> authorities = null;
-            //加锁保证线程安全
-            synchronized (this) {
-                if (null == authorityMapper) {
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":authorityMapper为空");
-                } else {
-                    authorities = authorityMapper.selectByExample(authorityExample);
-                }
-                //数据库中没有该权限
-                if (authorities.size() == 0) {
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该权限记录,正在执行插入操作....");
-                    Authority authority = new Authority(au, auMd5);
-                    authorityMapper.insertSelective(authority);
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限记录插入成功，正在插入权限-apk关系...");
-                    Integer authorityId = authority.getAuthorityId();
+            if (null == authorityMapper) {
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":authorityMapper为空");
+            } else {
+                authorities = authorityMapper.selectByExample(authorityExample);
+            }
+            //数据库中没有该权限
+            if (authorities.size() == 0) {
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该权限记录,正在执行插入操作....");
+                Authority authority = new Authority(au, auMd5);
+                authorityMapper.insertSelective(authority);
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限记录插入成功，正在插入权限-apk关系...");
+                Integer authorityId = authority.getAuthorityId();
+                AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
+                authorityApkMapMapper.insertSelective(authorityApkMap);
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk关系插入成功");
+            }
+            if (authorities.size() == 1) {
+                //数据库中有1条权限记录
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在1条该权限记录，正在查询权限-apk映射关系是否存在....");
+                Authority authority = authorities.get(0);
+                Integer authorityId = authority.getAuthorityId();
+                //查询映射关系是否在数据库中已经存在
+                AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId, apkId[0]);
+                List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
+                //数据库中没有该映射关系
+                if (authorityApkMaps.size() == 0) {
+                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中不存在权限-apk映射关系,正在插入该映射关系....");
+                    //插入该映射关系
                     AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
                     authorityApkMapMapper.insertSelective(authorityApkMap);
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk关系插入成功");
-                } else if (authorities.size() == 1) {
-                    //数据库中有1条权限记录
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在1条该权限记录，正在查询权限-apk映射关系是否存在....");
-                    Authority authority = authorities.get(0);
-                    Integer authorityId = authority.getAuthorityId();
-                    //查询映射关系是否在数据库中已经存在
-                    AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId, apkId[0]);
-                    List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
-                    //数据库中没有该映射关系
-                    if (authorityApkMaps.size() == 0) {
-                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中不存在权限-apk映射关系,正在插入该映射关系....");
-                        //插入该映射关系
-                        AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
-                        authorityApkMapMapper.insertSelective(authorityApkMap);
-                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk映射关系插入完成");
-                    } else if (authorityApkMaps.size() == 1) {
-                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在一条权限-apk映射关系记录，本次未执行插入操作");
-                    } else if (authorityApkMaps.size() > 1) {
-                        //理论上不可能大于1
-                        System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>数据库中存在多条相同的权限-apk映射关系");
-                    }
-
-                } else if (authorities.size() > 1) {
-                    //存在多余1条的权限，理论上不可能
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>>数据库中存在多条相同的权限记录");
-
+                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk映射关系插入完成");
                 }
+                if (authorityApkMaps.size() == 1) {
+                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在一条权限-apk映射关系记录，本次未执行插入操作");
+                }
+                if (authorityApkMaps.size() > 1) {
+                    //理论上不可能大于1，出现则抛出异常
+                    new MultipleDuplicateValuesInDatabaseException("数据库中存在" + authorityApkMaps.size() + "条相同的权限-apk映射关系");
+                }
+
+            }
+            if (authorities.size() > 1) {
+                //存在多余1条的权限，理论上不可能,出现则抛出异常
+//                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":>>>>>>>>>>>>>数据库中存在多条相同的权限记录");
+                new MultipleDuplicateValuesInDatabaseException("数据库中存在" + authorities.size() + "条相同的权限信息");
+
             }
         }
     }
@@ -133,35 +140,38 @@ public class AuthorityService {
      * @param apkId        应用id
      * @param packageName  包名
      */
-    public void checkBeforeInsertAuthority(int apkAttribute, int[] apkId, String packageName) {
+    public synchronized void checkBeforeInsertAuthority(int apkAttribute, int[] apkId, String packageName) throws MultipleDuplicateValuesInDatabaseException {
         Apk apk = new Apk(packageName, apkAttribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);
-        //加锁，保证线程安全
-        synchronized (this) {
-            List<Apk> apks = apkMapper.selectByExample(apkExample);
-            if (apks.size() == 0) {
-                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该apk记录，正在执行插入....");
-                //数据库中没有，插入
-                if (null != apkMapper) {
-                    apkMapper.insertSelective(apk);
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":apk记录插入完成");
-                } else {
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":apkMapper为空");
-                }
-                //获取id
-                if (apk.getApkId() != null) {
-                    apkId[0] = apk.getApkId();
-                } else {
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":返回的id是空");
-                }
+        List<Apk> apks = apkMapper.selectByExample(apkExample);
+        if (apks.size() == 0) {
+            System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中没有该apk记录，正在执行插入....");
+            //数据库中没有，插入
+            if (null != apkMapper) {
+                apkMapper.insertSelective(apk);
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":apk记录插入完成");
             } else {
-                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库已经存在该apk记录，记录数为：" + apks.size());
-                //数据库中已经存在
-                //获取Id
-                Apk apk1 = apks.get(0);
-                apkId[0] = apk1.getApkId();
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":apkMapper为空");
             }
+            //获取id
+            if (apk.getApkId() != null) {
+                apkId[0] = apk.getApkId();
+            } else {
+                System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":返回的id是空");
+            }
+        }
+        //数据库中已经存在一条相同的apk记录
+        if (apks.size() == 1) {
+            System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库已经存在该apk记录，记录数为：" + apks.size());
+            //获取Id
+            Apk apk1 = apks.get(0);
+            apkId[0] = apk1.getApkId();
+        }
+        if (apks.size() >= 2) {
+            //理论上不可能，出现就抛出异常
+            throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apks.size() + "条相同的apk记录");
+
         }
     }
 
