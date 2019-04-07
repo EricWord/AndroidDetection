@@ -42,14 +42,20 @@ public class APIService {
             int apkId=-1;
             apkId=getApkId(apkAttribute,apkId,name);
             int finalApkId = apkId;
-            list.forEach(path->{
+            List<String> smaliFilePathList = Collections.synchronizedList(list);
+            //设置线程池的大小为10
+            int threadNumber=(list.size()<50)?list.size():50;
+            System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(threadNumber));
+            smaliFilePathList.parallelStream().forEach(path->{
                 File file = new File(path);
                 try {
                     smaliFileOperate(finalApkId, file);
                 } catch (MultipleDuplicateValuesInDatabaseException e) {
                     e.printStackTrace();
                 }
+
             });
+
 
         });
 
