@@ -7,12 +7,11 @@ import com.eric.dao.ApkMapper;
 import com.eric.exception.MultipleDuplicateValuesInDatabaseException;
 import com.eric.tools.MD5.MD5Utils;
 import com.eric.tools.api.APIHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import java.util.List;
 
 public class APIService {
 
-    private static final Logger logger = LoggerFactory.getLogger(APIService.class);
+    //    private static final Logger logger = LoggerFactory.getLogger(APIService.class);
     @Autowired
     ApkMapper apkMapper;
     @Autowired
@@ -54,7 +53,8 @@ public class APIService {
                 LinkedList<File> list = new LinkedList<>();
                 //目录下的所有文件
                 File[] files = file.listFiles();
-                for (File f : files) {
+                List<File> fileList = Arrays.asList(files);
+                fileList.forEach(f -> {
                     //获取当前正在执行的线程的名称
                     String currentThreadName = Thread.currentThread().getName();
                     //输出当前开始执行的线程名称
@@ -104,7 +104,8 @@ public class APIService {
                     }
                     System.out.println("--------------线程" + currentThreadName + "执行结束------------");
 
-                }
+                });
+
 
             } else {
                 //不是目录
@@ -147,7 +148,7 @@ public class APIService {
      * @param apkId        应用id
      * @return 当前应用id
      */
-    public  int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
+    public int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
         //获取应用的包名
         String[] split = path.split("\\\\");
         //获取包名
@@ -159,38 +160,38 @@ public class APIService {
         apkCriteria.andPackageNameEqualTo(packageName);
         apkCriteria.andApkAttributeEqualTo(apkAttribute);
 
-            List<Apk> apks = apkMapper.selectByExample(apkExample);
-            if (apks.size() == 0) {
-                //数据库中没有，插入
-                if (null != apkMapper) {
-                    System.out.println(Thread.currentThread().getName() + ":数据库中没有该apk记录，正在执行插入....");
+        List<Apk> apks = apkMapper.selectByExample(apkExample);
+        if (apks.size() == 0) {
+            //数据库中没有，插入
+            if (null != apkMapper) {
+                System.out.println(Thread.currentThread().getName() + ":数据库中没有该apk记录，正在执行插入....");
 
-                    //插入成功的apk记录数
-                    int apkInsertNum = apkMapper.insertSelective(apk);
-                    if (apkInsertNum > 0) {
-                        System.out.println(Thread.currentThread().getName() + ":apk记录插入成功");
-
-                    } else {
-                        System.err.println(Thread.currentThread().getName() + ":apk记录插入失败");
-                    }
-                } else {
-                    System.out.println(Thread.currentThread().getName() + ":apkMapper为空");
-                }
-
-                //获取id
-                if (apk.getApkId() != null) {
-
-                    apkId = apk.getApkId();
+                //插入成功的apk记录数
+                int apkInsertNum = apkMapper.insertSelective(apk);
+                if (apkInsertNum > 0) {
+                    System.out.println(Thread.currentThread().getName() + ":apk记录插入成功");
 
                 } else {
-                    System.out.println(Thread.currentThread().getName() + ":返回的id是空");
+                    System.err.println(Thread.currentThread().getName() + ":apk记录插入失败");
                 }
+            } else {
+                System.out.println(Thread.currentThread().getName() + ":apkMapper为空");
+            }
 
+            //获取id
+            if (apk.getApkId() != null) {
+
+                apkId = apk.getApkId();
 
             } else {
-                //数据库中已经存在与当前api相同的记录
-                apkId = getApkId(apks);
+                System.out.println(Thread.currentThread().getName() + ":返回的id是空");
             }
+
+
+        } else {
+            //数据库中已经存在与当前api相同的记录
+            apkId = getApkId(apks);
+        }
         return apkId;
     }
 
