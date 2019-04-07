@@ -1,4 +1,5 @@
 package com.eric.service;
+
 import com.eric.bean.*;
 import com.eric.dao.ApiApkMapMapper;
 import com.eric.dao.ApiMapper;
@@ -11,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @ClassName: APIService
@@ -32,6 +35,12 @@ public class APIService {
     ApiMapper apiMapper;
     @Autowired
     ApiApkMapMapper apiApkMapMapper;
+    //统计一个应用包下有多少.smali文件 泛型里面Sting表示包名 后面的ArrayList<String>存储smali文件绝对路径
+    private ConcurrentHashMap<String, ArrayList<String>> packageNameAndSmaliMap = new ConcurrentHashMap<>(30);
+
+    public void batchSaveApiNew(String src, int apkAttribute) {
+
+    }
 
     /**
      * 批量提取api特征到数据库
@@ -125,7 +134,7 @@ public class APIService {
         //文件路径
         String filePath = newCurrentFile.getAbsolutePath();
         //该文件是否.smali文件
-        int len=filePath.length();
+        int len = filePath.length();
         String s = filePath.substring(filePath.length() - 6, len);
         if (s.equals(".smali")) {
             //提取API信息
@@ -145,10 +154,7 @@ public class APIService {
      * @return 当前应用id
      */
     public int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
-        //获取应用的包名
-        String[] split = path.split("\\\\");
-        //获取包名
-        String packageName = split[split.length - 1];
+        String packageName = getPackageName(path);
         Apk apk = new Apk(packageName, apkAttribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = new ApkExample();
@@ -188,6 +194,13 @@ public class APIService {
             apkId = getApkId(apks);
         }
         return apkId;
+    }
+
+    public String getPackageName(String path) {
+        //获取应用的包名
+        String[] split = path.split("\\\\");
+        //获取包名
+        return split[split.length - 1];
     }
 
     /**
@@ -308,7 +321,104 @@ public class APIService {
     }
 
 
-    //接下来写一个统计smali文件的方法
+
+    /**
+     * 统计一个应用包下有多少个smali文件并加入队列
+     *
+     * @param packageSrc 包所在的路径
+     * @return
+     */
+    public ConcurrentHashMap<String, ArrayList<String>> countSmaliFile(String packageSrc) {
+        final String[] packageName = {""};
+        File file = new File(packageSrc);
+        //判断文件是否存在
+        if (file.exists()) {
+            //文件存在
+            //文件是目录
+            if (file.isDirectory()) {
+                LinkedList<File> list = new LinkedList<>();
+                //目录下的所有文件
+                File[] files = file.listFiles();
+                //转为list，为了使用jdk8中的多线程并发，见其下面的那行代码
+                List<File> fileList = Arrays.asList(files);
+                fileList.parallelStream().forEach(f -> {
+                    //smali文件队列
+                    ArrayList<String> smaliList = new ArrayList<>();
+                    //获取当前正在执行的线程的名称
+                    String currentThreadName = Thread.currentThread().getName();
+                    //输出当前开始执行的线程名称
+                    System.out.println("搜索smali文件的线程" + currentThreadName + "开始执行");
+                    //获取当前文件的绝对路径
+                    String path = f.getAbsolutePath();
+                    //获取包名
+                    packageName[0] = getPackageName(path);
+                    //文件存在
+                    if (f.exists()) {
+                        //判断是文件还是文件夹
+                        //如果是文件夹
+                        if (f.isDirectory()) {
+                            File[] currentFileArray = f.listFiles();
+                            //遍历每一个文件
+                            for (File newCurrentFile : currentFileArray) {
+                                //是目录
+                                if (newCurrentFile.isDirectory()) {
+                                    //将文件夹加入队列
+                                    list.add(newCurrentFile);
+                                } else {
+                                    //文件路径
+                                    checkAndAddSmali2List(smaliList, newCurrentFile);
+                                }
+                            }
+                            File tempFile;
+                            //list不空
+                            while (!list.isEmpty()) {
+                                //选取list的第一个文件
+                                tempFile = list.removeFirst();
+                                currentFileArray = tempFile.listFiles();
+                                for (File newCurrentFile : currentFileArray) {
+                                    //目录
+                                    if (newCurrentFile.isDirectory()) {
+                                        //加入队列
+                                        list.add(newCurrentFile);
+                                    } else {
+                                        //是文件
+                                        //文件路径
+                                        checkAndAddSmali2List(smaliList, newCurrentFile);
+                                    }
+                                }
+                            }
+                        } else {
+                            //当前文件不是文件夹是文件
+                            checkAndAddSmali2List(smaliList, f);
+                        }
+                    }
+                    System.out.println("--------------线程" + currentThreadName + "执行结束------------");
+                    packageNameAndSmaliMap.put(packageName[0], smaliList);
+                });
+            } else {
+                //不是目录
+                System.out.println(Thread.currentThread().getName() + ":>>>>>>>>>>>>请输入包含应用包名的路径！");
+            }
+        }
+        return packageNameAndSmaliMap;
+    }
+
+    /**
+     * 检查是否是smali文件，是的话加入队列
+     * @param smaliList smali文件列表
+     * @param newCurrentFile 当前文件
+     */
+    public void checkAndAddSmali2List(List<String> smaliList, File newCurrentFile) {
+        String filePath = newCurrentFile.getAbsolutePath();
+        //该文件是否.smali文件
+        int len = filePath.length();
+        String s = filePath.substring(filePath.length() - 6, len);
+        if (s.equals(".smali")) {
+            //加入队列
+            smaliList.add(filePath);
+
+        }
+    }
 
 }
 

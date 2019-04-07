@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
@@ -234,6 +235,19 @@ public class ServiceTest {
         }
 
     }
+
+
+    @Test
+    public void  testCountSmaliFile(){
+        ConcurrentHashMap<String, ArrayList<String>> smaliFile = apiService.countSmaliFile("E:\\7BiShe\\DeCompileResults\\goodApksDecompileResult\\1-300\\1-4");
+        smaliFile.forEach((name,list)->{
+            System.out.println(name+"包下共有"+list.size()+"个.smali文件");
+
+        });
+
+
+    }
+
 
 
 
