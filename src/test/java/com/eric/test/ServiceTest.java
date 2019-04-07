@@ -257,7 +257,7 @@ public class ServiceTest {
 
     @Test
     public void testGoodApksAPIService040701() {
-        apiService.batchSaveApiNew("", 0);
+        apiService.batchSaveApiNew("D:\\cgs\\File\\data\\test20190407", 0);
 
     }
 

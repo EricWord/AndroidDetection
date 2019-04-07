@@ -35,11 +35,12 @@ public class APIService {
     ApiApkMapMapper apiApkMapMapper;
     //统计一个应用包下有多少.smali文件 泛型里面Sting表示包名 后面的ArrayList<String>存储smali文件绝对路径
     private ConcurrentHashMap<String, ArrayList<String>> packageNameAndSmaliMap = new ConcurrentHashMap<>(30);
+    private String packageName="";
 
     public void batchSaveApiNew(String src, int apkAttribute) {
         ConcurrentHashMap<String, ArrayList<String>> smaliFiles = countSmaliFile(src);
         smaliFiles.forEach((name,list)->{
-            int apkId=checkBeforeInsertApi(apkAttribute,src);
+            int apkId=getApkId(apkAttribute, packageName);
             int finalApkId = apkId;
             List<String> smaliFilePathList = Collections.synchronizedList(list);
             //设置线程池的大小为10
@@ -359,7 +360,7 @@ public class APIService {
      * @return
      */
     public ConcurrentHashMap<String, ArrayList<String>> countSmaliFile(String packageSrc) {
-        final String[] packageName = {""};
+
         File file = new File(packageSrc);
         //判断文件是否存在
         if (file.exists()) {
@@ -382,7 +383,7 @@ public class APIService {
                     //获取当前文件的绝对路径
                     String path = f.getAbsolutePath();
                     //获取包名
-                    packageName[0] = getPackageName(path);
+                    packageName = getPackageName(path);
                     //文件存在
                     if (f.exists()) {
                         //判断是文件还是文件夹
@@ -424,7 +425,7 @@ public class APIService {
                         }
                     }
                     System.out.println("--------------线程" + currentThreadName + "执行结束------------");
-                    packageNameAndSmaliMap.put(packageName[0], smaliList);
+                    packageNameAndSmaliMap.put(packageName, smaliList);
 
                 }
             } else {
