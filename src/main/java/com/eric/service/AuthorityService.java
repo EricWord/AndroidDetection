@@ -35,7 +35,7 @@ public class AuthorityService {
     AuthorityApkMapMapper authorityApkMapMapper;
 
 
-//    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
+    //    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
     public void saveAuthority(String path, int apkAttribute) {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "30");
@@ -106,19 +106,9 @@ public class AuthorityService {
                 AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId, apkId[0]);
                 List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
                 //数据库中没有该映射关系
-                if (authorityApkMaps.size() == 0) {
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中不存在权限-apk映射关系,正在插入该映射关系....");
-                    //插入该映射关系
-                    AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
-                    authorityApkMapMapper.insertSelective(authorityApkMap);
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk映射关系插入完成");
-                }
-                if (authorityApkMaps.size() == 1) {
-                    System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在一条权限-apk映射关系记录，本次未执行插入操作");
-                }
-                if (authorityApkMaps.size() > 1) {
-                    //理论上不可能大于1，出现则抛出异常
-                    new MultipleDuplicateValuesInDatabaseException("数据库中存在" + authorityApkMaps.size() + "条相同的权限-apk映射关系");
+                if (checkBeforeInsertAuthorityApkMap(apkId, packageName, authorityId, authorityApkMaps)) {
+
+                    return;
                 }
 
             }
@@ -133,10 +123,31 @@ public class AuthorityService {
                 AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
                 authorityApkMapMapper.insertSelective(authorityApkMap);
                 System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk关系插入成功");
+                return;
             }
 
 
         }
+    }
+
+    public boolean checkBeforeInsertAuthorityApkMap(int[] apkId, String packageName, Integer authorityId, List<AuthorityApkMap> authorityApkMaps) {
+        if (authorityApkMaps.size() == 0) {
+            System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中不存在权限-apk映射关系,正在插入该映射关系....");
+            //插入该映射关系
+            AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId[0], authorityId);
+            authorityApkMapMapper.insertSelective(authorityApkMap);
+            System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":权限-apk映射关系插入完成");
+            return true;
+        }
+        if (authorityApkMaps.size() == 1) {
+            System.out.println(Thread.currentThread().getName() + "当前正在提取权限的应用名称为：" + packageName + ":数据库中已经存在一条权限-apk映射关系记录，本次未执行插入操作");
+            return true;
+        }
+        if (authorityApkMaps.size() > 1) {
+            //理论上不可能大于1，出现则抛出异常
+            new MultipleDuplicateValuesInDatabaseException("数据库中存在" + authorityApkMaps.size() + "条相同的权限-apk映射关系");
+        }
+        return false;
     }
 
     /**
@@ -146,7 +157,7 @@ public class AuthorityService {
      * @param apkId        应用id
      * @param packageName  包名
      */
-    public  void checkBeforeInsertAuthority(int apkAttribute, int[] apkId, String packageName) throws MultipleDuplicateValuesInDatabaseException {
+    public void checkBeforeInsertAuthority(int apkAttribute, int[] apkId, String packageName) throws MultipleDuplicateValuesInDatabaseException {
         Apk apk = new Apk(packageName, apkAttribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);
