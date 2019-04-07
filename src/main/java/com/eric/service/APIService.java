@@ -39,8 +39,7 @@ public class APIService {
     public void batchSaveApiNew(String src, int apkAttribute) {
         ConcurrentHashMap<String, ArrayList<String>> smaliFiles = countSmaliFile(src);
         smaliFiles.forEach((name,list)->{
-            int apkId=-1;
-            apkId=getApkId(apkAttribute,apkId,name);
+            int apkId=checkBeforeInsertApi(apkAttribute,src);
             int finalApkId = apkId;
             List<String> smaliFilePathList = Collections.synchronizedList(list);
             //设置线程池的大小为10
@@ -89,7 +88,7 @@ public class APIService {
                     //获取当前文件的绝对路径
                     String path = f.getAbsolutePath();
                     int apkId = -1;
-                    apkId = checkBeforeInsertApi(apkAttribute, path, apkId);
+                    apkId = checkBeforeInsertApi(apkAttribute, path);
                     //当前操作的文件
 //                    File currentFile = new File(path);
                     //文件存在
@@ -180,16 +179,16 @@ public class APIService {
      *
      * @param apkAttribute 应用属性，0表示正常应用，1表示恶意应用
      * @param path         路径
-     * @param apkId        应用id
      * @return 当前应用id
      */
-    public int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
+    public int checkBeforeInsertApi(int apkAttribute, String path) {
         String packageName = getPackageName(path);
-        apkId = getApkId(apkAttribute, apkId, packageName);
+        int apkId = getApkId(apkAttribute, packageName);
         return apkId;
     }
 
-    public int getApkId(int apkAttribute, int apkId, String packageName) {
+    public synchronized int getApkId(int apkAttribute, String packageName) {
+        int apkId=-1;
         Apk apk = new Apk(packageName, apkAttribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = new ApkExample();
