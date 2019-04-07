@@ -4,6 +4,7 @@ import com.eric.bean.*;
 import com.eric.dao.ApiApkMapMapper;
 import com.eric.dao.ApiMapper;
 import com.eric.dao.ApkMapper;
+import com.eric.exception.MultipleDuplicateValuesInDatabaseException;
 import com.eric.tools.MD5.MD5Utils;
 import com.eric.tools.api.APIHelper;
 import org.slf4j.Logger;
@@ -12,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,6 +37,21 @@ public class APIService {
     private ConcurrentHashMap<String, ArrayList<String>> packageNameAndSmaliMap = new ConcurrentHashMap<>(30);
 
     public void batchSaveApiNew(String src, int apkAttribute) {
+        ConcurrentHashMap<String, ArrayList<String>> smaliFiles = countSmaliFile(src);
+        smaliFiles.forEach((name,list)->{
+            int apkId=-1;
+            apkId=getApkId(apkAttribute,apkId,name);
+            int finalApkId = apkId;
+            list.forEach(path->{
+                File file = new File(path);
+                try {
+                    smaliFileOperate(finalApkId, file);
+                } catch (MultipleDuplicateValuesInDatabaseException e) {
+                    e.printStackTrace();
+                }
+            });
+
+        });
 
     }
 
@@ -88,7 +101,11 @@ public class APIService {
                                     //将文件夹加入队列
                                     list.add(newCurrentFile);
                                 } else {
-                                    smaliFileOperate(apkId, newCurrentFile, Thread.currentThread().getName() + ":>>>>>>>>数据库中存在多条相同的api记录，记录数为:");
+                                    try {
+                                        smaliFileOperate(apkId, newCurrentFile);
+                                    } catch (MultipleDuplicateValuesInDatabaseException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
                             File tempFile;
@@ -104,14 +121,22 @@ public class APIService {
                                         list.add(newCurrentFile);
                                     } else {
                                         //是文件
-                                        smaliFileOperate(apkId, newCurrentFile, Thread.currentThread().getName() + ":>>>>>>>数据库中有多条相同的api记录，相同的api记录数为：");
+                                        try {
+                                            smaliFileOperate(apkId, newCurrentFile);
+                                        } catch (MultipleDuplicateValuesInDatabaseException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             }
 
                         } else {
                             //当前文件不是文件夹是文件
-                            smaliFileOperate(apkId, f, Thread.currentThread().getName() + ":>>>>>>>数据库中有多条相同的api记录，相同的api记录数为：");
+                            try {
+                                smaliFileOperate(apkId, f);
+                            } catch (MultipleDuplicateValuesInDatabaseException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                     System.out.println("--------------线程" + currentThreadName + "执行结束------------");
@@ -128,9 +153,8 @@ public class APIService {
      *
      * @param apkId          应用id
      * @param newCurrentFile 当前操作的文件
-     * @param s2             提示信息
      */
-    public void smaliFileOperate(int apkId, File newCurrentFile, String s2) {
+    public void smaliFileOperate(int apkId, File newCurrentFile) throws MultipleDuplicateValuesInDatabaseException {
         //文件路径
         String filePath = newCurrentFile.getAbsolutePath();
         //该文件是否.smali文件
@@ -140,7 +164,7 @@ public class APIService {
             //提取API信息
             List<String> apiList = APIHelper.handle(filePath);
             for (String item : apiList) {
-                apiOperate(apkId, item, s2, filePath);
+                apiOperate(apkId, item, filePath);
             }
         }
     }
@@ -155,6 +179,11 @@ public class APIService {
      */
     public int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
         String packageName = getPackageName(path);
+        apkId = getApkId(apkAttribute, apkId, packageName);
+        return apkId;
+    }
+
+    public int getApkId(int apkAttribute, int apkId, String packageName) {
         Apk apk = new Apk(packageName, apkAttribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = new ApkExample();
@@ -222,9 +251,8 @@ public class APIService {
      *
      * @param apkId 应用id
      * @param item  要操作的某一条具体的api
-     * @param s2    提示信息
      */
-    public void apiOperate(int apkId, String item, String s2, String path) {
+    public void apiOperate(int apkId, String item,  String path) throws MultipleDuplicateValuesInDatabaseException {
         String md5Value = MD5Utils.MD5Encode(item, "utf8");
         //先查询数据库中有没有该API
         ApiExample apiExample = getApiExample(md5Value);
@@ -286,7 +314,8 @@ public class APIService {
             //数据库中有多余一条记录
             //数据库中存在多条相同的映射关系
             //理论上不可能
-            System.out.println(Thread.currentThread().getName() + ":" + s2 + apis.size());
+//            System.out.println(Thread.currentThread().getName() + ":数据库" +  apis.size());
+            throw  new MultipleDuplicateValuesInDatabaseException("数据库中有"+apis.size()+"条相同的记录");
 
         }
     }
@@ -321,7 +350,6 @@ public class APIService {
     }
 
 
-
     /**
      * 统计一个应用包下有多少个smali文件并加入队列
      *
@@ -340,8 +368,9 @@ public class APIService {
                 //目录下的所有文件
                 File[] files = file.listFiles();
                 //转为list，为了使用jdk8中的多线程并发，见其下面的那行代码
-                List<File> fileList = Arrays.asList(files);
-                fileList.parallelStream().forEach(f -> {
+                List<File> flist = Arrays.asList(files);
+                List<File> fileList = Collections.synchronizedList(flist);
+                for (File f : files) {
                     //smali文件队列
                     ArrayList<String> smaliList = new ArrayList<>();
                     //获取当前正在执行的线程的名称
@@ -394,7 +423,8 @@ public class APIService {
                     }
                     System.out.println("--------------线程" + currentThreadName + "执行结束------------");
                     packageNameAndSmaliMap.put(packageName[0], smaliList);
-                });
+
+                }
             } else {
                 //不是目录
                 System.out.println(Thread.currentThread().getName() + ":>>>>>>>>>>>>请输入包含应用包名的路径！");
@@ -405,7 +435,8 @@ public class APIService {
 
     /**
      * 检查是否是smali文件，是的话加入队列
-     * @param smaliList smali文件列表
+     *
+     * @param smaliList      smali文件列表
      * @param newCurrentFile 当前文件
      */
     public void checkAndAddSmali2List(List<String> smaliList, File newCurrentFile) {

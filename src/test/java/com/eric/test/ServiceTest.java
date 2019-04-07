@@ -165,7 +165,7 @@ public class ServiceTest {
 
     @Test
     public void testGoodApksAPIService3() {
-        apiService.batchSaveApi("", 0);
+        apiService.batchSaveApiNew("", 0);
 
     }
 
@@ -200,15 +200,15 @@ public class ServiceTest {
     }
 
     @Test
-    public void test100(){
-        List<String> list=new LinkedList<>();
+    public void test100() {
+        List<String> list = new LinkedList<>();
         String s = ((LinkedList<String>) list).removeFirst();
         System.out.println(s);
 
     }
 
     @Test
-    public void test101(){
+    public void test101() {
         List<String> list = authorityService.getAndroidManifestXmlList("D:\\cgs\\File\\data\\goodAPKSDeCompileResult");
         for (String s : list) {
             System.out.println(s);
@@ -222,13 +222,13 @@ public class ServiceTest {
      */
 
     @Test
-    public void bestBatchInsertAuthority(){
+    public void bestBatchInsertAuthority() {
         File file = new File("");
-        if(file.isDirectory()){
+        if (file.isDirectory()) {
             File[] currentFiles = file.listFiles();
             for (File currentFile : currentFiles) {
-                if(currentFile.isDirectory()){
-                    authorityService.saveAuthority(currentFile.getAbsolutePath(),0);
+                if (currentFile.isDirectory()) {
+                    authorityService.saveAuthority(currentFile.getAbsolutePath(), 0);
                 }
             }
 
@@ -238,21 +238,28 @@ public class ServiceTest {
 
 
     @Test
-    public void  testCountSmaliFile(){
-        ConcurrentHashMap<String, ArrayList<String>> smaliFile = apiService.countSmaliFile("E:\\7BiShe\\DeCompileResults\\goodApksDecompileResult\\1-300\\1-4");
-        smaliFile.forEach((name,list)->{
-            System.out.println(name+"包下共有"+list.size()+"个.smali文件");
+    public void testCountSmaliFile() {
+        ConcurrentHashMap<String, ArrayList<String>> smaliFile = apiService.countSmaliFile("E:\\7BiShe\\DeCompileResults\\goodApksDecompileResult\\1-300\\5-15");
+        if (null != smaliFile && smaliFile.size() > 0) {
+            smaliFile.forEach((name, list) -> {
+                System.out.println(name + "包下共有" + list.size() + "个.smali文件");
+            /*    for (String s : list) {
+                    System.out.println(s);
 
-        });
+                }*/
+
+            });
+        }
 
 
     }
 
 
+    @Test
+    public void testGoodApksAPIService040701() {
+        apiService.batchSaveApiNew("", 0);
 
-
-
-
+    }
 
 
 }
