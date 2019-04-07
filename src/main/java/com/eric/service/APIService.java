@@ -37,7 +37,7 @@ public class APIService {
     private ConcurrentHashMap<String, ArrayList<String>> packageNameAndSmaliMap = new ConcurrentHashMap<>(30);
     private String packageName="";
 
-    public void batchSaveApiNew(String src, int apkAttribute) {
+    public void batchSaveApi(String src, int apkAttribute) {
         ConcurrentHashMap<String, ArrayList<String>> smaliFiles = countSmaliFile(src);
         smaliFiles.forEach((name,list)->{
             int apkId=getApkId(apkAttribute, packageName);
@@ -61,12 +61,12 @@ public class APIService {
 
     }
 
-    /**
+/*    *//**
      * 批量提取api特征到数据库
      *
      * @param src          包含有应用包名的总路径
      * @param apkAttribute 应用的属性 0表示正常应用，1表示恶意应用
-     */
+     *//*
     public void batchSaveApi(String src, int apkAttribute) {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "10");
@@ -90,29 +90,15 @@ public class APIService {
                     String path = f.getAbsolutePath();
                     int apkId = -1;
                     apkId = checkBeforeInsertApi(apkAttribute, path);
-                    //当前操作的文件
-//                    File currentFile = new File(path);
                     //文件存在
                     if (f.exists()) {
                         //判断是文件还是文件夹
                         //如果是文件夹
                         if (f.isDirectory()) {
-
-
                             File[] currentFileArray = f.listFiles();
                             //遍历每一个文件
                             for (File newCurrentFile : currentFileArray) {
-                                //是目录
-                                if (newCurrentFile.isDirectory()) {
-                                    //将文件夹加入队列
-                                    list.add(newCurrentFile);
-                                } else {
-                                    try {
-                                        smaliFileOperate(apkId, newCurrentFile);
-                                    } catch (MultipleDuplicateValuesInDatabaseException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
+                                fileOperate(list, apkId, newCurrentFile);
                             }
                             File tempFile;
                             //list不空
@@ -122,17 +108,7 @@ public class APIService {
                                 currentFileArray = tempFile.listFiles();
                                 for (File newCurrentFile : currentFileArray) {
                                     //目录
-                                    if (newCurrentFile.isDirectory()) {
-                                        //加入队列
-                                        list.add(newCurrentFile);
-                                    } else {
-                                        //是文件
-                                        try {
-                                            smaliFileOperate(apkId, newCurrentFile);
-                                        } catch (MultipleDuplicateValuesInDatabaseException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
+                                    fileOperate(list, apkId, newCurrentFile);
                                 }
                             }
 
@@ -150,6 +126,26 @@ public class APIService {
             } else {
                 //不是目录
                 System.out.println(Thread.currentThread().getName() + ":>>>>>>>>>>>>请输入包含应用包名的路径！");
+            }
+        }
+    }*/
+
+    /**
+     * 遍历每一个文件
+     * @param list 列表
+     * @param apkId 应用id
+     * @param newCurrentFile 当前文件
+     */
+    public void fileOperate(LinkedList<File> list, int apkId, File newCurrentFile) {
+        //是目录
+        if (newCurrentFile.isDirectory()) {
+            //将文件夹加入队列
+            list.add(newCurrentFile);
+        } else {
+            try {
+                smaliFileOperate(apkId, newCurrentFile);
+            } catch (MultipleDuplicateValuesInDatabaseException e) {
+                e.printStackTrace();
             }
         }
     }
