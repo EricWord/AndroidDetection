@@ -107,11 +107,7 @@ public class APIService {
                     System.out.println("--------------线程" + currentThreadName + "执行结束------------");
 
                 }
-                //转为list，为了使用jdk8中的多线程并发，见其下面的那行代码
-              /*  List<File> fileList = Arrays.asList(files);
-                fileList.parallelStream().forEach(f -> {
 
-                });*/
             } else {
                 //不是目录
                 System.out.println(Thread.currentThread().getName() + ":>>>>>>>>>>>>请输入包含应用包名的路径！");
@@ -242,6 +238,7 @@ public class APIService {
             //理论上不可能,如果出现，直接抛出异常
             throw new MultipleDuplicateValuesInDatabaseException("数据库中存在" + apis.size() + "条重复的api记录");
 
+
         }
 
         if (apis.size() == 1) {
@@ -259,7 +256,6 @@ public class APIService {
                 System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":数据库中不存在当前api-apk映射关系，正在插入该映射关系...");
                 ApiApkMap apiApkMap = new ApiApkMap(apkId, apiId);
                 //插入
-                apiApkMapMapper.insertSelective(apiApkMap);
                 //插入的api 和apk的映射关系的条数
                 int apiApkMapNum = apiApkMapMapper.insertSelective(apiApkMap);
                 String isApiApkInsertSuccess = (apiApkMapNum > 0) ? "成功" : "失败";
@@ -270,6 +266,7 @@ public class APIService {
             if (apiApkMaps.size() == 1) {
                 //数据库中已经存在一条api-apk映射关系
                 System.out.println(Thread.currentThread().getName() + "当前正在操作的文件是：" + path + ":>>>>>>>>数据库中已经存在一条api-apk映射关系，本次未进行插入操作");
+                return;
             }
             if (apiApkMaps.size() > 1) {
                 //数据库中存在多条相同的映射关系
