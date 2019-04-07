@@ -23,10 +23,8 @@ import java.util.List;
  * @Email: xiao_cui_vip@163.com
  */
 @Service
-
 public class APIService {
 
-    //    private static final Logger logger = LoggerFactory.getLogger(APIService.class);
     @Autowired
     ApkMapper apkMapper;
     @Autowired
@@ -40,7 +38,6 @@ public class APIService {
      * @param src          包含有应用包名的总路径
      * @param apkAttribute 应用的属性 0表示正常应用，1表示恶意应用
      */
-//    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
     public void batchSaveApi(String src, int apkAttribute) {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "15");

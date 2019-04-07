@@ -152,7 +152,7 @@ public class ServiceTest {
 
     @Test
     public void testGoodApksAPIService1() {
-        apiService.batchSaveApi("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+        apiService.batchSaveApi("D:\\cgs\\File\\data\\test20190407", 0);
 
     }
 

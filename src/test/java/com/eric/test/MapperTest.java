@@ -170,4 +170,11 @@ public class MapperTest {
     }
 
 
+    @Test
+    public void testInsert(){
+        Apk apk = new Apk("test20190407",0);
+        int i = apkMapper.insertSelective(apk);
+        System.out.println(i);
+
+    }
 }
