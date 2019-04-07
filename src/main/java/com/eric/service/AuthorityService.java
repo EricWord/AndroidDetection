@@ -9,8 +9,6 @@ import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import com.eric.tools.MD5.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ public class AuthorityService {
     AuthorityApkMapMapper authorityApkMapMapper;
 
 
-    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
+//    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
     public void saveAuthority(String path, int apkAttribute) {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "30");
@@ -80,7 +78,7 @@ public class AuthorityService {
      * @param authorityList 权限列表
      * @param packageName   包名
      */
-    public synchronized void insertAuthority(int[] apkId, List<String> authorityList, String packageName) {
+    public void insertAuthority(int[] apkId, List<String> authorityList, String packageName) {
         for (String au : authorityList) {
             //获取权限的md5值
             String auMd5 = MD5Utils.MD5Encode(au, "utf8");
@@ -148,7 +146,7 @@ public class AuthorityService {
      * @param apkId        应用id
      * @param packageName  包名
      */
-    public synchronized void checkBeforeInsertAuthority(int apkAttribute, int[] apkId, String packageName) throws MultipleDuplicateValuesInDatabaseException {
+    public  void checkBeforeInsertAuthority(int apkAttribute, int[] apkId, String packageName) throws MultipleDuplicateValuesInDatabaseException {
         Apk apk = new Apk(packageName, apkAttribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);

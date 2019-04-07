@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -43,7 +41,7 @@ public class APIService {
      * @param src          包含有应用包名的总路径
      * @param apkAttribute 应用的属性 0表示正常应用，1表示恶意应用
      */
-    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
+//    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
     public void batchSaveApi(String src, int apkAttribute) {
         //设置线程池的大小为10
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "15");
@@ -149,7 +147,7 @@ public class APIService {
      * @param apkId        应用id
      * @return 当前应用id
      */
-    public synchronized int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
+    public  int checkBeforeInsertApi(int apkAttribute, String path, int apkId) {
         //获取应用的包名
         String[] split = path.split("\\\\");
         //获取包名
@@ -217,7 +215,7 @@ public class APIService {
      * @param item  要操作的某一条具体的api
      * @param s2    提示信息
      */
-    public synchronized void apiOperate(int apkId, String item, String s2, String path) throws MultipleDuplicateValuesInDatabaseException {
+    public void apiOperate(int apkId, String item, String s2, String path) throws MultipleDuplicateValuesInDatabaseException {
         //当多线程向数据库中插入数据时肯定会存在线程安全问题，所以在进行插入操作时一定要加锁
         //虽然每个线程操作的对象是包名
         //但是多线程可能会同时调用这个方法，进而导致线程安全问题
