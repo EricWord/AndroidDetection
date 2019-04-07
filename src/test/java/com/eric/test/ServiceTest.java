@@ -131,7 +131,7 @@ public class ServiceTest {
     //--------------------------2019.04.03新增批量提取权限测试方法
     @Test
     public void testAuthorityService1() {
-        authorityService.saveAuthority("D:\\cgs\\File\\data\\testAPKDecompileOutput", 0);
+        authorityService.saveAuthority("D:\\cgs\\File\\data\\test20190407", 0);
 
     }
 

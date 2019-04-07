@@ -106,10 +106,8 @@ public class AuthorityService {
                 List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
                 //数据库中没有该映射关系
                 if (checkBeforeInsertAuthorityApkMap(apkId, packageName, authorityId, authorityApkMaps)) {
-
                     return;
                 }
-
             }
 
             //数据库中没有该权限
