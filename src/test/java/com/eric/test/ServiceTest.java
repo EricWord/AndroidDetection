@@ -236,18 +236,15 @@ public class ServiceTest {
 
     }
 
-
+    /**
+     * 统计包下有多少smali文件
+     */
     @Test
     public void testCountSmaliFile() {
         ConcurrentHashMap<String, ArrayList<String>> smaliFile = apiService.countSmaliFile("E:\\7BiShe\\DeCompileResults\\goodApksDecompileResult\\1-300\\5-15");
         if (null != smaliFile && smaliFile.size() > 0) {
             smaliFile.forEach((name, list) -> {
                 System.out.println(name + "包下共有" + list.size() + "个.smali文件");
-            /*    for (String s : list) {
-                    System.out.println(s);
-
-                }*/
-
             });
         }
 
@@ -260,6 +257,8 @@ public class ServiceTest {
         apiService.batchSaveApi("D:\\cgs\\File\\data\\test20190407", 0);
 
     }
+
+
 
 
 }
