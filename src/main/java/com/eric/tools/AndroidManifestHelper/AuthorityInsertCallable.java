@@ -1,19 +1,5 @@
 package com.eric.tools.AndroidManifestHelper;
 
-import com.eric.bean.Authority;
-import com.eric.bean.AuthorityApkMap;
-import com.eric.bean.AuthorityApkMapExample;
-import com.eric.bean.AuthorityExample;
-import com.eric.dao.AuthorityApkMapMapper;
-import com.eric.dao.AuthorityMapper;
-import com.eric.tools.MD5.MD5Utils;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.concurrent.Callable;
-
 /**
  * @ClassName: AuthorityInsertCallable
  * @Description: 实现Callable接口的权限批量插入
@@ -32,7 +18,7 @@ public class AuthorityInsertCallable implements Callable<Integer> {
     @Resource
     private AuthorityApkMapMapper authorityApkMapMapper;
 
-    public static AuthorityInsertCallable authorityInsertCallable;
+    public img AuthorityInsertCallable authorityInsertCallable;
 
     @PostConstruct
     public void init(){

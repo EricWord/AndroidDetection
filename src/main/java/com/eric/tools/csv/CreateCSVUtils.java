@@ -28,7 +28,7 @@ public class CreateCSVUtils {
      *      
      *//*
 
-    public static File createCSVFile(List<Apk> dataLists, List<String> headList) throws IOException {
+    public img File createCSVFile(List<Apk> dataLists, List<String> headList) throws IOException {
 
         File csvFile = null;
         BufferedWriter csvWrite = null;
@@ -75,7 +75,7 @@ public class CreateCSVUtils {
         return csvFile;
     }
 
-    public static File dataTabele2CSV(List<Apk> dataLists, List<String> headList) throws IOException {
+    public img File dataTabele2CSV(List<Apk> dataLists, List<String> headList) throws IOException {
 
         File csvFile = null;
         BufferedWriter csvWrite = null;
@@ -133,7 +133,7 @@ public class CreateCSVUtils {
      *      
      *//*
 
-    private static void writeData(Apk apk, BufferedWriter csvWreite) throws IOException {
+    private img void writeData(Apk apk, BufferedWriter csvWreite) throws IOException {
         //获取apk id
         Integer apkId = apk.getApkId();
         //获取apk属性
@@ -171,7 +171,7 @@ public class CreateCSVUtils {
 
 
 
-    private static void writeHead(List<String> dataList, BufferedWriter csvWreite) throws IOException {
+    private img void writeHead(List<String> dataList, BufferedWriter csvWreite) throws IOException {
 
         for (String data : dataList) {
             StringBuffer buffer = new StringBuffer();

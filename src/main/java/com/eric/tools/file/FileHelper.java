@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
 /*
 public class FileHelper {
     //线程数
-    private static final Integer TASK_SIZE = 10;
+    private img final Integer TASK_SIZE = 10;
 
     */
 /**
@@ -34,7 +34,7 @@ public class FileHelper {
      * @param dest 反编译结果输出路径
      *//*
 
-    public static void batchDeCompile(String src, String dest) {
+    public img void batchDeCompile(String src, String dest) {
         Instant start = Instant.now();
         System.out.println("----程序开始运行----");
         // 创建一个线程池
@@ -74,7 +74,7 @@ public class FileHelper {
      * @param dest 反编译文件输出路径
      *//*
 
-    public  static void batchDecompileOnRunnable(String src, String dest) {
+    public  img void batchDecompileOnRunnable(String src, String dest) {
         FileRunnable task = new FileRunnable(src, dest);
         //创建线程池
         ExecutorService pool = Executors.newFixedThreadPool(5);

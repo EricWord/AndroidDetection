@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+
+<BorderPane stylesheets="@/static/mainUI.css"
+        styleClass="green-theme"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="com.eric.MainUI">
+ <!--   <top>
+        <AnchorPane prefHeight="80.0">
+            &lt;!&ndash;onMouseClicked=""&ndash;&gt;
+          &lt;!&ndash;  <Label text="图书后台管理系统" styleClass="font-gray"
+                   AnchorPane.topAnchor="20" AnchorPane.leftAnchor="10">
+                <effect>
+                    <Reflection bottomOpacity="0.2" fraction="0.5" topOffset="-5.0"/>
+                </effect>
+                <font>
+                    <Font name="System Bold" size="26.0"/>
+                </font>
+            </Label>&ndash;&gt;
+           &lt;!&ndash; <ImageView fitWidth="45" fitHeight="45" AnchorPane.topAnchor="15" AnchorPane.rightAnchor="120">
+                <Image url="/img/me.png"/>
+            </ImageView>&ndash;&gt;
+            <Button text="退出系统" styleClass="btn-radius-large,blue-theme"
+                    AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20"/>
+        </AnchorPane>
+    </top>-->
+    <center>
+        <SplitPane>
+            <AnchorPane styleClass="dark-gray-theme" minWidth="150" maxWidth="180">
+                <Accordion AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0"
+                           AnchorPane.topAnchor="0.0">
+                    <panes>
+                        <TitledPane alignment="TOP_LEFT" text="逆向工程">
+                            <VBox minHeight="100" spacing="10" styleClass="dark-theme">
+                                <Button styleClass="menu-btn" text="单个APK文件反编译" onAction="#sigleDecomplie" /><!--onAction="#listType"-->
+                                <Button styleClass="menu-btn" text="批量APK文件反编译" onAction="#mulltiDecomplie"/>
+                            </VBox>
+                        </TitledPane>
+                        <TitledPane alignment="TOP_LEFT" text="静态特征提取">
+                            <VBox minHeight="100" spacing="10" styleClass="dark-theme">
+                                <Button styleClass="menu-btn" text="权限特征提取" /> <!--onAction="#listBook"-->
+                                <Button styleClass="menu-btn" text="API特征提取"/>
+                            </VBox>
+                        </TitledPane>
+                        <TitledPane alignment="TOP_LEFT" text="模型训练">
+                            <VBox minHeight="130" spacing="10" styleClass="dark-theme">
+                                <Button styleClass="menu-btn" text="在线学习算法"/>
+                                <Button styleClass="menu-btn" text="其他算法"/>
+                            </VBox>
+                        </TitledPane>
+                        <TitledPane alignment="TOP_LEFT" text="应用检测">
+                            <VBox minHeight="130" spacing="10" styleClass="dark-theme">
+                                <Button styleClass="menu-btn" text="单一应用检测"/>
+                                <Button styleClass="menu-btn" text="批量应用检测"/>
+                            </VBox>
+                        </TitledPane>
+                        <TitledPane alignment="TOP_LEFT" text="模型更新">
+                            <VBox minHeight="130" spacing="10" styleClass="dark-theme">
+                                <Button styleClass="menu-btn" text="在线更新"/>
+                                <Button styleClass="menu-btn" text="数据对比"/>
+                            </VBox>
+                        </TitledPane>
+                    </panes>
+                </Accordion>
+            </AnchorPane>
+
+            <!--中间内容面板-->
+            <StackPane fx:id="mainContainer" styleClass="default-theme" minWidth="1060">
+                <padding>
+                    <Insets top="10" left="30" bottom="5" right="10"/>
+
+
+                </padding>
+                <Label text="基于在线学习的恶意Android应用检测系统" styleClass="font-gray"
+                       AnchorPane.topAnchor="20" AnchorPane.leftAnchor="10">
+                    <effect>
+                        <Reflection bottomOpacity="0.2" fraction="0.5" topOffset="-5.0"/>
+                    </effect>
+                    <font>
+                        <Font name="System Bold" size="26.0"/>
+                    </font>
+                </Label>
+
+            </StackPane>
+            <padding>
+                <Insets top="10"/>
+            </padding>
+        </SplitPane>
+    </center>
+</BorderPane>
