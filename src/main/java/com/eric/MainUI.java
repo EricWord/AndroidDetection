@@ -1,16 +1,19 @@
 package com.eric;
 
+import com.eric.fxmlController.MainUIController;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.net.URL;
 
 /*
  *@description:应用程序主界面
@@ -19,11 +22,39 @@ import javafx.stage.Stage;
  *@Version:1.0
  *@Date:2019/4/8
  */
-public class MainUI extends Application  implements EventHandler {
+public class MainUI extends Application implements EventHandler {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/MainUI.fxml"));
+
+        FXMLLoader loader = new FXMLLoader();
+        URL url = loader.getClassLoader().getResource("fxml/MainUI.fxml");
+//        Parent root = loader.load(getClass().getClassLoader().getResource("fxml/MainUI.fxml"));
+        loader.setLocation(url);
+        BorderPane root = (BorderPane) loader.load();
+        //获得控制器
+        MainUIController mainUIController = (MainUIController) loader.getController();
+        //获取单一APK文件反编译按钮
+        Button singleApkDecompileButton = mainUIController.getSingleApkDecompile();
+        //获取批量反编译APK按钮
+        Button multipleApkDecompileButton = mainUIController.getMultipleApkDecompile();
+        //获取权限特征提取按钮
+        Button authorityExtractButton = mainUIController.getAuthorityExtract();
+        //获取API特征提取按钮
+        Button apiExtractButton = mainUIController.getApiExtract();
+        //获取在线学习算法按钮
+        Button onlineLearningAlgorithmButton = mainUIController.getOnlineLearningAlgorithm();
+        //获取其他算法按钮
+        Button otherAlgorithmButton = mainUIController.getOtherAlgorithm();
+        //获取单一应用检测按钮
+        Button singleApkDetectionButton = mainUIController.getSingleApkDetection();
+        //获取批量应用检测按钮
+        Button multipleApkDetectionButton = mainUIController.getMultipleApkDetection();
+        //获取在线更新按钮
+        Button onlineUpdateButton = mainUIController.getOnlineUpdate();
+        //获取数据对比按钮
+        Button compareDataButton = mainUIController.getCompareData();
+
 
         Scene scene = new Scene(root, 1200, 750);
         stage.setTitle("基于在线学习的恶意Android应用检测系统");
@@ -34,10 +65,112 @@ public class MainUI extends Application  implements EventHandler {
         stage.setScene(scene);
         stage.show();
 
+        //获取中间的标签
+        Label mainContainerLabel = mainUIController.getMainContainerLabel();
+
+
+        //-----------------下面是按钮的点击事件---------------------
+        //单一APK文件反编译按钮事件监听
+        singleApkDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("单个APK文件反编译");
+
+            }
+        });
+
+        //批量APK文件反编译按钮事件监听
+        multipleApkDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("批量APK文件反编译");
+
+            }
+        });
+
+        //权限特征提取按钮事件监听
+        authorityExtractButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("权限特征提取");
+
+            }
+        });
+
+        //API特征提取按钮事件监听
+        apiExtractButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("API特征提取");
+
+            }
+        });
+
+        //在线学习算法按钮事件监听
+        onlineLearningAlgorithmButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("在线学习算法");
+
+            }
+        });
+
+        //其他算法按钮事件监听
+        otherAlgorithmButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("其他学习算法");
+
+            }
+        });
+
+        //单一应用检测按钮事件监听
+        singleApkDetectionButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("单一应用检测");
+
+
+            }
+        });
+
+        //批量应用检测按钮事件监听
+        multipleApkDetectionButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("批量应用检测");
+
+            }
+        });
+
+        //在线更新按钮事件监听
+        onlineUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("在线更新模型");
+
+
+            }
+        });
+
+        //数据对比按钮设置事件监听
+        compareDataButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mainContainerLabel.setText("数据对比");
+
+            }
+        });
+
+
+
+
+
+
 
     }
 
-    public void sigleDecomplie(){
+ /*   public void sigleDecomplie(){
         System.out.println("单线程反编译按钮被点击了...");
         Stage stage = new Stage();
         BorderPane borderPane = new BorderPane();
@@ -49,11 +182,11 @@ public class MainUI extends Application  implements EventHandler {
         stage.show();
 
 
-    }
-    public void mulltiDecomplie(){
+    }*/
+/*    public void mulltiDecomplie(){
         System.out.println("多线程反编译按钮被点击了...");
 
-    }
+    }*/
 
 
     public static void main(String[] args) {
@@ -62,7 +195,7 @@ public class MainUI extends Application  implements EventHandler {
 
     @Override
     public void handle(Event event) {
-        Button bt = (Button)event.getSource();
+        Button bt = (Button) event.getSource();
         String text = bt.getText();
         System.out.println(text);
 
