@@ -8,6 +8,7 @@ import com.eric.service.APIService;
 import com.eric.service.AuthorityService;
 import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import com.eric.tools.api.APIHelper;
+import com.eric.tools.decode.APKTool;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,6 +163,12 @@ public class TestTools {
                 }
             }
         }
+
+    }
+
+    @Test
+    public void testApkTool(){
+        APKTool.decode("D:\\cgs\\File\\data\\goodAPKS\\com.bottle.buildcloud.apk","D:\\cgs\\File\\data\\testJavaFX\\DecompileResults");
 
     }
 

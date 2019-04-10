@@ -68,7 +68,7 @@ public class MainUIController {
 
     @FXML
     private void initialize() {
-        System.out.println("initialize()");
+        System.out.println("initialize MainUIController...");
 
     }
 
@@ -126,5 +126,61 @@ public class MainUIController {
 
     public Button getCompareData() {
         return compareData;
+    }
+
+    public void setMaxMainBorderPane(BorderPane maxMainBorderPane) {
+        this.maxMainBorderPane = maxMainBorderPane;
+    }
+
+    public void setSingleApkDecompile(Button singleApkDecompile) {
+        this.singleApkDecompile = singleApkDecompile;
+    }
+
+    public void setMultipleApkDecompile(Button multipleApkDecompile) {
+        this.multipleApkDecompile = multipleApkDecompile;
+    }
+
+    public void setAuthorityExtract(Button authorityExtract) {
+        this.authorityExtract = authorityExtract;
+    }
+
+    public void setApiExtract(Button apiExtract) {
+        this.apiExtract = apiExtract;
+    }
+
+    public void setOnlineLearningAlgorithm(Button onlineLearningAlgorithm) {
+        this.onlineLearningAlgorithm = onlineLearningAlgorithm;
+    }
+
+    public void setOtherAlgorithm(Button otherAlgorithm) {
+        this.otherAlgorithm = otherAlgorithm;
+    }
+
+    public void setSingleApkDetection(Button singleApkDetection) {
+        this.singleApkDetection = singleApkDetection;
+    }
+
+    public void setMultipleApkDetection(Button multipleApkDetection) {
+        this.multipleApkDetection = multipleApkDetection;
+    }
+
+    public void setOnlineUpdate(Button onlineUpdate) {
+        this.onlineUpdate = onlineUpdate;
+    }
+
+    public void setCompareData(Button compareData) {
+        this.compareData = compareData;
+    }
+
+    public void setMainContainer(StackPane mainContainer) {
+        this.mainContainer = mainContainer;
+    }
+
+    public void setMainContainerLabel(Label mainContainerLabel) {
+        this.mainContainerLabel = mainContainerLabel;
+    }
+
+    public void setCenterSplitPane(SplitPane centerSplitPane) {
+        this.centerSplitPane = centerSplitPane;
     }
 }

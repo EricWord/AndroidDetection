@@ -11,7 +11,7 @@
 <BorderPane stylesheets="@/static/mainUI.css" fx:id="maxMainBorderPane"
             styleClass="green-theme"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.eric.fxmlController.SingleApkDecompileController">
+            fx:controller="com.eric.fxmlController.AuthorityExtractFXMLController">
 
     <center>
         <SplitPane fx:id="centerSplitPane">
@@ -66,11 +66,8 @@
                     <!--左侧-->
                     <left>
                         <VBox >
-                            <Button text="选择一个APK文件"  onAction="#chooseOneApk"></Button>
-                            <Label fx:id="choseOneApkPathLabel"></Label>
-                            <Button text="设置反编译结果存放文件夹"  onAction="#setDecompileResultSavePath"></Button>
-                            <Label fx:id="DecompileResultSavePathLabel"></Label>
-                            <Button text="开始反编译" onAction="#startDecompile"></Button>
+                            <Button text="选择要提取权限的文件包"  onAction="#chooseAuthorityExtractPackage"></Button>
+                            <Button text="开始反编译" onAction="#startExtractAuthority"></Button>
                             <Label fx:id="tipsLabel"></Label>
                         </VBox>
                     </left>
@@ -78,10 +75,10 @@
                     <right>
                         <VBox >
 
-                            <Label text="反编译信息(日志)"  ></Label>
-                            <TextArea fx:id="decompileInfoTextArea">
+                            <Label text="权限信息列表"  ></Label>
+                            <TextArea fx:id="AuthorityInfoTextArea">
 
-                                <text>日志内容</text>
+                                <text>权限信息内容</text>
                             </TextArea>
 
 

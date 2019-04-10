@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 
 /*
@@ -74,7 +76,20 @@ public class MainUI extends Application implements EventHandler {
         singleApkDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                mainContainerLabel.setText("单个APK文件反编译");
+                FXMLLoader singleApkDecompileLoader = new FXMLLoader();
+                URL url = singleApkDecompileLoader.getClassLoader().getResource("fxml/singleApkDecompile.fxml");
+                singleApkDecompileLoader.setLocation(url);
+                BorderPane singleApkDecompileRoot = null;
+                try {
+                    singleApkDecompileRoot = (BorderPane) singleApkDecompileLoader.load();
+                    Scene singleApkDecompileScene = new Scene(singleApkDecompileRoot);
+                    Node node = (Node) event.getSource();
+                    Stage mainStage = (Stage) node.getScene().getWindow();
+                    mainStage.setScene(singleApkDecompileScene);
+                    mainStage.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -83,7 +98,20 @@ public class MainUI extends Application implements EventHandler {
         multipleApkDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                mainContainerLabel.setText("批量APK文件反编译");
+                FXMLLoader multipleApkDecompileLoader = new FXMLLoader();
+                URL url = multipleApkDecompileLoader.getClassLoader().getResource("fxml/multipleApkDecompile.fxml");
+                multipleApkDecompileLoader.setLocation(url);
+                BorderPane multipleApkDecompileRoot = null;
+                try {
+                    multipleApkDecompileRoot = (BorderPane) multipleApkDecompileLoader.load();
+                    Scene multipleApkDecompileScene = new Scene(multipleApkDecompileRoot);
+                    Node node = (Node) event.getSource();
+                    Stage mainStage = (Stage) node.getScene().getWindow();
+                    mainStage.setScene(multipleApkDecompileScene);
+                    mainStage.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -92,7 +120,20 @@ public class MainUI extends Application implements EventHandler {
         authorityExtractButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                mainContainerLabel.setText("权限特征提取");
+                FXMLLoader authorityExtractLoader = new FXMLLoader();
+                URL url = authorityExtractLoader.getClassLoader().getResource("fxml/AuthorityExtract.fxml");
+                authorityExtractLoader.setLocation(url);
+                BorderPane authorityExtractRoot = null;
+                try {
+                    authorityExtractRoot = (BorderPane) authorityExtractLoader.load();
+                    Scene authorityExtractScene = new Scene(authorityExtractRoot);
+                    Node node = (Node) event.getSource();
+                    Stage mainStage = (Stage) node.getScene().getWindow();
+                    mainStage.setScene(authorityExtractScene);
+                    mainStage.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -161,11 +202,6 @@ public class MainUI extends Application implements EventHandler {
 
             }
         });
-
-
-
-
-
 
 
     }

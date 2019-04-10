@@ -11,7 +11,7 @@
 <BorderPane stylesheets="@/static/mainUI.css" fx:id="maxMainBorderPane"
             styleClass="green-theme"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.eric.fxmlController.SingleApkDecompileController">
+            fx:controller="com.eric.fxmlController.MultipleApkDecompileController">
 
     <center>
         <SplitPane fx:id="centerSplitPane">
@@ -66,8 +66,8 @@
                     <!--左侧-->
                     <left>
                         <VBox >
-                            <Button text="选择一个APK文件"  onAction="#chooseOneApk"></Button>
-                            <Label fx:id="choseOneApkPathLabel"></Label>
+                            <Button text="选择多个APK文件"  onAction="#chooseManyApk"></Button>
+                            <Label fx:id="choseManyApkPathLabel"></Label>
                             <Button text="设置反编译结果存放文件夹"  onAction="#setDecompileResultSavePath"></Button>
                             <Label fx:id="DecompileResultSavePathLabel"></Label>
                             <Button text="开始反编译" onAction="#startDecompile"></Button>

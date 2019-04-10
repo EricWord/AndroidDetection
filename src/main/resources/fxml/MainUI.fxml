@@ -75,7 +75,7 @@
             <!--中间内容面板-->
             <StackPane fx:id="mainContainer" styleClass="default-theme" minWidth="1060">
                 <padding>
-                    <Insets top="10" left="30" bottom="5" right="10"/>
+                    <Insets top="30" left="30" bottom="5" right="30"/>
 
 
                 </padding>
