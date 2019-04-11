@@ -1,22 +1,18 @@
 package com.eric;
 
-import com.eric.fxmlController.MainUIController;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import java.net.URL;
 
 /*
  *@description:应用程序主界面
@@ -25,211 +21,131 @@ import java.net.URL;
  *@Version:1.0
  *@Date:2019/4/8
  */
-public class MainUI extends Application implements EventHandler {
+public class MainUI extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
 
-        FXMLLoader loader = new FXMLLoader();
-        URL url = loader.getClassLoader().getResource("fxml/MainUI.fxml");
-//        Parent root = loader.load(getClass().getClassLoader().getResource("fxml/MainUI.fxml"));
-        loader.setLocation(url);
-        BorderPane root = (BorderPane) loader.load();
-        //获得控制器
-        MainUIController mainUIController = (MainUIController) loader.getController();
-        //获取单一APK文件反编译按钮
-        Button singleApkDecompileButton = mainUIController.getSingleApkDecompile();
-        //获取批量反编译APK按钮
-        Button multipleApkDecompileButton = mainUIController.getMultipleApkDecompile();
-        //获取权限特征提取按钮
-        Button authorityExtractButton = mainUIController.getAuthorityExtract();
-        //获取API特征提取按钮
-        Button apiExtractButton = mainUIController.getApiExtract();
-        //获取在线学习算法按钮
-        Button onlineLearningAlgorithmButton = mainUIController.getOnlineLearningAlgorithm();
-        //获取其他算法按钮
-        Button otherAlgorithmButton = mainUIController.getOtherAlgorithm();
-        //获取单一应用检测按钮
-        Button singleApkDetectionButton = mainUIController.getSingleApkDetection();
-        //获取批量应用检测按钮
-        Button multipleApkDetectionButton = mainUIController.getMultipleApkDetection();
-        //获取在线更新按钮
-        Button onlineUpdateButton = mainUIController.getOnlineUpdate();
-        //获取数据对比按钮
-        Button compareDataButton = mainUIController.getCompareData();
-        //获取主界面中间内容面板
-        StackPane mainContainer = mainUIController.getMainContainer();
-        //获取单个Apk文件反编译中间内容部分
-        StackPane singleDecompileMainContainer = mainUIController.getSingleDecompileMainContainer();
-
-
-        Scene scene = new Scene(root, 1200, 750);
-        stage.setTitle("基于在线学习的恶意Android应用检测系统");
-        //设置icon
-        stage.getIcons().add(new Image("file:D:\\cgs\\Projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
-
-
+        //绝对布局
+        AnchorPane an = new AnchorPane();
+        //给布局设置一个背景颜色
+        an.setStyle("-fx-background-color: #FFEFDB");
+        Scene scene = new Scene(an);
+        //将场景添加到舞台
         stage.setScene(scene);
+        //设置舞台的宽高
+        stage.setHeight(780);
+        stage.setWidth(1400);
+        //设置标题
+        stage.setTitle("基于在线学习的恶意Android应用检测系统");
+        //设置左上角的图标
+        stage.getIcons().add(new Image("file:D:\\cgs\\Projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
+        TabPane tabPane = new TabPane();
+        tabPane.setPrefHeight(300);
+        Tab reverseEngineeringTab = new Tab("逆向工程");
+        Tab StaticFeatureExtractionTab = new Tab("静态特征提取");
+        Tab modelTrainingTab = new Tab("模型训练");
+        Tab applicationDetectionTab = new Tab("应用检测");
+        Tab ModelUpdatingTab = new Tab("模型更新");
+        tabPane.getTabs().addAll(reverseEngineeringTab, StaticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, ModelUpdatingTab);
+
+        //设置不可关闭
+        reverseEngineeringTab.setClosable(false);
+        StaticFeatureExtractionTab.setClosable(false);
+        modelTrainingTab.setClosable(false);
+        applicationDetectionTab.setClosable(false);
+        ModelUpdatingTab.setClosable(false);
+        //给tab设置图标
+        an.getChildren().add(tabPane);
+
+
+//----------------------------------设置各个Tab的内容开始----------------------------------------------------
+        //设置逆向工程Tab的内容
+        BorderPane reverseEngineeringBorderPane = new BorderPane();
+        //左侧部分的内容
+        VBox reverseEngineeringLeftVBox = new VBox();
+        //选择单个APK文件按钮
+        Button chooseOneApkButton = new Button("选择单个Apk文件");
+        //设置反编译结果存放文件夹按钮
+        Button setDecompileSaveDirectoryButton = new Button("设置反编译结果存放文件夹");
+        //开始反编译按钮
+        Button startDecompileButton = new Button("开始反编译");
+        //将上述按钮添加到VBox
+        reverseEngineeringLeftVBox.getChildren().addAll(chooseOneApkButton,setDecompileSaveDirectoryButton,startDecompileButton);
+
+
+        //右侧部分
+        VBox reverseEngineeringRightVBox =new VBox();
+        //右侧表头
+        Label rightDecompileInfoLabel = new Label("反编译日志信息");
+        //右侧文本域
+        TextArea rightDecompileInfoTextArea = new TextArea("反编译信息");
+        reverseEngineeringRightVBox.getChildren().addAll(rightDecompileInfoLabel,rightDecompileInfoTextArea);
+
+        //将左侧内容添加到布局
+        reverseEngineeringBorderPane.setLeft(reverseEngineeringLeftVBox);
+        //将右侧内容添加到布局
+        reverseEngineeringBorderPane.setRight(reverseEngineeringRightVBox);
+        BorderPane.setMargin(reverseEngineeringLeftVBox,new Insets(30,200,500,30));
+        BorderPane.setMargin(reverseEngineeringRightVBox,new Insets(30,30,500,200));
+
+
+
+        reverseEngineeringTab.setContent(reverseEngineeringBorderPane);
+        StaticFeatureExtractionTab.setContent(new Button("tab2上的按钮"));
+        modelTrainingTab.setContent(new Button("tab3上的按钮"));
+
+
+//----------------------------------设置各个Tab的内容结束----------------------------------------------------
+
+
+//显示舞台
         stage.show();
+        //设置不可变
+        stage.setResizable(false);
+        tabPane.setPrefWidth(an.getWidth());
+        //设置选中哪个
+        tabPane.getSelectionModel().select(StaticFeatureExtractionTab);
+        //设置tabPane的背景颜色
+        tabPane.setStyle("-fx-background-color: #F5FFFA");
 
-        //获取中间的标签
-        Label mainContainerLabel = mainUIController.getMainContainerLabel();
 
-
-        //-----------------下面是按钮的点击事件---------------------
-        //单一APK文件反编译按钮事件监听
-        singleApkDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
+        //监听选择了哪个tab
+        tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
             @Override
-            public void handle(ActionEvent event) {
-                //首页主面板不可见
-                mainContainer.setVisible(false);
-                stage.hide();
-                //单个Apk文件中间内容面板可见
-                singleDecompileMainContainer.setVisible(true);
-                stage.show();
-
-
-
-            /*    FXMLLoader singleApkDecompileLoader = new FXMLLoader();
-                URL url = singleApkDecompileLoader.getClassLoader().getResource("fxml/singleApkDecompile.fxml");
-                singleApkDecompileLoader.setLocation(url);
-                BorderPane singleApkDecompileRoot = null;
-                try {
-                    singleApkDecompileRoot = (BorderPane) singleApkDecompileLoader.load();
-                    Scene singleApkDecompileScene = new Scene(singleApkDecompileRoot);
-                    Node node = (Node) event.getSource();
-                    Stage mainStage = (Stage) node.getScene().getWindow();
-                    mainStage.setScene(singleApkDecompileScene);
-                    mainStage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
-
+            public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+                System.out.println(newValue.getText());
             }
         });
 
-        //批量APK文件反编译按钮事件监听
-        multipleApkDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
+        //tab被选中时事件监听
+        reverseEngineeringTab.setOnSelectionChanged(new EventHandler<Event>() {
             @Override
-            public void handle(ActionEvent event) {
-                FXMLLoader multipleApkDecompileLoader = new FXMLLoader();
-                URL url = multipleApkDecompileLoader.getClassLoader().getResource("fxml/multipleApkDecompile.fxml");
-                multipleApkDecompileLoader.setLocation(url);
-                BorderPane multipleApkDecompileRoot = null;
-                try {
-                    multipleApkDecompileRoot = (BorderPane) multipleApkDecompileLoader.load();
-                    Scene multipleApkDecompileScene = new Scene(multipleApkDecompileRoot);
-                    Node node = (Node) event.getSource();
-                    Stage mainStage = (Stage) node.getScene().getWindow();
-                    mainStage.setScene(multipleApkDecompileScene);
-                    mainStage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            public void handle(Event event) {
+                Tab t = (Tab) event.getSource();
+                System.out.println("tab1的选择状态是：" + reverseEngineeringTab.isSelected());
+            }
+
+        });
+
+        //如何动态添加tab
+      /*  an.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                tabPane.getTabs().add(new Tab("hello"));
+            }
+        });*/
+
+        tabPane.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                tabPane.setPrefHeight(an.getWidth());
 
             }
         });
-
-        //权限特征提取按钮事件监听
-        authorityExtractButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                FXMLLoader authorityExtractLoader = new FXMLLoader();
-                URL url = authorityExtractLoader.getClassLoader().getResource("fxml/AuthorityExtract.fxml");
-                authorityExtractLoader.setLocation(url);
-                BorderPane authorityExtractRoot = null;
-                try {
-                    authorityExtractRoot = (BorderPane) authorityExtractLoader.load();
-                    Scene authorityExtractScene = new Scene(authorityExtractRoot);
-                    Node node = (Node) event.getSource();
-                    Stage mainStage = (Stage) node.getScene().getWindow();
-                    mainStage.setScene(authorityExtractScene);
-                    mainStage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-
-        //API特征提取按钮事件监听
-        apiExtractButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mainContainerLabel.setText("API特征提取");
-
-            }
-        });
-
-        //在线学习算法按钮事件监听
-        onlineLearningAlgorithmButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mainContainerLabel.setText("在线学习算法");
-
-            }
-        });
-
-        //其他算法按钮事件监听
-        otherAlgorithmButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mainContainerLabel.setText("其他学习算法");
-
-            }
-        });
-
-        //单一应用检测按钮事件监听
-        singleApkDetectionButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mainContainerLabel.setText("单一应用检测");
-
-
-            }
-        });
-
-        //批量应用检测按钮事件监听
-        multipleApkDetectionButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mainContainerLabel.setText("批量应用检测");
-
-            }
-        });
-
-        //在线更新按钮事件监听
-        onlineUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mainContainerLabel.setText("在线更新模型");
-
-
-            }
-        });
-
-        //数据对比按钮设置事件监听
-        compareDataButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mainContainerLabel.setText("数据对比");
-
-            }
-        });
-
-
     }
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    @Override
-    public void handle(Event event) {
-        Button bt = (Button) event.getSource();
-        String text = bt.getText();
-        System.out.println(text);
-
-
     }
 }
