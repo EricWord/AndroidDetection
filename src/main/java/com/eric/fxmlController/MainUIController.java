@@ -53,9 +53,13 @@ public class MainUIController {
     @FXML
     private Button compareData;
 
-    //中间内容面板
+    //中间内容面板(主界面)
     @FXML
     private StackPane mainContainer;
+
+    //单个Apk文件反编译中间内容面板
+    @FXML
+    private StackPane singleDecompileMainContainer;
     //中间内容面板label
     @FXML
     private Label mainContainerLabel;
@@ -71,6 +75,32 @@ public class MainUIController {
         System.out.println("initialize MainUIController...");
 
     }
+
+
+
+    public StackPane getSingleDecompileMainContainer() {
+        return singleDecompileMainContainer;
+    }
+
+    public void singleApkDecompileChooseOneApk(){
+
+    }
+
+
+    public void singleApkDecompileSetDecompileResultSavePath(){
+
+    }
+
+
+    public void singleApkDecompileStartDecompile(){
+
+    }
+
+
+
+
+
+
 
     public Button getSingleApkDecompile() {
         return singleApkDecompile;

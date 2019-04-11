@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -56,6 +57,10 @@ public class MainUI extends Application implements EventHandler {
         Button onlineUpdateButton = mainUIController.getOnlineUpdate();
         //获取数据对比按钮
         Button compareDataButton = mainUIController.getCompareData();
+        //获取主界面中间内容面板
+        StackPane mainContainer = mainUIController.getMainContainer();
+        //获取单个Apk文件反编译中间内容部分
+        StackPane singleDecompileMainContainer = mainUIController.getSingleDecompileMainContainer();
 
 
         Scene scene = new Scene(root, 1200, 750);
@@ -76,7 +81,16 @@ public class MainUI extends Application implements EventHandler {
         singleApkDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                FXMLLoader singleApkDecompileLoader = new FXMLLoader();
+                //首页主面板不可见
+                mainContainer.setVisible(false);
+                stage.hide();
+                //单个Apk文件中间内容面板可见
+                singleDecompileMainContainer.setVisible(true);
+                stage.show();
+
+
+
+            /*    FXMLLoader singleApkDecompileLoader = new FXMLLoader();
                 URL url = singleApkDecompileLoader.getClassLoader().getResource("fxml/singleApkDecompile.fxml");
                 singleApkDecompileLoader.setLocation(url);
                 BorderPane singleApkDecompileRoot = null;
@@ -89,7 +103,7 @@ public class MainUI extends Application implements EventHandler {
                     mainStage.show();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
 
             }
         });
@@ -205,25 +219,6 @@ public class MainUI extends Application implements EventHandler {
 
 
     }
-
- /*   public void sigleDecomplie(){
-        System.out.println("单线程反编译按钮被点击了...");
-        Stage stage = new Stage();
-        BorderPane borderPane = new BorderPane();
-
-        Text text = new Text("这是测试文本");
-        borderPane.getChildren().add(text);
-        Scene scene = new Scene(borderPane);
-        stage.setScene(scene);
-        stage.show();
-
-
-    }*/
-/*    public void mulltiDecomplie(){
-        System.out.println("多线程反编译按钮被点击了...");
-
-    }*/
-
 
     public static void main(String[] args) {
         launch(args);

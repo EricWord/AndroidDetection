@@ -22,7 +22,8 @@
                     <panes>
                         <TitledPane alignment="TOP_LEFT" text="逆向工程">
                             <VBox minHeight="100" spacing="10" styleClass="dark-theme">
-                                <Button styleClass="menu-btn" text="单个APK文件反编译" fx:id="singleApkDecompile"/><!--onAction="#listType"-->
+                                <Button styleClass="menu-btn" text="单个APK文件反编译"
+                                        fx:id="singleApkDecompile"/><!--onAction="#listType"-->
                                 <Button styleClass="menu-btn" text="批量APK文件反编译" fx:id="multipleApkDecompile"/>
                             </VBox>
                         </TitledPane>
@@ -62,13 +63,13 @@
 
                 </padding>
 
-                <BorderPane    minWidth="1060" minHeight="745">
+                <BorderPane minWidth="1060" minHeight="745">
                     <!--左侧-->
                     <left>
-                        <VBox >
-                            <Button text="选择一个APK文件"  onAction="#chooseOneApk"></Button>
+                        <VBox>
+                            <Button text="选择一个APK文件" onAction="#chooseOneApk"></Button>
                             <Label fx:id="choseOneApkPathLabel"></Label>
-                            <Button text="设置反编译结果存放文件夹"  onAction="#setDecompileResultSavePath"></Button>
+                            <Button text="设置反编译结果存放文件夹" onAction="#setDecompileResultSavePath"></Button>
                             <Label fx:id="DecompileResultSavePathLabel"></Label>
                             <Button text="开始反编译" onAction="#startDecompile"></Button>
                             <Label fx:id="tipsLabel"></Label>
@@ -76,9 +77,9 @@
                     </left>
                     <!--右侧-->
                     <right>
-                        <VBox >
+                        <VBox>
 
-                            <Label text="反编译信息(日志)"  ></Label>
+                            <Label text="反编译信息(日志)"></Label>
                             <TextArea fx:id="decompileInfoTextArea">
 
                                 <text>日志内容</text>
@@ -91,16 +92,6 @@
                     </right>
 
                 </BorderPane>
-                <!-- <Label fx:id="mainContainerLabel" text="基于在线学习的恶意Android应用检测系统" styleClass="font-gray"
-                        AnchorPane.topAnchor="20" AnchorPane.leftAnchor="10">
-                     <effect>
-                         <Reflection bottomOpacity="0.2" fraction="0.5" topOffset="-5.0"/>
-                     </effect>
-                     <font>
-                         <Font name="System Bold" size="26.0"/>
-                     </font>
-                 </Label>-->
-
             </StackPane>
             <padding>
                 <Insets top="10"/>

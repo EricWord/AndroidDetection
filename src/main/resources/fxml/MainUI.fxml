@@ -9,28 +9,28 @@
 
 
 <BorderPane stylesheets="@/static/mainUI.css" fx:id="maxMainBorderPane"
-        styleClass="green-theme"
-        xmlns:fx="http://javafx.com/fxml"
-        fx:controller="com.eric.fxmlController.MainUIController">
- <!--   <top>
-        <AnchorPane prefHeight="80.0">
-            &lt;!&ndash;onMouseClicked=""&ndash;&gt;
-          &lt;!&ndash;  <Label text="图书后台管理系统" styleClass="font-gray"
-                   AnchorPane.topAnchor="20" AnchorPane.leftAnchor="10">
-                <effect>
-                    <Reflection bottomOpacity="0.2" fraction="0.5" topOffset="-5.0"/>
-                </effect>
-                <font>
-                    <Font name="System Bold" size="26.0"/>
-                </font>
-            </Label>&ndash;&gt;
-           &lt;!&ndash; <ImageView fitWidth="45" fitHeight="45" AnchorPane.topAnchor="15" AnchorPane.rightAnchor="120">
-                <Image url="/img/me.png"/>
-            </ImageView>&ndash;&gt;
-            <Button text="退出系统" styleClass="btn-radius-large,blue-theme"
-                    AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20"/>
-        </AnchorPane>
-    </top>-->
+            styleClass="green-theme"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.eric.fxmlController.MainUIController">
+    <!--   <top>
+           <AnchorPane prefHeight="80.0">
+               &lt;!&ndash;onMouseClicked=""&ndash;&gt;
+             &lt;!&ndash;  <Label text="图书后台管理系统" styleClass="font-gray"
+                      AnchorPane.topAnchor="20" AnchorPane.leftAnchor="10">
+                   <effect>
+                       <Reflection bottomOpacity="0.2" fraction="0.5" topOffset="-5.0"/>
+                   </effect>
+                   <font>
+                       <Font name="System Bold" size="26.0"/>
+                   </font>
+               </Label>&ndash;&gt;
+              &lt;!&ndash; <ImageView fitWidth="45" fitHeight="45" AnchorPane.topAnchor="15" AnchorPane.rightAnchor="120">
+                   <Image url="/img/me.png"/>
+               </ImageView>&ndash;&gt;
+               <Button text="退出系统" styleClass="btn-radius-large,blue-theme"
+                       AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20"/>
+           </AnchorPane>
+       </top>-->
     <center>
         <SplitPane fx:id="centerSplitPane">
             <AnchorPane styleClass="dark-gray-theme" minWidth="150" maxWidth="180">
@@ -40,7 +40,8 @@
                     <panes>
                         <TitledPane alignment="TOP_LEFT" text="逆向工程">
                             <VBox minHeight="100" spacing="10" styleClass="dark-theme">
-                                <Button styleClass="menu-btn" text="单个APK文件反编译" fx:id="singleApkDecompile"/><!--onAction="#listType"-->
+                                <Button styleClass="menu-btn" text="单个APK文件反编译"
+                                        fx:id="singleApkDecompile"/><!--onAction="#listType"-->
                                 <Button styleClass="menu-btn" text="批量APK文件反编译" fx:id="multipleApkDecompile"/>
                             </VBox>
                         </TitledPane>
@@ -73,7 +74,7 @@
             </AnchorPane>
 
             <!--中间内容面板-->
-            <StackPane fx:id="mainContainer" styleClass="default-theme" minWidth="1060">
+            <StackPane fx:id="mainContainer" styleClass="default-theme" minWidth="1060" visible="true">
                 <padding>
                     <Insets top="30" left="30" bottom="5" right="30"/>
 
@@ -90,6 +91,49 @@
                 </Label>
 
             </StackPane>
+
+            <StackPane fx:id="singleDecompileMainContainer" styleClass="default-theme" minWidth="1060" visible="false">
+                <padding>
+                    <Insets top="0" left="30" bottom="5" right="10"/>
+
+
+                </padding>
+
+                <BorderPane minWidth="1060" minHeight="745">
+                    <!--左侧-->
+                    <left>
+                        <VBox>
+                            <Button text="选择一个APK文件" onAction="#singleApkDecompileChooseOneApk"></Button>
+                            <Label fx:id="choseOneApkPathLabel"></Label>
+                            <Button text="设置反编译结果存放文件夹" onAction="#singleApkDecompileSetDecompileResultSavePath"></Button>
+                            <Label fx:id="DecompileResultSavePathLabel"></Label>
+                            <Button text="开始反编译" onAction="#singleApkDecompileStartDecompile"></Button>
+                            <Label fx:id="tipsLabel"></Label>
+                        </VBox>
+                    </left>
+                    <!--右侧-->
+                    <right>
+                        <VBox>
+
+                            <Label text="反编译信息(日志)"></Label>
+                            <TextArea fx:id="decompileInfoTextArea">
+
+                                <text>日志内容</text>
+                            </TextArea>
+
+
+                        </VBox>
+
+
+                    </right>
+
+                </BorderPane>
+            </StackPane>
+
+
+
+
+
             <padding>
                 <Insets top="10"/>
             </padding>
