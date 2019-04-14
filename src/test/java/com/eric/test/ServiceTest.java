@@ -259,6 +259,28 @@ public class ServiceTest {
     }
 
 
+    /**
+     * 测试将权限从TXT文件中读取出来然后存入数据库
+     */
+    @Test
+    public void testAuthority2DB() {
+        authorityService.saveAuthority2DB("D:\\cgs\\File\\论文相关\\Android系统所有权限.txt");
+
+    }
+
+    @Test
+    public void testSaveAuthorityApkMap() {
+        authorityService.saveAuthorityApkMap("D:\\cgs\\File\\data\\0test0412\\GoodApksResults\\authority",0);
+
+    }
+    @Test
+    public void testGetAllAuthorityFromTxt(){
+        List<String> list = authorityService.getAllAuthorityFromTxt("D:\\cgs\\File\\data\\0test0412\\GoodApksResults\\authority\\com.brightdairy.personal.txt");
+        for (String s : list) {
+            System.out.println(s);
+        }
+
+    }
 
 
 }

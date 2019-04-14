@@ -9,8 +9,12 @@ import com.eric.tools.AndroidManifestHelper.AndroidManifestAnalyze;
 import com.eric.tools.MD5.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,9 +63,9 @@ public class AuthorityService {
 
                     packageName = AndroidManifestAnalyze.findPackage(xmlPath);
                 }
-                int apkId=-1;
+                int apkId = -1;
                 try {
-                    apkId=checkBeforeInsertAuthority(apkAttribute, packageName);
+                    apkId = checkBeforeInsertAuthority(apkAttribute, packageName);
                 } catch (MultipleDuplicateValuesInDatabaseException e) {
                     e.printStackTrace();
                 }
@@ -153,8 +157,8 @@ public class AuthorityService {
      * @param apkAttribute 应用属性
      * @param packageName  包名
      */
-    public synchronized int  checkBeforeInsertAuthority(int apkAttribute,String packageName) throws MultipleDuplicateValuesInDatabaseException {
-        int apkId=-1;
+    public synchronized int checkBeforeInsertAuthority(int apkAttribute, String packageName) throws MultipleDuplicateValuesInDatabaseException {
+        int apkId = -1;
         Apk apk = new Apk(packageName, apkAttribute);
         //在插入之前先判断数据库中有没有
         ApkExample apkExample = getApkExample(packageName);
@@ -359,6 +363,120 @@ public class AuthorityService {
         ApkExample.Criteria apkCriteria = apkExample.createCriteria();
         apkCriteria.andPackageNameEqualTo(packageName);
         return apkExample;
+    }
+
+    /**
+     * 将TXT中的权限存入数据库中
+     *
+     * @param src TXT文件路径
+     */
+    public void saveAuthority2DB(String src) {
+        int sum = 0;
+        try (FileReader reader = new FileReader(src);
+             BufferedReader br = new BufferedReader(reader)
+        ) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                //按照空格进行分割
+                String[] auArr = line.split("\\s+");
+                String au = auArr[1];
+                System.out.println(au);
+                String auMd5 = MD5Utils.MD5Encode(au, "UTF-8");
+                Authority authority = new Authority(au, auMd5);
+                //存入数据库
+                int i = authorityMapper.insertSelective(authority);
+                sum += i;
+            }
+            System.out.println("共插入了:" + sum + "条数据");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     * 从TXT文件中获取到所有的权限
+     *
+     * @return
+     */
+    public List<String> getAllAuthorityFromTxt(String path) {
+        List<String> auList = new ArrayList<>();
+        try (FileReader reader = new FileReader(path);
+             BufferedReader br = new BufferedReader(reader)
+        ) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                //非空
+                if(!StringUtils.isEmpty(line)){
+                    auList.add(line);
+                }
+
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return auList;
+
+
+    }
+
+    /**
+     * 遍历一个包含有多个txt文件的文件夹，将apk和权限的映射关系存入数据库中
+     *
+     * @param src
+     */
+    public void saveAuthorityApkMap(String src, int apkAttribute) {
+        File file = new File(src);
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            int i=0;
+            for (File f : files) {
+                String path = f.getAbsolutePath();
+                String[] pathArr = path.split("\\\\");
+                //获取包名
+                String fileName = pathArr[pathArr.length - 1];
+                String packageName = fileName.substring(0, fileName.length() - 4);
+                Apk apk = new Apk(packageName, apkAttribute);
+                ApkExample apkExample = getApkExample(packageName);
+                List<Apk> apks = apkMapper.selectByExample(apkExample);
+                if (apks.size() <= 0) {
+                    //插入
+                    apkMapper.insertSelective(apk);
+                }
+                //获取当前apk的id
+                Integer apkId = apk.getApkId();
+                List<String> list = getAllAuthorityFromTxt(path);
+                for (String a : list) {
+                    //加密权限
+                    String md5Encode = MD5Utils.MD5Encode(a, "UTF-8");
+                    AuthorityExample authorityExample = getAuthorityExample(md5Encode);
+                    List<Authority> authorities = authorityMapper.selectByExample(authorityExample);
+                    //理论上数据库中存在该权限记录的话只有一条
+                    //并且只处理只有一条记录的情况
+                    //没有或者多余1条的都不处理
+                    if(authorities.size()==1){
+                        //获取权限id
+                        Integer authorityId = authorities.get(0).getAuthorityId();
+                        AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId, apkId);
+                        List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
+                        //如果数据库中没有该映射关系则插入，其他情况不处理
+                        if(authorityApkMaps.size()<=0){
+                            AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId, authorityId);
+                            authorityApkMapMapper.insertSelective(authorityApkMap);
+                        }
+
+                    }
+                }
+                i++;
+                System.out.println("已经完成"+i+"个");
+
+            }
+        }
+
     }
 
 }
