@@ -270,7 +270,7 @@ public class ServiceTest {
 
     @Test
     public void testSaveAuthorityApkMap() {
-        authorityService.saveAuthorityApkMap("D:\\cgs\\File\\data\\0test0412\\GoodApksResults\\authority",0);
+        authorityService.saveApkAuthorityApkMap("E:\\7BiShe\\badAPKs\\3901-4200\\3901-4200Results\\",1);
 
     }
     @Test
@@ -279,6 +279,16 @@ public class ServiceTest {
         for (String s : list) {
             System.out.println(s);
         }
+
+    }
+
+    /**
+     * 测试生成最终用于机器学习的CSV格式的文件
+     */
+    @Test
+    public void testCreateFinalCSV(){
+        csvService.createFinalCSV("D:\\cgs\\File\\CSV\\20190416\\");
+
 
     }
 

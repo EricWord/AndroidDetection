@@ -426,10 +426,11 @@ public class AuthorityService {
 
     /**
      * 遍历一个包含有多个txt文件的文件夹，将apk和权限的映射关系存入数据库中
+     * 操作的对象是正常APK
      *
      * @param src
      */
-    public void saveAuthorityApkMap(String src, int apkAttribute) {
+    public void saveApkAuthorityApkMap(String src, int apkAttribute) {
         File file = new File(src);
         if (file.isDirectory()) {
             File[] files = file.listFiles();
@@ -447,8 +448,15 @@ public class AuthorityService {
                     //插入
                     apkMapper.insertSelective(apk);
                 }
-                //获取当前apk的id
-                Integer apkId = apk.getApkId();
+                //获取当前apk的id 这个地方这么获得的话得到的值是null,改进后的结果如下：
+                apks = apkMapper.selectByExample(apkExample);
+                //如果数据库中只有一条记录
+                Integer apkId =-1;
+                if(apks.size()==1){
+                    apkId =apks.get(0).getApkId();
+
+                }
+
                 List<String> list = getAllAuthorityFromTxt(path);
                 for (String a : list) {
                     //加密权限
@@ -461,12 +469,14 @@ public class AuthorityService {
                     if(authorities.size()==1){
                         //获取权限id
                         Integer authorityId = authorities.get(0).getAuthorityId();
-                        AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId, apkId);
-                        List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
-                        //如果数据库中没有该映射关系则插入，其他情况不处理
-                        if(authorityApkMaps.size()<=0){
-                            AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId, authorityId);
-                            authorityApkMapMapper.insertSelective(authorityApkMap);
+                        if(null!=authorityId&&apkId!=-1){
+                            AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId, apkId);
+                            List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
+                            //如果数据库中没有该映射关系则插入，其他情况不处理
+                            if (authorityApkMaps.size() <= 0) {
+                                AuthorityApkMap authorityApkMap = new AuthorityApkMap(apkId, authorityId);
+                                authorityApkMapMapper.insertSelective(authorityApkMap);
+                            }
                         }
 
                     }

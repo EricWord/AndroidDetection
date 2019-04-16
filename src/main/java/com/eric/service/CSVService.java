@@ -55,6 +55,7 @@ public class CSVService {
 
     /**
      * 将权限-应用关系映射表转为CSV格式文件
+     *
      * @param stringDate 用于拼接文件名的当前时间，保证每次生成的CSV文件名称不重复
      */
     public void tableAuthorityApkMap2CSV(String stringDate) {
@@ -66,7 +67,7 @@ public class CSVService {
             authorityApkMapTableFiledList.add(authorityApkMap.getAuthorityId().toString());
             authorityApkMapTableFiledList.add(authorityApkMap.getApkId().toString());
         }
-        System.out.println(">>>>>>authorityApkMapTableFiledList的大小为:"+authorityApkMapTableFiledList.size());
+        System.out.println(">>>>>>authorityApkMapTableFiledList的大小为:" + authorityApkMapTableFiledList.size());
         //将tb_authority_apk_map数据库表转为CSV格式的文件
         CSVUtils.createCSVFile(FileConstantUtils.TABLE_AUTHORITY_APK_MAP_LIST, authorityApkMapTableFiledList, "D:\\cgs\\File\\CSV", "tb_authority_apk_map_" + stringDate);
         authorityApkMapTableFiledList.clear();
@@ -74,6 +75,7 @@ public class CSVService {
 
     /**
      * 将API-应用关系映射表转为CSV格式的文件
+     *
      * @param stringDate 用于拼接文件名的当前时间，保证每次生成的CSV文件名称不重复
      */
     public void tableApiApkMap2CSV(String stringDate) {
@@ -84,7 +86,7 @@ public class CSVService {
             apiApkMapsTableFiledList.add(apiApkMap.getApiId().toString());
             apiApkMapsTableFiledList.add(apiApkMap.getApkId().toString());
         }
-        System.out.println(">>>>>>>apiApkMapsTableFiledList的大小为："+apiApkMapsTableFiledList.size());
+        System.out.println(">>>>>>>apiApkMapsTableFiledList的大小为：" + apiApkMapsTableFiledList.size());
         //将tb_api_apk_map数据库表转为CSV格式的文件
         CSVUtils.createCSVFile(FileConstantUtils.TABLE_API_APK_MAP_LIST, apiApkMapsTableFiledList, "D:\\cgs\\File\\CSV", "tb_api_apk_map_" + stringDate);
         apiApkMapsTableFiledList.clear();
@@ -92,6 +94,7 @@ public class CSVService {
 
     /**
      * 将权限表转为CSV格式的文件
+     *
      * @param stringDate 用于拼接文件名的当前时间，保证每次生成的CSV文件名称不重复
      */
     public void tableAuthority2CSV(String stringDate) {
@@ -105,7 +108,7 @@ public class CSVService {
             authorityTableFiledList.add(authority.getAuthorityMd5());
         }
 
-        System.out.println(">>>>>>authorityTableFiledList的大小为："+authorityTableFiledList.size());
+        System.out.println(">>>>>>authorityTableFiledList的大小为：" + authorityTableFiledList.size());
 
         //将tb_authority数据库表转为CSV格式的文件
         CSVUtils.createCSVFile(FileConstantUtils.TABLE_AUTHORITY_LIST, authorityTableFiledList, "D:\\cgs\\File\\CSV", "tb_authority_" + stringDate);
@@ -115,6 +118,7 @@ public class CSVService {
 
     /**
      * 将API表转为CSV格式的文件
+     *
      * @param stringDate 用于拼接文件名的当前时间，保证每次生成的CSV文件名称不重复
      */
     public void tableApi2CSV(String stringDate) {
@@ -126,7 +130,7 @@ public class CSVService {
             apiTableFiledList.add(api.getApiContent());
             apiTableFiledList.add(api.getApiMad5());
         }
-        System.out.println(">>>>>>>apiTableFiledList的大小为："+apiTableFiledList.size());
+        System.out.println(">>>>>>>apiTableFiledList的大小为：" + apiTableFiledList.size());
         //将tb_api数据库表转为CSV格式的文件
         CSVUtils.createCSVFile(FileConstantUtils.TABLE_API_LIST, apiTableFiledList, "D:\\cgs\\File\\CSV", "tb_api_" + stringDate);
         apiTableFiledList.clear();
@@ -134,6 +138,7 @@ public class CSVService {
 
     /**
      * 将apk表转为CSV格式的文件
+     *
      * @param stringDate 用于拼接文件名的当前时间，保证每次生成的CSV文件名称不重复
      */
 
@@ -141,17 +146,88 @@ public class CSVService {
         //查询数tb_apk表中的所有记录
         List<Apk> apks = apkMapper.selectByExample(null);
         //遍历每一个apk
-        List<String> tableFiledList =new ArrayList<>();
+        List<String> tableFiledList = new ArrayList<>();
         for (Apk apk : apks) {
             tableFiledList.add(apk.getApkId().toString());
             tableFiledList.add(apk.getPackageName());
             tableFiledList.add(apk.getApkAttribute().toString());
 
         }
-        System.out.println(">>>>>tableFiledList的大小为："+tableFiledList.size());
+        System.out.println(">>>>>tableFiledList的大小为：" + tableFiledList.size());
         //将tb_apk数据库转为CSV格式的文件
         CSVUtils.createCSVFile(FileConstantUtils.TABLE_APK_LIST, tableFiledList, "D:\\cgs\\File\\CSV", "tb_apk_" + stringDate);
         tableFiledList.clear();
+    }
+
+    /**
+     * 生成最终可以用于机器学习的CSV格式的文件
+     *
+     * @param des
+     */
+    public void createFinalCSV(String des) {
+        DateTime dateTime = new DateTime();
+        //当前时间
+        String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
+        /**
+         * 实现思路：
+         * 1.生成表头
+         * 2.生成每一行 表头中的数据只需要包含应用名称+各种权限+应用属性
+         *  2.1
+         */
+        //1.生成表头
+        //构造符合工具类要求的表头List
+        List<String> head = new ArrayList<>();
+        head.add("package_name");
+        List<Authority> authorities = authorityMapper.selectByExample(null);
+        for (Authority authority : authorities) {
+            String authorityContent = authority.getAuthorityContent();
+            head.add(authorityContent);
+        }
+        head.add("apk_attribute");
+
+        //2.生成每一行数据,构造每一行的数据
+        List<String> dataList = new ArrayList<>();
+
+        //获取所有的apk
+        List<Apk> apks = apkMapper.selectByExample(null);
+        //对每一个apk进行操作
+        for (Apk apk : apks) {
+            dataList.add(apk.getPackageName());
+            //遍历每一个权限，然后查找权限-apk映射表，确定当前apk有没有该权限
+            for (Authority authority : authorities) {
+                boolean flag = false;
+                AuthorityApkMapExample authorityApkMapExample = new AuthorityApkMapExample();
+                AuthorityApkMapExample.Criteria criteria = authorityApkMapExample.createCriteria();
+                criteria.andAuthorityIdEqualTo(authority.getAuthorityId());
+                List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
+                for (AuthorityApkMap authorityApkMap : authorityApkMaps) {
+                    if (authorityApkMap.getApkId() == apk.getApkId()) {
+                        flag = true;
+                    }
+                }
+                if (flag) {
+                    dataList.add(1+"");
+                } else {
+                    dataList.add(0+"");
+                }
+            }
+            //添加属性
+            if (apk.getApkAttribute() == 0) {
+                dataList.add(0+"");
+                continue;
+
+            }
+            if (apk.getApkAttribute() == 1) {
+                dataList.add(1+"");
+                continue;
+
+            }
+
+        }
+
+        //生成CSV格式的文件
+        CSVUtils.createCSVFile(head, dataList, des, "androidDetection_" + stringDate);
+
     }
 
 

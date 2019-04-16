@@ -83,13 +83,13 @@ public class CSVUtils {
 
         for (int i = 0; i < row.size(); i++) {
             //第一行数据要先写入一个换行
-            if(i==0){
+            if (i == 0) {
                 csvWriter.newLine();
             }
             if (i != row.size() - 1) {
                 csvWriter.write(row.get(i) + ",");
                 //换行逻辑判断
-                if ((i+1) % headLength == 0) {
+                if ((i + 1) % headLength == 0) {
                     //写入换行
                     csvWriter.newLine();
                 }

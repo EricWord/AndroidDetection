@@ -27,7 +27,7 @@ public class CommonTest {
      */
     @Test
     public void test2(){
-        File file = new File("D:\\cgs\\File\\data\\0test0412\\tenGoodApksResults\\authority");
+        File file = new File("D:\\cgs\\File\\data\\0test0412\\BadApkResult");
         String[] list = file.list();
         for (String s : list) {
             System.out.println(s);
