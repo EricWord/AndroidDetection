@@ -1,4 +1,4 @@
-package com.eric.test;
+package com.eric.test.javaFX;
 
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Application;
