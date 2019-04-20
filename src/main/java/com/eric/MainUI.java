@@ -76,12 +76,12 @@ public class MainUI extends Application {
         //将场景添加到舞台
         stage.setScene(scene);
         //设置舞台的宽高
-        stage.setHeight(780);
-        stage.setWidth(1400);
+        stage.setHeight(700);
+        stage.setWidth(1300);
         //设置标题
         stage.setTitle("基于在线学习的恶意Android应用检测系统");
         //设置左上角的图标
-        stage.getIcons().add(new Image("file:D:\\cgs\\Projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
+        stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
         TabPane tabPane = new TabPane();
         tabPane.setPrefHeight(750);
         //首页Tab 默认
@@ -112,6 +112,7 @@ public class MainUI extends Application {
         Label singelApkDecompileLabel = new Label("-------------------单个Apk文件反编译-------------------");
         //选择单个APK文件按钮
         Button chooseOneApkButton = new Button("选择单个Apk文件");
+
         //设置按钮的大小    在这里设置并不起作用
 //        chooseOneApkButton.setPrefHeight(50);
         //单个apk文件的路径
