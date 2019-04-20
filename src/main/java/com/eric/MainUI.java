@@ -4,6 +4,7 @@ import com.eric.service.AuthorityService;
 import com.eric.service.DeCompileService;
 import com.eric.tools.decode.APKTool;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTabPane;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -88,7 +89,8 @@ public class MainUI extends Application {
         stage.setTitle("基于在线学习的恶意Android应用检测系统");
         //设置左上角的图标
         stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
-        TabPane tabPane = new TabPane();
+//        TabPane tabPane = new TabPane();
+        JFXTabPane tabPane = new JFXTabPane();
         tabPane.setPrefHeight(750);
         //首页Tab 默认
         Tab reverseEngineeringTab = new Tab("逆向工程");
@@ -97,6 +99,8 @@ public class MainUI extends Application {
         Tab applicationDetectionTab = new Tab("应用检测");
         Tab ModelUpdatingTab = new Tab("模型更新");
         tabPane.getTabs().addAll(reverseEngineeringTab, StaticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, ModelUpdatingTab);
+        SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+        selectionModel.select(0);
 
         //设置不可关闭
         reverseEngineeringTab.setClosable(false);
