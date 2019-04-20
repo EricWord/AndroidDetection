@@ -3,6 +3,7 @@ package com.eric;
 import com.eric.service.AuthorityService;
 import com.eric.service.DeCompileService;
 import com.eric.tools.decode.APKTool;
+import com.jfoenix.controls.JFXButton;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -22,6 +23,7 @@ import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +60,8 @@ public class MainUI extends Application {
     private String multipleApkDirectoryPath;
     //反编译结果存放文件夹
     private String decompileResultSavePath;
+    //批量反编译结果存放文件夹
+//    private String batchDecomplieResultSavePath;
     //权限提取选择的文件夹路径
     private String authorityDirectory;
     //要检测的Apk所在的路径
@@ -73,6 +77,8 @@ public class MainUI extends Application {
         //给布局设置一个背景颜色
         an.setStyle("-fx-background-color: #FFEFDB");
         Scene scene = new Scene(an);
+        //使用jfoenix框架必须给场景设置css后按钮才有效果
+        scene.getStylesheets().add(MainUI.class.getResource("/static/jfoenix-components.css").toExternalForm());
         //将场景添加到舞台
         stage.setScene(scene);
         //设置舞台的宽高
@@ -105,39 +111,43 @@ public class MainUI extends Application {
 //----------------------------------设置各个Tab的内容开始----------------------------------------------------
         //设置逆向工程Tab的内容
         BorderPane reverseEngineeringBorderPane = new BorderPane();
-        reverseEngineeringBorderPane.setPrefSize(750, 1400);
+        reverseEngineeringBorderPane.setPrefSize(700, 1300);
         //左侧部分的内容
         VBox reverseEngineeringLeftVBox = new VBox();
         //单个Apk文件反编译Label
         Label singelApkDecompileLabel = new Label("-------------------单个Apk文件反编译-------------------");
         //选择单个APK文件按钮
-        Button chooseOneApkButton = new Button("选择单个Apk文件");
-
-        //设置按钮的大小    在这里设置并不起作用
-//        chooseOneApkButton.setPrefHeight(50);
+        JFXButton chooseOneApkButton = new JFXButton("选择单个Apk文件");
+        chooseOneApkButton.getStyleClass().add("button-raised");
         //单个apk文件的路径
         Label singleApkPathLabel = new Label();
         //设置反编译结果存放文件夹按钮
-        Button setDecompileSaveDirectoryButton = new Button("设置反编译结果存放文件夹");
+        JFXButton setDecompileSaveDirectoryButton = new JFXButton("设置反编译结果存放文件夹");
+        setDecompileSaveDirectoryButton.getStyleClass().add("button-raised");
         //反编译结果存放文件夹路径
         Label decompileResultSaveDirectoryPathLabel = new Label();
         //开始反编译按钮
-        Button startDecompileButton = new Button("开始反编译");
+        JFXButton startDecompileButton = new JFXButton("开始反编译");
+        startDecompileButton.getStyleClass().add("button-raised");
 
         //多个Apk文件反编译Label
         Label multipleApkDecompileLabel = new Label("-------------------多个Apk文件反编译-------------------");
 
 
         //选择多个APK文件按钮
-        Button chooseManyApkAndDecompileButton = new Button("选择多个Apk文件并反编译");
-        Button chooseManyApkButton = new Button("选择多个Apk文件所在文件夹");
+        JFXButton chooseManyApkAndDecompileButton = new JFXButton("选择多个Apk文件并反编译");
+        chooseManyApkAndDecompileButton.getStyleClass().add("button-raised");
+        JFXButton chooseManyApkButton = new JFXButton("选择多个Apk文件所在文件夹");
+        chooseManyApkButton.getStyleClass().add("button-raised");
         //多个Apk文件的路径
         Label multipleApkPathLabel = new Label();
         //设置反编译结果存放文件夹按钮
-        Button setMultipleDecompileSaveDirectoryButton = new Button("设置批量反编译结果存放文件夹");
+        JFXButton setMultipleDecompileSaveDirectoryButton = new JFXButton("设置批量反编译结果存放文件夹");
+        setMultipleDecompileSaveDirectoryButton.getStyleClass().add("button-raised");
         Label multipleDecompileSavePathLabel = new Label();
         //开始批量反编译按钮
-        Button startMultipleDecompileButton = new Button("开始批量反编译");
+        JFXButton startMultipleDecompileButton = new JFXButton("开始批量反编译");
+        startMultipleDecompileButton.getStyleClass().add("button-raised");
 
         //将上述按钮添加到VBox
         reverseEngineeringLeftVBox.getChildren().addAll(singelApkDecompileLabel,
@@ -158,6 +168,7 @@ public class MainUI extends Application {
 
         //右侧部分
         VBox reverseEngineeringRightVBox = new VBox();
+        reverseEngineeringRightVBox.setSpacing(15);
         //右侧表头
         Label rightDecompileInfoLabel = new Label("反编译日志信息");
         rightDecompileInfoLabel.setFont(Font.font("宋体", 16));
@@ -166,7 +177,7 @@ public class MainUI extends Application {
         //设置允许换行
         rightDecompileInfoTextArea.setWrapText(true);
         //设置显示的行数
-        rightDecompileInfoTextArea.setPrefRowCount(41);
+        rightDecompileInfoTextArea.setPrefRowCount(35);
         reverseEngineeringRightVBox.getChildren().addAll(rightDecompileInfoLabel, rightDecompileInfoTextArea);
         //设置内容居中
         reverseEngineeringRightVBox.setAlignment(Pos.TOP_CENTER);
@@ -174,8 +185,8 @@ public class MainUI extends Application {
         reverseEngineeringBorderPane.setLeft(reverseEngineeringLeftVBox);
         //将右侧内容添加到布局
         reverseEngineeringBorderPane.setRight(reverseEngineeringRightVBox);
-        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(30, 200, 500, 30));
-        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(30, 30, 500, 200));
+        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(30, 80, 500, 100));
+        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(45, 100, 500, 80));
 
         reverseEngineeringTab.setContent(reverseEngineeringBorderPane);
 
@@ -186,18 +197,21 @@ public class MainUI extends Application {
         //左侧部分的内容
         VBox staticFeatureLeftVBox = new VBox();
         //选择权限特征文件夹按钮
-        Button chooseAuthorityDirectoryButton = new Button("选择要提取权限特征的文件夹");
+        JFXButton chooseAuthorityDirectoryButton = new JFXButton("选择要提取权限特征的文件夹");
+        chooseAuthorityDirectoryButton.getStyleClass().add("button-raised");
         //权限特征所文件夹的路径
-        Label AuthorityDirectoryLabel=new Label();
+        Label AuthorityDirectoryLabel = new Label();
         //开始提取权限按钮
-        Button startExtractAuthorityButton = new Button("开始提取权限特征");
+        JFXButton startExtractAuthorityButton = new JFXButton("开始提取权限特征");
+        startExtractAuthorityButton.getStyleClass().add("button-raised");
         //将上述按钮添加到VBox
-        staticFeatureLeftVBox.getChildren().addAll(chooseAuthorityDirectoryButton,AuthorityDirectoryLabel, startExtractAuthorityButton);
+        staticFeatureLeftVBox.getChildren().addAll(chooseAuthorityDirectoryButton, AuthorityDirectoryLabel, startExtractAuthorityButton);
         //设置左侧VBox中按钮之间的间距
         staticFeatureLeftVBox.setSpacing(15);
 
         //右侧部分
         VBox staticFeatureRightVBox = new VBox();
+        staticFeatureRightVBox.setSpacing(15);
         //右侧表头
         Label rightAuthorityInfoLabel = new Label("权限特征信息");
         rightAuthorityInfoLabel.setFont(Font.font("宋体", 16));
@@ -206,7 +220,7 @@ public class MainUI extends Application {
         //设置允许换行
         rightAuthorityInfoTextArea.setWrapText(true);
         //设置显示的行数
-        rightAuthorityInfoTextArea.setPrefRowCount(40);
+        rightAuthorityInfoTextArea.setPrefRowCount(35);
         staticFeatureRightVBox.getChildren().addAll(rightAuthorityInfoLabel, rightAuthorityInfoTextArea);
         //设置内容居中
         staticFeatureRightVBox.setAlignment(Pos.TOP_CENTER);
@@ -214,8 +228,8 @@ public class MainUI extends Application {
         staticFeatureBorderPane.setLeft(staticFeatureLeftVBox);
         //将右侧内容添加到布局
         staticFeatureBorderPane.setRight(staticFeatureRightVBox);
-        BorderPane.setMargin(staticFeatureLeftVBox, new Insets(30, 200, 500, 30));
-        BorderPane.setMargin(staticFeatureRightVBox, new Insets(30, 30, 500, 200));
+        BorderPane.setMargin(staticFeatureLeftVBox, new Insets(80, 80, 500, 100));
+        BorderPane.setMargin(staticFeatureRightVBox, new Insets(45, 100, 500, 80));
         StaticFeatureExtractionTab.setContent(staticFeatureBorderPane);
 
         //--------模型训练Tab内容
@@ -223,20 +237,41 @@ public class MainUI extends Application {
         //设置大小
         modelTrainingBorderPane.setPrefSize(750, 1400);
         //选择训练样本按钮
-        Button chooseTrainDataButton = new Button("选择训练样本");
+        JFXButton chooseTrainDataButton = new JFXButton("选择训练样本");
+        chooseTrainDataButton.getStyleClass().add("button-raised");
         //训练样本所在路径
-        Label trainDataPathLabel=new Label();
+        Label trainDataPathLabel = new Label();
         //开始训练按钮
-        Button startTrainButton = new Button("开始训练");
+        JFXButton startTrainButton = new JFXButton("开始训练");
+        startTrainButton.getStyleClass().add("button-raised");
         VBox modelTrainingLeftVBox = new VBox();
+        VBox modelTrainingRightVBox = new VBox();
         modelTrainingLeftVBox.setSpacing(15);
+        //模型训练结果显示label
+        Label modelTrainingResultLabel = new Label("----------------训练结果----------------");
+        //模型训练结果TextArea
+        TextArea modelTrainingResultTextArea = new TextArea("此处将显示模型训练的结果");
+        //设置显示的行数
+        modelTrainingResultTextArea.setPrefRowCount(35);
+        //自动换行
+        modelTrainingResultTextArea.setWrapText(true);
         //将按钮添加进布局
-        modelTrainingLeftVBox.getChildren().addAll(chooseTrainDataButton,trainDataPathLabel, startTrainButton);
+        modelTrainingLeftVBox.getChildren().addAll(chooseTrainDataButton, trainDataPathLabel, startTrainButton);
         modelTrainingLeftVBox.setAlignment(Pos.TOP_LEFT);
-        modelTrainingLeftVBox.setPadding(new Insets(30, 300, 500, 30));
-        modelTrainingBorderPane.getChildren().addAll(modelTrainingLeftVBox);
-        BorderPane.setMargin(modelTrainingLeftVBox, new Insets(60, 30, 500, 300));
-        modelTrainingTab.setContent(modelTrainingLeftVBox);
+//        modelTrainingLeftVBox.setPadding(new Insets(80, 80, 500, 100));
+
+
+        modelTrainingRightVBox.getChildren().addAll(modelTrainingResultLabel, modelTrainingResultTextArea);
+        modelTrainingRightVBox.setAlignment(Pos.TOP_CENTER);
+        modelTrainingRightVBox.setSpacing(15);
+
+
+//        modelTrainingBorderPane.getChildren().addAll(modelTrainingLeftVBox,modelTrainingRightVBox);
+        BorderPane.setMargin(modelTrainingLeftVBox, new Insets(45, 100, 500, 80));
+        BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 100, 500, 80));
+        modelTrainingBorderPane.setLeft(modelTrainingLeftVBox);
+        modelTrainingBorderPane.setRight(modelTrainingRightVBox);
+        modelTrainingTab.setContent(modelTrainingBorderPane);
 
 
         //------------------------应用检测Tab按钮
@@ -248,19 +283,25 @@ public class MainUI extends Application {
         //右侧
         VBox applicationDetectionRightVBox = new VBox();
         //选择要检测的apk文件按钮
-        Button chooseOneTargetApkButton = new Button("选择要检测的Apk文件");
+        JFXButton chooseOneTargetApkButton = new JFXButton("选择要检测的Apk文件");
+        chooseOneTargetApkButton.getStyleClass().add("button-raised");
         //要检测的Apk文件的路径
-        Label targetApkPath=new Label();
+        Label targetApkPath = new Label();
         //开始检测按钮
-        Button startDetectButton = new Button("开始检测");
+        JFXButton startDetectButton = new JFXButton("开始检测");
+        startDetectButton.getStyleClass().add("button-raised");
         //检测结果显示label
         Label detectResultLabel = new Label("----------------检测结果----------------");
         //检测结果TextArea
         TextArea detectResultTextArea = new TextArea("此处将显示检测的结果，包括应用为正常应用还是恶意应用以及得出相关结论的依据");
+        //设置显示的行数
+        detectResultTextArea.setPrefRowCount(35);
+        //自动换行
+        detectResultTextArea.setWrapText(true);
         applicationDetectionLeftVBox.setSpacing(15);
         applicationDetectionLeftVBox.setAlignment(Pos.TOP_LEFT);
         //将上述按钮添加到左侧VBox
-        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton,targetApkPath, startDetectButton);
+        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton, targetApkPath, startDetectButton);
         applicationDetectionRightVBox.setSpacing(15);
         applicationDetectionRightVBox.setAlignment(Pos.TOP_CENTER);
         //将标签和TextArea加入到右侧VBox中
@@ -268,8 +309,8 @@ public class MainUI extends Application {
         //左右两侧内容加入到面板
         applicationDetectionBorderPane.setLeft(applicationDetectionLeftVBox);
         applicationDetectionBorderPane.setRight(applicationDetectionRightVBox);
-        BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(30, 20, 500, 30));
-        BorderPane.setMargin(applicationDetectionRightVBox, new Insets(30, 30, 500, 20));
+        BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(80, 80, 500, 100));
+        BorderPane.setMargin(applicationDetectionRightVBox, new Insets(45, 100, 500, 80));
         applicationDetectionTab.setContent(applicationDetectionBorderPane);
 
         //-----------------------------------模型更新Tab内容
@@ -277,25 +318,29 @@ public class MainUI extends Application {
         modelUpdateBorderPane.setPrefSize(750, 1400);
         //左侧
         VBox modelUpdateLeftVBox = new VBox();
-        modelUpdateLeftVBox.setPadding(new Insets(30, 30, 500, 30));
+        modelUpdateLeftVBox.setPadding(new Insets(80, 80, 500, 100));
         modelUpdateLeftVBox.setSpacing(15);
         //右侧
         VBox modelUpdateRightVBox = new VBox();
         modelUpdateRightVBox.setSpacing(15);
-        modelUpdateRightVBox.setPadding(new Insets(30, 30, 500, 30));
+        modelUpdateRightVBox.setPadding(new Insets(45, 100, 500, 80));
         modelUpdateRightVBox.setAlignment(Pos.TOP_CENTER);
         //选择用于更新模型的样本按钮
-        Button chooseOneUpdateDataButton = new Button("选择用于更新模型的样本");
+        JFXButton chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
+        chooseOneUpdateDataButton.getStyleClass().add("button-raised");
         //用于更新模型的样本所在的路径
-        Label updateDataPathLabel=new Label();
+        Label updateDataPathLabel = new Label();
         //开始更新模型按钮
-        Button startUpdateModelButton = new Button("开始更新模型");
+        JFXButton startUpdateModelButton = new JFXButton("开始更新模型");
+        startUpdateModelButton.getStyleClass().add("button-raised");
         //将上述按钮添加到左侧的VBox
-        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton,updateDataPathLabel, startUpdateModelButton);
+        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, startUpdateModelButton);
         //模型更新结果显示label
         Label modelUpdateResultLabel = new Label("----------------更新结果----------------");
         //模型更新结果TextArea
         TextArea modelUpdateResultTextArea = new TextArea("此处将显示模型更新的结果，包括更新的内容、预估模型预测准确率的提升幅度等");
+        //设置显示的行数
+        modelUpdateResultTextArea.setPrefRowCount(35);
         //将上述显示模型更新结果的元素加入到右侧VBox
         modelUpdateRightVBox.getChildren().addAll(modelUpdateResultLabel, modelUpdateResultTextArea);
         //设置面板左右两侧的内容
@@ -350,7 +395,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("D://"));
+                fc.setInitialDirectory(new File("E:\\BiSheData"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -371,7 +416,7 @@ public class MainUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 decompileResultSavePath = setDirectory();
-                decompileResultSaveDirectoryPathLabel.setText(decompileResultSavePath);
+                decompileResultSaveDirectoryPathLabel.setText("选择的文件夹路径:" + decompileResultSavePath);
                 decompileResultSaveDirectoryPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
             }
         });
@@ -426,7 +471,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择多个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("D://"));
+                fc.setInitialDirectory(new File("E:\\BiSheData"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 List<File> files = fc.showOpenMultipleDialog(st);
@@ -446,7 +491,7 @@ public class MainUI extends Application {
                                     APKTool.decode(path, decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
 
                                 }
-                            },"批量反编译Apk线程").start();
+                            }, "批量反编译Apk线程").start();
                         } else {
                             /*tipsLabel.setText("请先选择反编译结果存放文件夹再点击反编译按钮哦！");
                             tipsLabel.setTextFill(Paint.valueOf("#FF0000"));*/
@@ -473,11 +518,30 @@ public class MainUI extends Application {
             }
         });
 
-        //设置反编译结果存放文件夹按钮
+        //选择多个APK所在的文件夹按钮点击事件
+        chooseManyApkButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                //多个apk文件所在文件夹的路径
+                multipleApkDirectoryPath = setDirectory();
+                //不空
+                if (!StringUtils.isEmpty(multipleApkDirectoryPath)) {
+
+                    multipleApkPathLabel.setText("选择的文件夹路径为:" + multipleApkDirectoryPath);
+                    decompileResultSaveDirectoryPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                }
+
+
+            }
+        });
+
+        //设置批量反编译结果存放文件夹按钮
         setMultipleDecompileSaveDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                decompileResultSavePath = setDirectory();
+                    multipleDecompileSavePathLabel.setText("选择的文件夹路径为:" + setDirectory());
+                    multipleDecompileSavePathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+
             }
         });
 
@@ -505,8 +569,8 @@ public class MainUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 authorityDirectory = setDirectory();
-                if(null!=authorityDirectory){
-                    AuthorityDirectoryLabel.setText("选择的路径："+authorityDirectory);
+                if (null != authorityDirectory) {
+                    AuthorityDirectoryLabel.setText("选择的路径：" + authorityDirectory);
                     AuthorityDirectoryLabel.setTextFill(Paint.valueOf("#7B68EE"));
                 }
 
@@ -546,7 +610,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("D://"));
+                fc.setInitialDirectory(new File("E:\\BiSheData"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -579,7 +643,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("D://"));
+                fc.setInitialDirectory(new File("E:\\BiSheData"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -611,7 +675,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("D://"));
+                fc.setInitialDirectory(new File("E:\\BiSheData"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -623,7 +687,6 @@ public class MainUI extends Application {
                     updateDataPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
 
                 }
-
 
 
             }
@@ -648,7 +711,7 @@ public class MainUI extends Application {
     public String setDirectory() {
         Stage st = new Stage();
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(new File("D:" + File.separator));
+        dc.setInitialDirectory(new File("E:" + File.separator+"BiSheData"));
         dc.setTitle("选择文件夹");
         File file = dc.showDialog(st);
         String absolutePath = null;
@@ -657,7 +720,6 @@ public class MainUI extends Application {
         }
         return absolutePath;
     }
-
 
 
     public static void main(String[] args) {
