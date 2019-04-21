@@ -3,6 +3,7 @@ package com.eric;
 import com.eric.service.AuthorityService;
 import com.eric.service.DeCompileService;
 import com.eric.tools.decode.APKTool;
+import com.eric.tools.ui.UIUtils;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTabPane;
 import javafx.application.Application;
@@ -15,9 +16,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
@@ -91,18 +94,21 @@ public class MainUI extends Application {
         stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
 //        TabPane tabPane = new TabPane();
         JFXTabPane tabPane = new JFXTabPane();
-        tabPane.setPrefHeight(750);
+        tabPane.setPrefHeight(700);
+        tabPane.setPrefWidth(1300);
         //首页Tab 默认
+        Tab indexTab = new Tab("首页");
         Tab reverseEngineeringTab = new Tab("逆向工程");
         Tab StaticFeatureExtractionTab = new Tab("静态特征提取");
         Tab modelTrainingTab = new Tab("模型训练");
         Tab applicationDetectionTab = new Tab("应用检测");
         Tab ModelUpdatingTab = new Tab("模型更新");
-        tabPane.getTabs().addAll(reverseEngineeringTab, StaticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, ModelUpdatingTab);
+        tabPane.getTabs().addAll(indexTab,reverseEngineeringTab, StaticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, ModelUpdatingTab);
         SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
         selectionModel.select(0);
 
         //设置不可关闭
+        indexTab.setClosable(false);
         reverseEngineeringTab.setClosable(false);
         StaticFeatureExtractionTab.setClosable(false);
         modelTrainingTab.setClosable(false);
@@ -112,6 +118,21 @@ public class MainUI extends Application {
 
 
 //----------------------------------设置各个Tab的内容开始----------------------------------------------------
+        //首页Tab的内容
+        StackPane indexStackPane = new StackPane();
+        indexStackPane.setAlignment(Pos.CENTER);
+        Label indexLabel = new Label();
+        indexLabel.setText("基于在线学习的恶意Android应用检测系统");
+        indexLabel.setFont(Font.font("华文行楷"));
+        indexLabel.setEffect(UIUtils.shadowEffect());
+        //设置字体大小  通过CSS
+        indexLabel.getStyleClass().add("index-label");
+        //将首页标签添加到indexStackPane
+        indexStackPane.getChildren().addAll(indexLabel);
+        indexTab.setContent(indexStackPane);
+
+
+
         //设置逆向工程Tab的内容
         BorderPane reverseEngineeringBorderPane = new BorderPane();
         reverseEngineeringBorderPane.setPrefSize(700, 1300);
@@ -188,8 +209,9 @@ public class MainUI extends Application {
         reverseEngineeringBorderPane.setLeft(reverseEngineeringLeftVBox);
         //将右侧内容添加到布局
         reverseEngineeringBorderPane.setRight(reverseEngineeringRightVBox);
-        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(60, 80, 500, 100));
-        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(60, 100, 500, 80));
+        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(80, 80, 50, 100));
+        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(80, 100, 50, 80));
+
 
         reverseEngineeringTab.setContent(reverseEngineeringBorderPane);
 
@@ -231,8 +253,8 @@ public class MainUI extends Application {
         staticFeatureBorderPane.setLeft(staticFeatureLeftVBox);
         //将右侧内容添加到布局
         staticFeatureBorderPane.setRight(staticFeatureRightVBox);
-        BorderPane.setMargin(staticFeatureLeftVBox, new Insets(80, 80, 500, 100));
-        BorderPane.setMargin(staticFeatureRightVBox, new Insets(45, 100, 500, 80));
+        BorderPane.setMargin(staticFeatureLeftVBox, new Insets(80, 80, 50, 100));
+        BorderPane.setMargin(staticFeatureRightVBox, new Insets(45, 100, 50, 80));
         StaticFeatureExtractionTab.setContent(staticFeatureBorderPane);
 
         //--------模型训练Tab内容
@@ -261,17 +283,14 @@ public class MainUI extends Application {
         //将按钮添加进布局
         modelTrainingLeftVBox.getChildren().addAll(chooseTrainDataButton, trainDataPathLabel, startTrainButton);
         modelTrainingLeftVBox.setAlignment(Pos.TOP_LEFT);
-//        modelTrainingLeftVBox.setPadding(new Insets(80, 80, 500, 100));
-
 
         modelTrainingRightVBox.getChildren().addAll(modelTrainingResultLabel, modelTrainingResultTextArea);
         modelTrainingRightVBox.setAlignment(Pos.TOP_CENTER);
         modelTrainingRightVBox.setSpacing(15);
 
 
-//        modelTrainingBorderPane.getChildren().addAll(modelTrainingLeftVBox,modelTrainingRightVBox);
-        BorderPane.setMargin(modelTrainingLeftVBox, new Insets(45, 100, 500, 80));
-        BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 100, 500, 80));
+        BorderPane.setMargin(modelTrainingLeftVBox, new Insets(45, 100, 50, 80));
+        BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 100, 50, 80));
         modelTrainingBorderPane.setLeft(modelTrainingLeftVBox);
         modelTrainingBorderPane.setRight(modelTrainingRightVBox);
         modelTrainingTab.setContent(modelTrainingBorderPane);
@@ -312,8 +331,8 @@ public class MainUI extends Application {
         //左右两侧内容加入到面板
         applicationDetectionBorderPane.setLeft(applicationDetectionLeftVBox);
         applicationDetectionBorderPane.setRight(applicationDetectionRightVBox);
-        BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(80, 80, 500, 100));
-        BorderPane.setMargin(applicationDetectionRightVBox, new Insets(45, 100, 500, 80));
+        BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(80, 80, 50, 100));
+        BorderPane.setMargin(applicationDetectionRightVBox, new Insets(45, 100, 50, 80));
         applicationDetectionTab.setContent(applicationDetectionBorderPane);
 
         //-----------------------------------模型更新Tab内容
@@ -321,12 +340,12 @@ public class MainUI extends Application {
         modelUpdateBorderPane.setPrefSize(750, 1400);
         //左侧
         VBox modelUpdateLeftVBox = new VBox();
-        modelUpdateLeftVBox.setPadding(new Insets(80, 80, 500, 100));
+        modelUpdateLeftVBox.setPadding(new Insets(80, 80, 50, 100));
         modelUpdateLeftVBox.setSpacing(15);
         //右侧
         VBox modelUpdateRightVBox = new VBox();
         modelUpdateRightVBox.setSpacing(15);
-        modelUpdateRightVBox.setPadding(new Insets(45, 100, 500, 80));
+        modelUpdateRightVBox.setPadding(new Insets(45, 100, 50, 80));
         modelUpdateRightVBox.setAlignment(Pos.TOP_CENTER);
         //选择用于更新模型的样本按钮
         JFXButton chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
@@ -355,9 +374,9 @@ public class MainUI extends Application {
         stage.show();
         //设置不可变
         stage.setResizable(false);
-        tabPane.setPrefWidth(an.getWidth());
+//        tabPane.setPrefWidth(an.getWidth());
         //设置选中哪个Tab 默认显示逆向工程Tab
-        tabPane.getSelectionModel().select(reverseEngineeringTab);
+//        tabPane.getSelectionModel().select(reverseEngineeringTab);
         //设置tabPane的背景颜色
         tabPane.setStyle("-fx-background-color: #F5FFFA");
 
@@ -542,8 +561,8 @@ public class MainUI extends Application {
         setMultipleDecompileSaveDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                    multipleDecompileSavePathLabel.setText("选择的文件夹路径为:" + setDirectory());
-                    multipleDecompileSavePathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                multipleDecompileSavePathLabel.setText("选择的文件夹路径为:" + setDirectory());
+                multipleDecompileSavePathLabel.setTextFill(Paint.valueOf("#7B68EE"));
 
             }
         });
@@ -714,7 +733,7 @@ public class MainUI extends Application {
     public String setDirectory() {
         Stage st = new Stage();
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(new File("E:" + File.separator+"BiSheData"));
+        dc.setInitialDirectory(new File("E:" + File.separator + "BiSheData"));
         dc.setTitle("选择文件夹");
         File file = dc.showDialog(st);
         String absolutePath = null;

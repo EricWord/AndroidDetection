@@ -339,3 +339,8 @@
 .tree-table-view .menu-item .label {
     -fx-padding: 5 0 5 0;
 }
+
+.index-label {
+    -fx-font-size: 50;
+
+}
