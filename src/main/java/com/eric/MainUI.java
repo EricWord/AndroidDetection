@@ -108,7 +108,6 @@ public class MainUI extends Application {
         modelTrainingTab.setClosable(false);
         applicationDetectionTab.setClosable(false);
         ModelUpdatingTab.setClosable(false);
-        //给tab设置图标
         an.getChildren().add(tabPane);
 
 
@@ -181,7 +180,7 @@ public class MainUI extends Application {
         //设置允许换行
         rightDecompileInfoTextArea.setWrapText(true);
         //设置显示的行数
-        rightDecompileInfoTextArea.setPrefRowCount(35);
+        rightDecompileInfoTextArea.setPrefRowCount(33);
         reverseEngineeringRightVBox.getChildren().addAll(rightDecompileInfoLabel, rightDecompileInfoTextArea);
         //设置内容居中
         reverseEngineeringRightVBox.setAlignment(Pos.TOP_CENTER);
@@ -189,8 +188,8 @@ public class MainUI extends Application {
         reverseEngineeringBorderPane.setLeft(reverseEngineeringLeftVBox);
         //将右侧内容添加到布局
         reverseEngineeringBorderPane.setRight(reverseEngineeringRightVBox);
-        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(30, 80, 500, 100));
-        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(45, 100, 500, 80));
+        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(60, 80, 500, 100));
+        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(60, 100, 500, 80));
 
         reverseEngineeringTab.setContent(reverseEngineeringBorderPane);
 
