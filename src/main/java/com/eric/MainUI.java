@@ -5,6 +5,7 @@ import com.eric.service.DeCompileService;
 import com.eric.tools.decode.APKTool;
 import com.eric.tools.ui.UIUtils;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXTabPane;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -47,19 +48,13 @@ import java.util.Locale;
  *@Version:1.0
  *@Date:2019/4/8
  */
-@Component
 public class MainUI extends Application {
-    @Resource
-    private DeCompileService deCompileService;
+    private DeCompileService deCompileService=new DeCompileService();
     @Resource
     private AuthorityService authorityService;
     public static MainUI mainUI;
 
-    @PostConstruct
-    public void init() {
-        mainUI = this;
 
-    }
 
     //单个Apk文件路径
     private String singleApkPath;
@@ -193,6 +188,15 @@ public class MainUI extends Application {
         //设置左侧VBox中按钮之间的间距
         reverseEngineeringLeftVBox.setSpacing(15);
 
+
+        //中间部分
+        StackPane reverseEngineeringCenterPane = new StackPane();
+        JFXSpinner reverseEngineeringSpinner = new JFXSpinner();
+        reverseEngineeringCenterPane.getChildren().add(reverseEngineeringSpinner);
+        reverseEngineeringCenterPane.setVisible(false);
+        reverseEngineeringBorderPane.setCenter(reverseEngineeringCenterPane);
+        reverseEngineeringCenterPane.setMaxSize(50, 50);
+
         //右侧部分
         VBox reverseEngineeringRightVBox = new VBox();
         reverseEngineeringRightVBox.setSpacing(15);
@@ -236,6 +240,14 @@ public class MainUI extends Application {
         staticFeatureLeftVBox.getChildren().addAll(chooseAuthorityDirectoryButton, AuthorityDirectoryLabel, startExtractAuthorityButton);
         //设置左侧VBox中按钮之间的间距
         staticFeatureLeftVBox.setSpacing(15);
+
+        //中间部分
+        StackPane staticFeatureCenterPane = new StackPane();
+        JFXSpinner staticFeatureSpinner = new JFXSpinner();
+        staticFeatureCenterPane.getChildren().add(staticFeatureSpinner);
+        staticFeatureCenterPane.setVisible(false);
+        staticFeatureBorderPane.setCenter(staticFeatureCenterPane);
+        staticFeatureCenterPane.setMaxSize(50, 50);
 
         //右侧部分
         VBox staticFeatureRightVBox = new VBox();
@@ -290,6 +302,14 @@ public class MainUI extends Application {
         modelTrainingRightVBox.getChildren().addAll(modelTrainingResultLabel, modelTrainingResultTextArea);
         modelTrainingRightVBox.setAlignment(Pos.TOP_CENTER);
         modelTrainingRightVBox.setSpacing(15);
+
+        //中间部分
+        StackPane modelTrainingCenterPane = new StackPane();
+        JFXSpinner modelTrainingSpinner = new JFXSpinner();
+        modelTrainingCenterPane.getChildren().add(modelTrainingSpinner);
+        modelTrainingCenterPane.setVisible(false);
+        modelTrainingBorderPane.setCenter(modelTrainingCenterPane);
+        modelTrainingCenterPane.setMaxSize(50, 50);
 
 
         BorderPane.setMargin(modelTrainingLeftVBox, new Insets(45, 100, 50, 80));
@@ -450,35 +470,30 @@ public class MainUI extends Application {
         startDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                DateTime dateTime = new DateTime();
-                //当前时间
-                String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
-                //路径不为空
-                if (null != singleApkPath && null != decompileResultSavePath) {
-                    rightDecompileInfoTextArea.setText("");
-                    rightDecompileInfoTextArea.appendText("开始反编译.....\n");
-                    rightDecompileInfoTextArea.appendText("正在反编译.....\n");
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //设置按钮不可用
+                        startDecompileButton.setDisable(true);
+                        reverseEngineeringCenterPane.setVisible(true);
+                        DateTime dateTime = new DateTime();
+                        //当前时间
+                        String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
+                        //路径不为空
+                        if (null != singleApkPath && null != decompileResultSavePath) {
+                            rightDecompileInfoTextArea.setText("");
+                            rightDecompileInfoTextArea.appendText("开始反编译.....\n");
+                            rightDecompileInfoTextArea.appendText("正在反编译.....\n");
                             APKTool.decode(singleApkPath, decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
+                            rightDecompileInfoTextArea.appendText("反编译完成，结果存放路径：" + decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
                         }
-                    }).start();
+                        //设置按钮可用
+                        startDecompileButton.setDisable(false);
+                        reverseEngineeringCenterPane.setVisible(false);
 
-                } else if (null == singleApkPath && null != decompileResultSavePath) {
-                   /* tipsLabel.setText("请先选择要反编译的Apk文件再点击反编译按钮哦！");
-                    tipsLabel.setTextFill(Paint.valueOf("#FF0000"));*/
+                    }
+                }).start();
 
-                } else if (null != singleApkPath && null == decompileResultSavePath) {
-                   /* tipsLabel.setText("请先选择反编译结果存放文件夹再点击反编译按钮哦！");
-                    tipsLabel.setTextFill(Paint.valueOf("#FF0000"));*/
-
-                } else {
-                    /*tipsLabel.setText("请先选择要反编译的Apk文件和反编译结果存放文件夹再点击反编译按钮哦！");
-                    tipsLabel.setTextFill(Paint.valueOf("#FF0000"));*/
-
-                }
             }
         });
 
@@ -488,6 +503,7 @@ public class MainUI extends Application {
             public void handle(ActionEvent event) {
                 //下面设置其他不相关按钮不可用
                 setButtonDisble(true, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
+
                 //当前时间
                 DateTime dateTime = new DateTime();
                 String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
@@ -500,35 +516,30 @@ public class MainUI extends Application {
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 List<File> files = fc.showOpenMultipleDialog(st);
-                if (null != files) {
-                    for (File file : files) {
-                        //获取文件路径
-                        String path = file.getAbsolutePath();
-                        if (null != path) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        reverseEngineeringCenterPane.setVisible(true);
 
-
+                        if (null != files) {
+                            for (File file : files) {
+                                //获取文件路径
+                                String path = file.getAbsolutePath();
+                                if (null != path) {
                                     rightDecompileInfoTextArea.setText("");
                                     rightDecompileInfoTextArea.appendText("开始批量反编译...\n");
                                     rightDecompileInfoTextArea.appendText("正在进行批量反编译，预计耗时36分11秒...\n");
                                     APKTool.decode(path, decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
-
                                 }
-                            }, "批量反编译Apk线程").start();
-                        } else {
-                            /*tipsLabel.setText("请先选择反编译结果存放文件夹再点击反编译按钮哦！");
-                            tipsLabel.setTextFill(Paint.valueOf("#FF0000"));*/
-
+                            }
                         }
+                        reverseEngineeringCenterPane.setVisible(false);
+                        rightDecompileInfoTextArea.appendText("反编译完成!");
+                        //下面设置其他按钮可用
+                        setButtonDisble(false, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
 
                     }
-                }
-                rightDecompileInfoTextArea.appendText("反编译完成!");
-                //下面设置其他按钮可用
-                setButtonDisble(false, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
-
+                }).start();
 
             }
 
@@ -553,7 +564,7 @@ public class MainUI extends Application {
                 if (!StringUtils.isEmpty(multipleApkDirectoryPath)) {
 
                     multipleApkPathLabel.setText("选择的文件夹路径为:" + multipleApkDirectoryPath);
-                    decompileResultSaveDirectoryPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                    multipleApkPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
                 }
 
 
@@ -564,8 +575,11 @@ public class MainUI extends Application {
         setMultipleDecompileSaveDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                multipleDecompileSavePathLabel.setText("选择的文件夹路径为:" + setDirectory());
-                multipleDecompileSavePathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                decompileResultSavePath = setDirectory();
+                if (null != decompileResultSavePath) {
+                    multipleDecompileSavePathLabel.setText("选择的文件夹路径为:" + decompileResultSavePath);
+                    multipleDecompileSavePathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                }
 
             }
         });
@@ -575,14 +589,18 @@ public class MainUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 if (null != multipleApkDirectoryPath && null != decompileResultSavePath) {
+                    //设置按钮不可用
+                    startMultipleDecompileButton.setDisable(true);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             rightDecompileInfoTextArea.setText("");
                             rightDecompileInfoTextArea.appendText("开始反编译....\n");
                             rightDecompileInfoTextArea.appendText("正在反编译反编译，预计需要9分40秒....\n");
-                            mainUI.deCompileService.batchDeCompile(multipleApkDirectoryPath, decompileResultSavePath);
+                            deCompileService.batchDeCompile(multipleApkDirectoryPath, decompileResultSavePath);
                             rightDecompileInfoTextArea.appendText("反编译完成！\n");
+                            //设置按钮可用
+                            startMultipleDecompileButton.setDisable(false);
                         }
                     }, "批量反编译线程").start();
                 }
@@ -593,11 +611,7 @@ public class MainUI extends Application {
         chooseAuthorityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-               /* authorityDirectory = setDirectory();
-                if (null != authorityDirectory) {
-                    AuthorityDirectoryLabel.setText("选择的路径：" + authorityDirectory);
-                    AuthorityDirectoryLabel.setTextFill(Paint.valueOf("#7B68EE"));
-                }*/
+
                 Stage st = new Stage();
                 FileChooser fc = new FileChooser();
                 //设置标题
@@ -621,10 +635,11 @@ public class MainUI extends Application {
 
         //开始提取权限按钮
         startExtractAuthorityButton.setOnAction(new EventHandler<ActionEvent>() {
-
-
             @Override
             public void handle(ActionEvent event) {
+                //设置按钮不可用
+                startExtractAuthorityButton.setDisable(true);
+                staticFeatureCenterPane.setVisible(true);
                 rightAuthorityInfoTextArea.setText("");
                 //这里通过Java调用python代码进行权限的提取
                 if (null != extractAuthorityApkPath) {
@@ -641,11 +656,15 @@ public class MainUI extends Application {
                                     rightAuthorityInfoTextArea.appendText(temp);
 
                                 }
+                                staticFeatureCenterPane.setVisible(false);
                                 in.close();
                                 //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
                                 int wait = proc.waitFor();
                                 String execResult = (wait == 0 ? "成功" : "失败");
                                 System.out.println("Java调用python程序执行" + execResult);
+                                //设置按钮可用
+                                startExtractAuthorityButton.setDisable(false);
+
 
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -687,10 +706,14 @@ public class MainUI extends Application {
         startTrainButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+
                 if (null != csvFilePath) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            //设置按钮不可用
+                            startTrainButton.setDisable(true);
+                            modelTrainingCenterPane.setVisible(true);
                             modelTrainingResultTextArea.setText("");
                             String temp = "";
                             try {
@@ -699,13 +722,16 @@ public class MainUI extends Application {
 
                                 BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
                                 while ((temp = in.readLine()) != null) {
-                                    modelTrainingResultTextArea.appendText(temp+"\n");
+                                    modelTrainingResultTextArea.appendText(temp + "\n");
                                 }
+                                modelTrainingCenterPane.setVisible(false);
                                 in.close();
                                 //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
                                 int wait = proc.waitFor();
                                 String execResult = (wait == 0 ? "成功" : "失败");
                                 System.out.println("Java调用python程序执行" + execResult);
+                                //设置按钮可用
+                                startTrainButton.setDisable(false);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
