@@ -6,6 +6,7 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -48,18 +49,21 @@ public class JavaCallPythonTest {
     @Test
     public void testJavaCallPythonLogic() {
 
-        String path = "E:\\BiSheData\\CSV\\androidDetection_all.csv";
+        String csvPath = "E:\\BiSheData\\CSV\\androidDetection_all.csv";
         try {
-            String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\test\\JavaCallPythonTest.py",path};
+            String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicCallByJava.py",csvPath};
             Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(),"GBK"));
             String line = null;
             while ((line = in.readLine()) != null) {
                 System.out.println(line);
             }
             in.close();
-            proc.waitFor();
+            //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
+            int wait = proc.waitFor();
+            String execResult=(wait==0?"成功":"失败");
+            System.out.println("Java调用python程序执行"+execResult);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -82,7 +86,9 @@ public class JavaCallPythonTest {
                 System.out.println(line);
             }
             in.close();
-            proc.waitFor();
+            int wait = proc.waitFor();
+            String execResult=(wait==0?"成功":"失败");
+            System.out.println("Java调用python程序执行"+execResult);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
