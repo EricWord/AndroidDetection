@@ -33,7 +33,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
 
@@ -64,11 +67,12 @@ public class MainUI extends Application {
     private String multipleApkDirectoryPath;
     //反编译结果存放文件夹
     private String decompileResultSavePath;
-    //批量反编译结果存放文件夹
-//    private String batchDecomplieResultSavePath;
+    //要提取权限特征的apk文件路径(静态特征提取模块)
+    private String extractAuthorityApkPath;
     //权限提取选择的文件夹路径
     private String authorityDirectory;
-    //要检测的Apk所在的路径
+    //用于训练模型的CSV文件路径(模型训练模块用到)
+    private String csvFilePath;
     private String detectApkPath;
     //用于更新模型的样本所在的路径
     private String updateModelDataPath;
@@ -103,7 +107,7 @@ public class MainUI extends Application {
         Tab modelTrainingTab = new Tab("模型训练");
         Tab applicationDetectionTab = new Tab("应用检测");
         Tab ModelUpdatingTab = new Tab("模型更新");
-        tabPane.getTabs().addAll(indexTab,reverseEngineeringTab, StaticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, ModelUpdatingTab);
+        tabPane.getTabs().addAll(indexTab, reverseEngineeringTab, StaticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, ModelUpdatingTab);
         SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
         selectionModel.select(0);
 
@@ -130,7 +134,6 @@ public class MainUI extends Application {
         //将首页标签添加到indexStackPane
         indexStackPane.getChildren().addAll(indexLabel);
         indexTab.setContent(indexStackPane);
-
 
 
         //设置逆向工程Tab的内容
@@ -222,7 +225,7 @@ public class MainUI extends Application {
         //左侧部分的内容
         VBox staticFeatureLeftVBox = new VBox();
         //选择权限特征文件夹按钮
-        JFXButton chooseAuthorityDirectoryButton = new JFXButton("选择要提取权限特征的文件夹");
+        JFXButton chooseAuthorityDirectoryButton = new JFXButton("选择要提取权限特征的APK文件");
         chooseAuthorityDirectoryButton.getStyleClass().add("button-raised");
         //权限特征所文件夹的路径
         Label AuthorityDirectoryLabel = new Label();
@@ -586,40 +589,72 @@ public class MainUI extends Application {
             }
         });
 
-        //选择权限特征文件夹按钮
+        //选择权限特征的APK文件按钮点击事件
         chooseAuthorityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                authorityDirectory = setDirectory();
+               /* authorityDirectory = setDirectory();
                 if (null != authorityDirectory) {
                     AuthorityDirectoryLabel.setText("选择的路径：" + authorityDirectory);
                     AuthorityDirectoryLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                }*/
+                Stage st = new Stage();
+                FileChooser fc = new FileChooser();
+                //设置标题
+                fc.setTitle("选择单个Apk文件");
+                //设置初始路径
+                fc.setInitialDirectory(new File("E:\\BiSheData"));
+                //设置打开的文件类型
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
+                File file = fc.showOpenDialog(st);
+                if (null != file) {
+                    //文件路径
+                    String absolutePath = file.getAbsolutePath();
+                    extractAuthorityApkPath = absolutePath;
+                    AuthorityDirectoryLabel.setText("选择APK的路径：" + absolutePath);
+                    AuthorityDirectoryLabel.setTextFill(Paint.valueOf("#7B68EE"));
+
                 }
 
             }
         });
 
-        //开始批量提取权限按钮
+        //开始提取权限按钮
         startExtractAuthorityButton.setOnAction(new EventHandler<ActionEvent>() {
+
+
             @Override
             public void handle(ActionEvent event) {
-                if (null != authorityDirectory) {
-                    rightAuthorityInfoTextArea.setText("");
-                    rightAuthorityInfoTextArea.appendText("开始提取权限...\n");
-                    rightAuthorityInfoTextArea.appendText("正在提取权限,预计耗时8分10秒...\n");
+                rightAuthorityInfoTextArea.setText("");
+                //这里通过Java调用python代码进行权限的提取
+                if (null != extractAuthorityApkPath) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            mainUI.authorityService.saveAuthority(authorityDirectory, 0);
+                            String temp = "";
+                            try {
+                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority.py", extractAuthorityApkPath};
+                                Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
 
-                            rightAuthorityInfoTextArea.appendText("权限提取完成！\n");
+                                BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
+                                while ((temp = in.readLine()) != null) {
+                                    rightAuthorityInfoTextArea.appendText(temp);
+
+                                }
+                                in.close();
+                                //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
+                                int wait = proc.waitFor();
+                                String execResult = (wait == 0 ? "成功" : "失败");
+                                System.out.println("Java调用python程序执行" + execResult);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }, "提取权限线程").start();
-
-
+                    }).start();
                 }
-
-
             }
         });
 
@@ -634,13 +669,13 @@ public class MainUI extends Application {
                 //设置初始路径
                 fc.setInitialDirectory(new File("E:\\BiSheData"));
                 //设置打开的文件类型
-                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.csv","*.txt"));
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.csv", "*.txt"));
                 File file = fc.showOpenDialog(st);
                 if (null != file) {
                     //文件路径
                     String absolutePath = file.getAbsolutePath();
-                    singleApkPath = absolutePath;
-                    trainDataPathLabel.setText("选择的文件路径:"+absolutePath);
+                    csvFilePath = absolutePath;
+                    trainDataPathLabel.setText("选择的文件路径:" + absolutePath);
                     trainDataPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
 
                 }
@@ -652,7 +687,33 @@ public class MainUI extends Application {
         startTrainButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("开始训练按钮");
+                if (null != csvFilePath) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            modelTrainingResultTextArea.setText("");
+                            String temp = "";
+                            try {
+                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicCallByJava.py", csvFilePath};
+                                Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+
+                                BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
+                                while ((temp = in.readLine()) != null) {
+                                    modelTrainingResultTextArea.appendText(temp+"\n");
+                                }
+                                in.close();
+                                //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
+                                int wait = proc.waitFor();
+                                String execResult = (wait == 0 ? "成功" : "失败");
+                                System.out.println("Java调用python程序执行" + execResult);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
             }
         });
 
