@@ -3,6 +3,9 @@ package com.eric.test;
 import com.eric.tools.cmd.CMDHelper;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 /*
  *@description:cmd测试
  *@author:cuigs
@@ -22,6 +25,17 @@ public class CMDTest {
         String s="abc";
         String newS = s.replace("b", "e");
         System.out.println("newS="+newS+",s="+s);
+
+    }
+
+    /**
+     * 获取控制台输出内容
+     */
+    @Test
+    public void test3(){
+
+
+
 
     }
 }
