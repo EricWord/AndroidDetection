@@ -1,5 +1,6 @@
 package com.eric.test;
 
+import org.junit.Test;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -17,7 +18,7 @@ import java.io.InputStreamReader;
  */
 public class JavaCallPythonTest {
 
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         int a = 18;
         int b = 23;
         try {
@@ -38,6 +39,55 @@ public class JavaCallPythonTest {
         }
 
 
+
+    }*/
+
+    /**
+     * 测试JAVA调用pytho程序logic
+     */
+    @Test
+    public void testJavaCallPythonLogic() {
+
+        String path = "E:\\BiSheData\\CSV\\androidDetection_all.csv";
+        try {
+            String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\test\\JavaCallPythonTest.py",path};
+            Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+            }
+            in.close();
+            proc.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void test2(){
+        int a = 18;
+        int b = 23;
+        try {
+            String[] pyArgs = new String[] { "python", "E:\\projects\\AndroidDetectionPythonVersion\\test\\JavaCallPythonTest.py", String.valueOf(a), String.valueOf(b) };
+            Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+            }
+            in.close();
+            proc.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 }
