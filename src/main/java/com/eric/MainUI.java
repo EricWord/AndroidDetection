@@ -630,17 +630,17 @@ public class MainUI extends Application {
                 Stage st = new Stage();
                 FileChooser fc = new FileChooser();
                 //设置标题
-                fc.setTitle("选择单个Apk文件");
+                fc.setTitle("选择训练样本文件");
                 //设置初始路径
                 fc.setInitialDirectory(new File("E:\\BiSheData"));
                 //设置打开的文件类型
-                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.csv","*.txt"));
                 File file = fc.showOpenDialog(st);
                 if (null != file) {
                     //文件路径
                     String absolutePath = file.getAbsolutePath();
                     singleApkPath = absolutePath;
-                    trainDataPathLabel.setText(absolutePath);
+                    trainDataPathLabel.setText("选择的文件路径:"+absolutePath);
                     trainDataPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
 
                 }
