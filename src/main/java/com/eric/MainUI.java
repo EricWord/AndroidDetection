@@ -1,15 +1,11 @@
 package com.eric;
 
-import com.eric.bean.Authority;
-import com.eric.service.AuthorityService;
 import com.eric.service.DeCompileService;
-import com.eric.tools.MD5.MD5Utils;
 import com.eric.tools.decode.APKTool;
 import com.eric.tools.ui.UIUtils;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXSpinner;
-import com.jfoenix.controls.JFXTabPane;
+import com.jfoenix.controls.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -19,12 +15,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
@@ -32,10 +24,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.io.*;
 import java.util.List;
 import java.util.Locale;
@@ -49,10 +38,6 @@ import java.util.Locale;
  */
 public class MainUI extends Application {
     private DeCompileService deCompileService = new DeCompileService();
-    @Resource
-    private AuthorityService authorityService;
-    public static MainUI mainUI;
-
 
     //单个Apk文件路径
     private String singleApkPath;
@@ -319,12 +304,10 @@ public class MainUI extends Application {
 
         //------------------------应用检测Tab按钮
         BorderPane applicationDetectionBorderPane = new BorderPane();
-        applicationDetectionBorderPane.setPrefSize(750, 1400);
         //左侧
         VBox applicationDetectionLeftVBox = new VBox();
 
         //中间进度条部分
-        //中间部分
         StackPane applicationDetectionCenterPane = new StackPane();
         JFXSpinner applicationDetectionSpinner = new JFXSpinner();
         applicationDetectionCenterPane.getChildren().add(applicationDetectionSpinner);
@@ -345,14 +328,22 @@ public class MainUI extends Application {
         startDetectButton.getStyleClass().add("button-raised");
         //检测结果显示label
         Label detectResultLabel = new Label("----------------检测结果----------------");
-        //检测结果TextArea
-        TextArea detectResultTextArea = new TextArea("此处将显示检测的结果，包括应用为正常应用还是恶意应用以及得出相关结论的依据");
-        //设置显示的行数
-        detectResultTextArea.setPrefRowCount(35);
-        //自动换行
-        detectResultTextArea.setWrapText(true);
-        //设置文本域右侧滚动条
-//        detectResultTextArea.set
+
+        JFXListView<Label> authorityList = new JFXListView<>();
+        authorityList.setExpanded(true);
+
+
+        authorityList.getStyleClass().add("mylistview");
+        authorityList.setMaxHeight(3400);
+
+
+        StackPane detectResultStackPane = new StackPane(authorityList);
+        detectResultStackPane.setPadding(new Insets(24, 100, 24, 100));
+
+        JFXScrollPane applicationDetectionScrollPane = new JFXScrollPane();
+        applicationDetectionScrollPane.setContent(detectResultStackPane);
+
+
         applicationDetectionLeftVBox.setSpacing(15);
         applicationDetectionLeftVBox.setAlignment(Pos.TOP_LEFT);
         //将上述按钮添加到左侧VBox
@@ -360,12 +351,12 @@ public class MainUI extends Application {
         applicationDetectionRightVBox.setSpacing(15);
         applicationDetectionRightVBox.setAlignment(Pos.TOP_CENTER);
         //将标签和TextArea加入到右侧VBox中
-        applicationDetectionRightVBox.getChildren().addAll(detectResultLabel, detectResultTextArea);
+        applicationDetectionRightVBox.getChildren().addAll(detectResultLabel, detectResultStackPane);
         //左右两侧内容加入到面板
         applicationDetectionBorderPane.setLeft(applicationDetectionLeftVBox);
         applicationDetectionBorderPane.setRight(applicationDetectionRightVBox);
-        BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(80, 80, 50, 100));
-        BorderPane.setMargin(applicationDetectionRightVBox, new Insets(45, 100, 50, 80));
+        BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(80, 10, 50, 100));
+        BorderPane.setMargin(applicationDetectionRightVBox, new Insets(45, 100, 50, 10));
         applicationDetectionTab.setContent(applicationDetectionBorderPane);
 
         //-----------------------------------模型更新Tab内容
@@ -373,8 +364,19 @@ public class MainUI extends Application {
         modelUpdateBorderPane.setPrefSize(750, 1400);
         //左侧
         VBox modelUpdateLeftVBox = new VBox();
+        modelUpdateLeftVBox.setAlignment(Pos.TOP_CENTER);
         modelUpdateLeftVBox.setPadding(new Insets(80, 80, 50, 100));
         modelUpdateLeftVBox.setSpacing(15);
+
+        //中间进度条
+        StackPane modelUpdateCenterPane = new StackPane();
+        JFXSpinner modelUpdateSpinner = new JFXSpinner();
+        modelUpdateCenterPane.getChildren().add(modelUpdateSpinner);
+        modelUpdateCenterPane.setVisible(false);
+        modelUpdateBorderPane.setCenter(modelUpdateCenterPane);
+        modelUpdateCenterPane.setMaxSize(50, 50);
+
+
         //右侧
         VBox modelUpdateRightVBox = new VBox();
         modelUpdateRightVBox.setSpacing(15);
@@ -383,13 +385,40 @@ public class MainUI extends Application {
         //选择用于更新模型的样本按钮
         JFXButton chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
         chooseOneUpdateDataButton.getStyleClass().add("button-raised");
+
+        //是否已知样本属性
+        final ToggleGroup group = new ToggleGroup();
+
+        JFXRadioButton modelUpdateGoodApkRadio = new JFXRadioButton("正常样本");
+        modelUpdateGoodApkRadio.setPadding(new Insets(10));
+        modelUpdateGoodApkRadio.setToggleGroup(group);
+
+        JFXRadioButton modelUpdateBadApkRadio = new JFXRadioButton("恶意样本");
+        modelUpdateBadApkRadio.setPadding(new Insets(10));
+        modelUpdateBadApkRadio.setToggleGroup(group);
+
+        JFXRadioButton modelUpdateUnknownRadio = new JFXRadioButton("未知属性");
+        modelUpdateUnknownRadio.setPadding(new Insets(10));
+        modelUpdateUnknownRadio.setToggleGroup(group);
+
+        //应用属性
+        Label modelUpdateApkAttributeLabel = new Label();
+        modelUpdateApkAttributeLabel.setText("应用属性：");
+
+        //水平布局
+        HBox modelUpdateHBox = new HBox();
+        modelUpdateHBox.getChildren().addAll(modelUpdateApkAttributeLabel, modelUpdateGoodApkRadio, modelUpdateBadApkRadio, modelUpdateUnknownRadio);
+        modelUpdateHBox.setSpacing(10);
+        modelUpdateHBox.setAlignment(Pos.CENTER);
+
+
         //用于更新模型的样本所在的路径
         Label updateDataPathLabel = new Label();
         //开始更新模型按钮
         JFXButton startUpdateModelButton = new JFXButton("开始更新模型");
         startUpdateModelButton.getStyleClass().add("button-raised");
         //将上述按钮添加到左侧的VBox
-        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, startUpdateModelButton);
+        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, modelUpdateHBox, startUpdateModelButton);
         //模型更新结果显示label
         Label modelUpdateResultLabel = new Label("----------------更新结果----------------");
         //模型更新结果TextArea
@@ -792,35 +821,62 @@ public class MainUI extends Application {
                         //调用python程序提取权限
                         if (null != detectApkPath) {
 
-                            detectResultTextArea.setText("");
+//                            detectResultTextArea.setText("");
+                            authorityList.getItems().clear();
+
                             try {
                                 String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", detectApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+                                Label tempLabel = new Label();
+                                tempLabel.setPrefWidth(200);
+                                tempLabel.setText("该应用主要有如下权限:");
+                                authorityList.getItems().add(tempLabel);
 
-                                detectResultTextArea.appendText("该应用主要有如下权限:\n");
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File("E:\\BiSheData\\temp\\res.txt");
                                 int wait = proc.waitFor();
-                                if (wait==0&&file.exists()) {
+                                if (wait == 0 && file.exists()) {
                                     try (FileReader reader = new FileReader("E:\\BiSheData\\temp\\res.txt");
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
                                         while ((line = br.readLine()) != null) {
                                             //将权限显示在文本域
-                                            detectResultTextArea.appendText(line+"\n");
+                                            String finalLine = line;
+                                            Platform.runLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Label tempLabel = new Label();
+                                                    tempLabel.setPrefWidth(200);
+                                                    tempLabel.setText(finalLine);
+                                                    //更新JavaFX的主线程的代码放在此处
+                                                    authorityList.getItems().add(tempLabel);
+                                                }
+                                            });
                                         }
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
+                                    //删除临时文件
+                                    file.delete();
 
-                                }else{
+                                } else {
                                     System.out.println("权限结果文件不存在！");
                                 }
-
-                                detectResultTextArea.appendText("\t\t\t>>>>>>预测结果<<<<<<\n");
-                                detectResultTextArea.appendText("该应用为正常应用的概率为98%\n");
-
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //更新JavaFX的主线程的代码放在此处
+                                        Label tempLabel = new Label();
+                                        tempLabel.setPrefWidth(200);
+                                        tempLabel.setText(">>>>>>预测结果<<<<<<");
+                                        authorityList.getItems().add(tempLabel);
+                                        Label tempLabel2 = new Label();
+                                        tempLabel2.setPrefWidth(200);
+                                        tempLabel2.setText("该应用为正常应用的概率为98%");
+                                        authorityList.getItems().add(tempLabel2);
+                                    }
+                                });
                                 applicationDetectionCenterPane.setVisible(false);
 
                                 //设置按钮可用
@@ -856,7 +912,7 @@ public class MainUI extends Application {
                 if (null != file) {
                     //文件路径
                     String absolutePath = file.getAbsolutePath();
-                    detectApkPath = absolutePath;
+                    updateModelDataPath = absolutePath;
                     updateDataPathLabel.setText("选择的路径：" + absolutePath);
                     updateDataPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
 
@@ -870,11 +926,71 @@ public class MainUI extends Application {
         startUpdateModelButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("开始更新模型按钮");
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //设置按钮不可用
+                        startUpdateModelButton.setDisable(true);
+                        //显示进度条
+                        modelUpdateCenterPane.setVisible(true);
+                        //调用python程序提取权限
+                        if (null != updateModelDataPath) {
+                            modelUpdateResultTextArea.setText("");
+                            modelUpdateResultTextArea.appendText("该样本主要有以下权限:\n");
+                            try {
+                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", updateModelDataPath};
+                                Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+                                //执行完毕开始读取提取出的权限TXT
+                                File file = new File("E:\\BiSheData\\temp\\res.txt");
+                                int wait = proc.waitFor();
+                                if (wait == 0 && file.exists()) {
+                                    try (FileReader reader = new FileReader("E:\\BiSheData\\temp\\res.txt");
+                                         BufferedReader br = new BufferedReader(reader)
+                                    ) {
+                                        String line;
+                                        while ((line = br.readLine()) != null) {
+                                            //将权限显示在文本域
+                                            String finalLine = line;
+                                            Platform.runLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    modelUpdateResultTextArea.appendText(finalLine + "\n");
+
+
+                                                }
+                                            });
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    //删除临时文件
+                                    file.delete();
+
+                                } else {
+                                    System.out.println("权限结果文件不存在！");
+                                }
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        modelUpdateResultTextArea.appendText("模型更新完毕！\n");
+
+
+                                    }
+                                });
+                            } catch (
+                                    Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        //设置按钮可用
+                        startUpdateModelButton.setDisable(false);
+                        //隐藏进度条
+                        modelUpdateCenterPane.setVisible(false);
+                    }
+                }).start();
             }
         });
-
-
 //----------------------------------各个按钮的点击事件结束----------------------------------------------------
 
     }
