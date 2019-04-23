@@ -7,10 +7,7 @@ import com.jfoenix.animation.alert.JFXAlertAnimation;
 import com.jfoenix.controls.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -49,17 +46,15 @@ public class MainUI extends Application {
     private String decompileResultSavePath;
     //要提取权限特征的apk文件路径(静态特征提取模块)
     private String extractAuthorityApkPath;
-    //权限提取选择的文件夹路径
-    private String authorityDirectory;
     //用于训练模型的CSV文件路径(模型训练模块用到)
     private String csvFilePath;
+    //要检测的apk文件路径
     private String detectApkPath;
     //用于更新模型的样本所在的路径
     private String updateModelDataPath;
 
     @Override
     public void start(Stage stage) throws Exception {
-
         //绝对布局
         AnchorPane an = new AnchorPane();
         //给布局设置一个背景颜色
@@ -77,6 +72,7 @@ public class MainUI extends Application {
         //设置左上角的图标
         stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
         JFXTabPane tabPane = new JFXTabPane();
+        tabPane.setPrefHeight(50);
         tabPane.setPrefHeight(700);
         tabPane.setPrefWidth(1300);
         //首页Tab 默认
@@ -99,9 +95,7 @@ public class MainUI extends Application {
         ModelUpdatingTab.setClosable(false);
         an.getChildren().add(tabPane);
 
-
-        //提示框
-
+        //提示框(全局通用)
         JFXDialogLayout layout = new JFXDialogLayout();
         //提示信息Label
         Label globalMsgLabel = new Label();
@@ -127,7 +121,6 @@ public class MainUI extends Application {
         indexStackPane.getChildren().addAll(indexLabel);
         indexTab.setContent(indexStackPane);
 
-
         //设置逆向工程Tab的内容
         BorderPane reverseEngineeringBorderPane = new BorderPane();
         reverseEngineeringBorderPane.setPrefSize(700, 1300);
@@ -148,11 +141,8 @@ public class MainUI extends Application {
         //开始反编译按钮
         JFXButton startDecompileButton = new JFXButton("开始反编译");
         startDecompileButton.getStyleClass().add("button-raised");
-
         //多个Apk文件反编译Label
         Label multipleApkDecompileLabel = new Label("-------------------多个Apk文件反编译-------------------");
-
-
         //选择多个APK文件按钮
         JFXButton chooseManyApkAndDecompileButton = new JFXButton("选择多个Apk文件并反编译");
         chooseManyApkAndDecompileButton.getStyleClass().add("button-raised");
@@ -184,7 +174,6 @@ public class MainUI extends Application {
                 startMultipleDecompileButton);
         //设置左侧VBox中按钮之间的间距
         reverseEngineeringLeftVBox.setSpacing(15);
-
 
         //中间部分
         VBox reverseEngineeringCenterVBox = new VBox();
@@ -225,9 +214,7 @@ public class MainUI extends Application {
         BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(80, 100, 50, 10));
         BorderPane.setMargin(reverseEngineeringCenterVBox, new Insets(150, 10, 50, 10));
 
-
         reverseEngineeringTab.setContent(reverseEngineeringBorderPane);
-
 
         //----------------静态特征提取Tab的内容
         BorderPane staticFeatureBorderPane = new BorderPane();
@@ -247,7 +234,6 @@ public class MainUI extends Application {
         //设置左侧VBox中按钮之间的间距
         staticFeatureLeftVBox.setSpacing(15);
 
-
         //中间部分
         VBox staticFeatureCenterVBox = new VBox();
         staticFeatureCenterVBox.setAlignment(Pos.CENTER);
@@ -262,7 +248,6 @@ public class MainUI extends Application {
         staticFeatureCenterVBox.setSpacing(10);
         //设置中间部分初始不可见
         staticFeatureCenterVBox.setVisible(false);
-
 
         //右侧部分
         VBox staticFeatureRightVBox = new VBox();
@@ -336,7 +321,6 @@ public class MainUI extends Application {
         //设置中间部分初始不可见
         modelTrainingCenterVBox.setVisible(false);
 
-
         BorderPane.setMargin(modelTrainingLeftVBox, new Insets(45, 100, 50, 80));
         BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 100, 50, 80));
         BorderPane.setMargin(modelTrainingCenterVBox, new Insets(150, 10, 50, 10));
@@ -345,52 +329,10 @@ public class MainUI extends Application {
         modelTrainingBorderPane.setCenter(modelTrainingCenterVBox);
         modelTrainingTab.setContent(modelTrainingBorderPane);
 
-
         //------------------------应用检测Tab按钮
         BorderPane applicationDetectionBorderPane = new BorderPane();
         //左侧
         VBox applicationDetectionLeftVBox = new VBox();
-
-
-        //右侧
-    /*    VBox applicationDetectionRightVBox = new VBox();
-        //选择要检测的apk文件按钮
-        JFXButton chooseOneTargetApkButton = new JFXButton("选择要检测的Apk文件");
-        chooseOneTargetApkButton.getStyleClass().add("button-raised");
-        //要检测的Apk文件的路径
-        Label targetApkPath = new Label();
-        //开始检测按钮
-        JFXButton startDetectButton = new JFXButton("开始检测");
-        startDetectButton.getStyleClass().add("button-raised");
-        //检测结果显示label
-        Label detectResultLabel = new Label("----------------检测结果----------------");
-
-        JFXListView<Label> authorityList = new JFXListView<>();
-        authorityList.setExpanded(true);
-
-
-        authorityList.getStyleClass().add("mylistview");
-        authorityList.setMaxHeight(3400);
-
-
-        StackPane detectResultStackPane = new StackPane(authorityList);
-        detectResultStackPane.setPadding(new Insets(24, 100, 24, 100));
-
-        JFXScrollPane applicationDetectionScrollPane = new JFXScrollPane();
-        applicationDetectionScrollPane.setContent(detectResultStackPane);
-
-
-        applicationDetectionLeftVBox.setSpacing(15);
-        applicationDetectionLeftVBox.setAlignment(Pos.TOP_LEFT);
-        //将上述按钮添加到左侧VBox
-        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton, targetApkPath, startDetectButton);
-        applicationDetectionRightVBox.setSpacing(15);
-        applicationDetectionRightVBox.setAlignment(Pos.TOP_CENTER);
-        //将标签和TextArea加入到右侧VBox中
-        applicationDetectionRightVBox.getChildren().addAll(detectResultLabel, detectResultStackPane);
-*/
-
-
         //右侧
         VBox applicationDetectionRightVBox = new VBox();
         //选择要检测的apk文件按钮
@@ -418,13 +360,11 @@ public class MainUI extends Application {
         //将标签和TextArea加入到右侧VBox中
         applicationDetectionRightVBox.getChildren().addAll(detectResultLabel, detectResultTextArea);
 
-
         //中间部分
         VBox applicationDetectionCenterVBox = new VBox();
         applicationDetectionCenterVBox.setAlignment(Pos.CENTER);
         //中间进度条的提示文字
         Label applicationDetectionCenterLabel = new Label();
-//        applicationDetectionCenterLabel.setPrefWidth(200);
         StackPane applicationDetectionCenterStackPane = new StackPane();
         JFXSpinner applicationDetectionCenterSpinner = new JFXSpinner();
         applicationDetectionCenterStackPane.getChildren().add(applicationDetectionCenterSpinner);
@@ -452,7 +392,6 @@ public class MainUI extends Application {
         modelUpdateLeftVBox.setPadding(new Insets(80, 80, 50, 100));
         modelUpdateLeftVBox.setSpacing(15);
 
-
         //中间部分
         VBox modelUpdateCenterVBox = new VBox();
         modelUpdateCenterVBox.setAlignment(Pos.CENTER);
@@ -468,7 +407,6 @@ public class MainUI extends Application {
         //设置中间部分初始不可见
         modelUpdateCenterVBox.setVisible(false);
 
-
         //右侧
         VBox modelUpdateRightVBox = new VBox();
         modelUpdateRightVBox.setSpacing(15);
@@ -477,10 +415,8 @@ public class MainUI extends Application {
         //选择用于更新模型的样本按钮
         JFXButton chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
         chooseOneUpdateDataButton.getStyleClass().add("button-raised");
-
         //是否已知样本属性
         final ToggleGroup group = new ToggleGroup();
-
         JFXRadioButton modelUpdateGoodApkRadio = new JFXRadioButton("正常样本");
         modelUpdateGoodApkRadio.setPadding(new Insets(10));
         modelUpdateGoodApkRadio.setToggleGroup(group);
@@ -493,7 +429,6 @@ public class MainUI extends Application {
         modelUpdateUnknownRadio.setPadding(new Insets(10));
         modelUpdateUnknownRadio.setToggleGroup(group);
 
-
         //应用属性
         Label modelUpdateApkAttributeLabel = new Label();
         modelUpdateApkAttributeLabel.setText("应用属性：");
@@ -503,7 +438,6 @@ public class MainUI extends Application {
         modelUpdateHBox.getChildren().addAll(modelUpdateApkAttributeLabel, modelUpdateGoodApkRadio, modelUpdateBadApkRadio, modelUpdateUnknownRadio);
         modelUpdateHBox.setSpacing(10);
         modelUpdateHBox.setAlignment(Pos.CENTER);
-
 
         //用于更新模型的样本所在的路径
         Label updateDataPathLabel = new Label();
@@ -536,35 +470,7 @@ public class MainUI extends Application {
         stage.setResizable(false);
         //设置tabPane的背景颜色
         tabPane.setStyle("-fx-background-color: #F5FFFA");
-
-//----------------------------------变化监听开始----------------------------------------------------
-
-        //监听选择了哪个tab
-        tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-            @Override
-            public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
-                System.out.println(newValue.getText());
-            }
-        });
-        //tab被选中时事件监听
-        reverseEngineeringTab.setOnSelectionChanged(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-                Tab t = (Tab) event.getSource();
-                System.out.println("tab1的选择状态是：" + reverseEngineeringTab.isSelected());
-            }
-
-        });
-        tabPane.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                tabPane.setPrefHeight(an.getWidth());
-
-            }
-        });
-//----------------------------------变化监听结束----------------------------------------------------
 //----------------------------------各个按钮的点击事件开始----------------------------------------------------
-
         //选择单个APK文件按钮点击事件监听
         chooseOneApkButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -584,11 +490,9 @@ public class MainUI extends Application {
                     singleApkPath = absolutePath;
                     singleApkPathLabel.setText("选择的路径：" + absolutePath);
                     singleApkPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
-
                 }
             }
         });
-
 
         //设置反编译结果存放文件夹按钮点击事件监听
         setDecompileSaveDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -606,7 +510,6 @@ public class MainUI extends Application {
             public void handle(ActionEvent event) {
                 //路径不为空
                 if (null != singleApkPath && null != decompileResultSavePath) {
-
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -625,18 +528,14 @@ public class MainUI extends Application {
                             });
 
                             DateTime dateTime = new DateTime();
-
                             //当前时间
                             String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
-
-
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     rightDecompileInfoTextArea.setText("");
                                     rightDecompileInfoTextArea.appendText("开始反编译.....\n");
                                     rightDecompileInfoTextArea.appendText("正在反编译.....\n");
-
                                 }
                             });
 
@@ -662,10 +561,8 @@ public class MainUI extends Application {
                             globalMsgLabel.setText("请先选择要进行反编译的文件以及设置反编译结果存放路径！");
                             globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
                             alert.showAndWait();
-
                         }
                     });
-
                 }
             }
         });
@@ -676,7 +573,6 @@ public class MainUI extends Application {
             public void handle(ActionEvent event) {
                 //下面设置其他不相关按钮不可用
                 setButtonDisble(true, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
-
                 //当前时间
                 DateTime dateTime = new DateTime();
                 String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
@@ -710,10 +606,8 @@ public class MainUI extends Application {
                         rightDecompileInfoTextArea.appendText("反编译完成!");
                         //下面设置其他按钮可用
                         setButtonDisble(false, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
-
                     }
                 }).start();
-
             }
 
             public void setButtonDisble(boolean b, Button chooseOneApkButton, Button setDecompileSaveDirectoryButton, Button startDecompileButton, Button chooseManyApkAndDecompileButton, Button chooseManyApkButton, Button setMultipleDecompileSaveDirectoryButton, Button startMultipleDecompileButton) {
@@ -735,12 +629,9 @@ public class MainUI extends Application {
                 multipleApkDirectoryPath = setDirectory();
                 //不空
                 if (!StringUtils.isEmpty(multipleApkDirectoryPath)) {
-
                     multipleApkPathLabel.setText("选择的文件夹路径为:" + multipleApkDirectoryPath);
                     multipleApkPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
                 }
-
-
             }
         });
 
@@ -753,7 +644,6 @@ public class MainUI extends Application {
                     multipleDecompileSavePathLabel.setText("选择的文件夹路径为:" + decompileResultSavePath);
                     multipleDecompileSavePathLabel.setTextFill(Paint.valueOf("#7B68EE"));
                 }
-
             }
         });
 
@@ -778,7 +668,6 @@ public class MainUI extends Application {
                                     reverseEngineeringCenterLabel.setText("正在进行反编译，请稍后...");
                                     reverseEngineeringCenterLabel.setFont(Font.font("华文行楷", 15));
                                     reverseEngineeringCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
-
                                     rightDecompileInfoTextArea.setText("");
                                     rightDecompileInfoTextArea.appendText("开始反编译....\n");
                                 }
@@ -788,7 +677,6 @@ public class MainUI extends Application {
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-
                                     rightDecompileInfoTextArea.appendText("反编译完成！\n");
                                     //设置按钮可用
                                     startMultipleDecompileButton.setDisable(false);
@@ -818,7 +706,6 @@ public class MainUI extends Application {
         chooseAuthorityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
                 Stage st = new Stage();
                 FileChooser fc = new FileChooser();
                 //设置标题
@@ -834,12 +721,9 @@ public class MainUI extends Application {
                     extractAuthorityApkPath = absolutePath;
                     AuthorityDirectoryLabel.setText("选择APK的路径：" + absolutePath);
                     AuthorityDirectoryLabel.setTextFill(Paint.valueOf("#7B68EE"));
-
                 }
-
             }
         });
-
 
         //开始提取权限按钮
         startExtractAuthorityButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -891,7 +775,6 @@ public class MainUI extends Application {
                                     }
                                     //删除临时文件
                                     file.delete();
-
                                 } else {
                                     System.out.println("权限结果文件不存在！");
                                 }
@@ -907,7 +790,6 @@ public class MainUI extends Application {
                                         startExtractAuthorityButton.setDisable(false);
                                         //设置进度条不可见
                                         staticFeatureCenterVBox.setVisible(false);
-//                                        staticFeatureCenterLabel.setText("");
                                     }
                                 });
                             } catch (IOException e) {
@@ -917,8 +799,6 @@ public class MainUI extends Application {
                             }
                         }
                     }).start();
-
-
                 } else {
                     System.out.println("extractAuthorityApkPath为空");
                     //提示用户正确操作
@@ -928,11 +808,8 @@ public class MainUI extends Application {
                             globalMsgLabel.setText("请先选择要进行提取权限的文件！");
                             globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
                             alert.showAndWait();
-
                         }
                     });
-
-
                 }
             }
         });
@@ -956,7 +833,6 @@ public class MainUI extends Application {
                     csvFilePath = absolutePath;
                     trainDataPathLabel.setText("选择的文件路径:" + absolutePath);
                     trainDataPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
-
                 }
             }
 
@@ -966,7 +842,6 @@ public class MainUI extends Application {
         startTrainButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
                 if (null != csvFilePath) {
                     new Thread(new Runnable() {
                         @Override
@@ -1009,7 +884,6 @@ public class MainUI extends Application {
                         }
                     }).start();
                 } else {
-
                     //提示用户正确操作
                     Platform.runLater(new Runnable() {
                         @Override
@@ -1017,11 +891,8 @@ public class MainUI extends Application {
                             globalMsgLabel.setText("请先选择训练样本！");
                             globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
                             alert.showAndWait();
-
                         }
                     });
-
-
                 }
             }
         });
@@ -1045,7 +916,6 @@ public class MainUI extends Application {
                     detectApkPath = absolutePath;
                     targetApkPath.setText("选择的路径：" + absolutePath);
                     targetApkPath.setTextFill(Paint.valueOf("#7B68EE"));
-
                 }
             }
         });
@@ -1072,12 +942,10 @@ public class MainUI extends Application {
                                     detectResultTextArea.setText("");
                                 }
                             });
-
                             //调用python程序提取权限
                             try {
                                 String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", detectApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
-
                                 detectResultTextArea.appendText("该应用主要有如下权限:\n");
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File("E:\\BiSheData\\temp\\res.txt");
@@ -1102,7 +970,6 @@ public class MainUI extends Application {
                                     }
                                     //删除临时文件
                                     file.delete();
-
                                 } else {
                                     System.out.println("权限结果文件不存在！");
                                 }
@@ -1112,23 +979,18 @@ public class MainUI extends Application {
                                         //更新JavaFX的主线程的代码放在此处
                                         detectResultTextArea.appendText(">>>>>>预测结果<<<<<<\n");
                                         detectResultTextArea.appendText("该应用为正常应用的概率为98%\n");
-
                                     }
                                 });
                                 applicationDetectionCenterVBox.setVisible(false);
-
                                 //设置按钮可用
                                 startDetectButton.setDisable(false);
                             } catch (
                                     Exception e) {
                                 e.printStackTrace();
                             }
-
                         }
                     }).start();
-
                 } else {
-
                     //提示用户正确操作
                     Platform.runLater(new Runnable() {
                         @Override
@@ -1136,10 +998,8 @@ public class MainUI extends Application {
                             globalMsgLabel.setText("请先选择要检测的APK文件！");
                             globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
                             alert.showAndWait();
-
                         }
                     });
-
                 }
             }
         });
@@ -1187,7 +1047,6 @@ public class MainUI extends Application {
                                     modelUpdateCenterLabel.setFont(Font.font("华文行楷", 15));
                                     modelUpdateCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
                                     //调用python程序提取权限
-
                                     modelUpdateResultTextArea.setText("");
                                     modelUpdateResultTextArea.appendText("该样本主要有以下权限:\n");
                                 }
@@ -1218,7 +1077,6 @@ public class MainUI extends Application {
                                     }
                                     //删除临时文件
                                     file.delete();
-
                                 } else {
                                     System.out.println("权限结果文件不存在！");
                                 }
@@ -1232,7 +1090,6 @@ public class MainUI extends Application {
                                     Exception e) {
                                 e.printStackTrace();
                             }
-
                             //设置按钮可用
                             startUpdateModelButton.setDisable(false);
                             //隐藏进度条
