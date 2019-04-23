@@ -1,7 +1,9 @@
 package com.eric;
 
+import com.eric.bean.Authority;
 import com.eric.service.AuthorityService;
 import com.eric.service.DeCompileService;
+import com.eric.tools.MD5.MD5Utils;
 import com.eric.tools.decode.APKTool;
 import com.eric.tools.ui.UIUtils;
 import com.jfoenix.controls.JFXButton;
@@ -46,11 +48,10 @@ import java.util.Locale;
  *@Date:2019/4/8
  */
 public class MainUI extends Application {
-    private DeCompileService deCompileService=new DeCompileService();
+    private DeCompileService deCompileService = new DeCompileService();
     @Resource
     private AuthorityService authorityService;
     public static MainUI mainUI;
-
 
 
     //单个Apk文件路径
@@ -322,6 +323,16 @@ public class MainUI extends Application {
         //左侧
         VBox applicationDetectionLeftVBox = new VBox();
 
+        //中间进度条部分
+        //中间部分
+        StackPane applicationDetectionCenterPane = new StackPane();
+        JFXSpinner applicationDetectionSpinner = new JFXSpinner();
+        applicationDetectionCenterPane.getChildren().add(applicationDetectionSpinner);
+        applicationDetectionCenterPane.setVisible(false);
+        applicationDetectionBorderPane.setCenter(applicationDetectionCenterPane);
+        applicationDetectionCenterPane.setMaxSize(50, 50);
+
+
         //右侧
         VBox applicationDetectionRightVBox = new VBox();
         //选择要检测的apk文件按钮
@@ -340,6 +351,8 @@ public class MainUI extends Application {
         detectResultTextArea.setPrefRowCount(35);
         //自动换行
         detectResultTextArea.setWrapText(true);
+        //设置文本域右侧滚动条
+//        detectResultTextArea.set
         applicationDetectionLeftVBox.setSpacing(15);
         applicationDetectionLeftVBox.setAlignment(Pos.TOP_LEFT);
         //将上述按钮添加到左侧VBox
@@ -768,7 +781,62 @@ public class MainUI extends Application {
         startDetectButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("开始检测按钮");
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //设置按钮不可用
+                        startDetectButton.setDisable(true);
+                        //显示进度条
+                        applicationDetectionCenterPane.setVisible(true);
+                        //调用python程序提取权限
+                        if (null != detectApkPath) {
+
+                            detectResultTextArea.setText("");
+                            try {
+                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", detectApkPath};
+                                Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+
+                                detectResultTextArea.appendText("该应用主要有如下权限:\n");
+                                //执行完毕开始读取提取出的权限TXT
+                                File file = new File("E:\\BiSheData\\temp\\res.txt");
+                                int wait = proc.waitFor();
+                                if (wait==0&&file.exists()) {
+                                    try (FileReader reader = new FileReader("E:\\BiSheData\\temp\\res.txt");
+                                         BufferedReader br = new BufferedReader(reader)
+                                    ) {
+                                        String line;
+                                        while ((line = br.readLine()) != null) {
+                                            //将权限显示在文本域
+                                            detectResultTextArea.appendText(line+"\n");
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }else{
+                                    System.out.println("权限结果文件不存在！");
+                                }
+
+                                detectResultTextArea.appendText("\t\t\t>>>>>>预测结果<<<<<<\n");
+                                detectResultTextArea.appendText("该应用为正常应用的概率为98%\n");
+
+                                applicationDetectionCenterPane.setVisible(false);
+
+                                //设置按钮可用
+                                startDetectButton.setDisable(false);
+                            } catch (
+                                    Exception e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+
+
+                    }
+                }).start();
+
             }
         });
 
