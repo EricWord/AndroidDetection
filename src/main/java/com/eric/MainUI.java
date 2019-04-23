@@ -3,6 +3,7 @@ package com.eric;
 import com.eric.service.DeCompileService;
 import com.eric.tools.decode.APKTool;
 import com.eric.tools.ui.UIUtils;
+import com.jfoenix.animation.alert.JFXAlertAnimation;
 import com.jfoenix.controls.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,6 +22,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -74,7 +76,6 @@ public class MainUI extends Application {
         stage.setTitle("基于在线学习的恶意Android应用检测系统");
         //设置左上角的图标
         stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
-//        TabPane tabPane = new TabPane();
         JFXTabPane tabPane = new JFXTabPane();
         tabPane.setPrefHeight(700);
         tabPane.setPrefWidth(1300);
@@ -97,6 +98,19 @@ public class MainUI extends Application {
         applicationDetectionTab.setClosable(false);
         ModelUpdatingTab.setClosable(false);
         an.getChildren().add(tabPane);
+
+
+        //提示框
+
+        JFXDialogLayout layout = new JFXDialogLayout();
+        //提示信息Label
+        Label globalMsgLabel = new Label();
+        layout.setBody(globalMsgLabel);
+        JFXAlert<Void> alert = new JFXAlert<>(stage);
+        alert.setOverlayClose(true);
+        alert.setAnimation(JFXAlertAnimation.CENTER_ANIMATION);
+        alert.setContent(layout);
+        alert.initModality(Modality.NONE);
 
 
 //----------------------------------设置各个Tab的内容开始----------------------------------------------------
@@ -173,12 +187,18 @@ public class MainUI extends Application {
 
 
         //中间部分
+        VBox reverseEngineeringCenterVBox = new VBox();
+        reverseEngineeringCenterVBox.setAlignment(Pos.CENTER);
+        //中间进度条的提示文字
+        Label reverseEngineeringCenterLabel = new Label();
         StackPane reverseEngineeringCenterPane = new StackPane();
         JFXSpinner reverseEngineeringSpinner = new JFXSpinner();
         reverseEngineeringCenterPane.getChildren().add(reverseEngineeringSpinner);
-        reverseEngineeringCenterPane.setVisible(false);
-        reverseEngineeringBorderPane.setCenter(reverseEngineeringCenterPane);
         reverseEngineeringCenterPane.setMaxSize(50, 50);
+        reverseEngineeringCenterVBox.getChildren().addAll(reverseEngineeringCenterLabel, reverseEngineeringCenterPane);
+        reverseEngineeringCenterVBox.setSpacing(10);
+        //设置中间部分初始不可见
+        reverseEngineeringCenterVBox.setVisible(false);
 
         //右侧部分
         VBox reverseEngineeringRightVBox = new VBox();
@@ -197,10 +217,13 @@ public class MainUI extends Application {
         reverseEngineeringRightVBox.setAlignment(Pos.TOP_CENTER);
         //将左侧内容添加到布局
         reverseEngineeringBorderPane.setLeft(reverseEngineeringLeftVBox);
+        //将中间内容添加到布局
+        reverseEngineeringBorderPane.setCenter(reverseEngineeringCenterVBox);
         //将右侧内容添加到布局
         reverseEngineeringBorderPane.setRight(reverseEngineeringRightVBox);
-        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(80, 80, 50, 100));
-        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(80, 100, 50, 80));
+        BorderPane.setMargin(reverseEngineeringLeftVBox, new Insets(80, 10, 50, 100));
+        BorderPane.setMargin(reverseEngineeringRightVBox, new Insets(80, 100, 50, 10));
+        BorderPane.setMargin(reverseEngineeringCenterVBox, new Insets(150, 10, 50, 10));
 
 
         reverseEngineeringTab.setContent(reverseEngineeringBorderPane);
@@ -401,6 +424,7 @@ public class MainUI extends Application {
         modelUpdateUnknownRadio.setPadding(new Insets(10));
         modelUpdateUnknownRadio.setToggleGroup(group);
 
+
         //应用属性
         Label modelUpdateApkAttributeLabel = new Label();
         modelUpdateApkAttributeLabel.setText("应用属性：");
@@ -436,9 +460,6 @@ public class MainUI extends Application {
         stage.show();
         //设置不可变
         stage.setResizable(false);
-//        tabPane.setPrefWidth(an.getWidth());
-        //设置选中哪个Tab 默认显示逆向工程Tab
-//        tabPane.getSelectionModel().select(reverseEngineeringTab);
         //设置tabPane的背景颜色
         tabPane.setStyle("-fx-background-color: #F5FFFA");
 
@@ -509,30 +530,69 @@ public class MainUI extends Application {
         startDecompileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //设置按钮不可用
-                        startDecompileButton.setDisable(true);
-                        reverseEngineeringCenterPane.setVisible(true);
-                        DateTime dateTime = new DateTime();
-                        //当前时间
-                        String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
-                        //路径不为空
-                        if (null != singleApkPath && null != decompileResultSavePath) {
-                            rightDecompileInfoTextArea.setText("");
-                            rightDecompileInfoTextArea.appendText("开始反编译.....\n");
-                            rightDecompileInfoTextArea.appendText("正在反编译.....\n");
+                //路径不为空
+                if (null != singleApkPath && null != decompileResultSavePath) {
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置按钮不可用
+                                    startDecompileButton.setDisable(true);
+                                    //设置中间部分可见
+                                    reverseEngineeringCenterVBox.setVisible(true);
+                                    //设置提示文字
+                                    reverseEngineeringCenterLabel.setText("正在进行反编译，请稍后...");
+                                    reverseEngineeringCenterLabel.setFont(Font.font("华文行楷", 15));
+                                    reverseEngineeringCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                                }
+                            });
+
+                            DateTime dateTime = new DateTime();
+
+                            //当前时间
+                            String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
+
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    rightDecompileInfoTextArea.setText("");
+                                    rightDecompileInfoTextArea.appendText("开始反编译.....\n");
+                                    rightDecompileInfoTextArea.appendText("正在反编译.....\n");
+
+                                }
+                            });
+
                             APKTool.decode(singleApkPath, decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
-                            rightDecompileInfoTextArea.appendText("反编译完成，结果存放路径：" + decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    rightDecompileInfoTextArea.appendText("反编译完成，结果存放路径：" + decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
+                                }
+                            });
+
+                            //设置按钮可用
+                            startDecompileButton.setDisable(false);
+                            reverseEngineeringCenterPane.setVisible(false);
+
                         }
-                        //设置按钮可用
-                        startDecompileButton.setDisable(false);
-                        reverseEngineeringCenterPane.setVisible(false);
+                    }).start();
+                } else {
+                    //提示用户正确操作
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            globalMsgLabel.setText("请先选择要进行反编译的文件以及设置反编译结果存放路径！");
+                            globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
+                            alert.showAndWait();
 
-                    }
-                }).start();
+                        }
+                    });
 
+                }
             }
         });
 
@@ -642,6 +702,18 @@ public class MainUI extends Application {
                             startMultipleDecompileButton.setDisable(false);
                         }
                     }, "批量反编译线程").start();
+                } else {
+
+                    //提示用户正确操作
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            globalMsgLabel.setText("请先选择要进行反编译的文件以及设置反编译结果存放路径！");
+                            globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
+                            alert.showAndWait();
+
+                        }
+                    });
                 }
             }
         });
@@ -672,16 +744,17 @@ public class MainUI extends Application {
             }
         });
 
+
         //开始提取权限按钮
         startExtractAuthorityButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                //设置按钮不可用
-                startExtractAuthorityButton.setDisable(true);
-                staticFeatureCenterPane.setVisible(true);
-                rightAuthorityInfoTextArea.setText("");
-                //这里通过Java调用python代码进行权限的提取
                 if (null != extractAuthorityApkPath) {
+                    //设置按钮不可用
+                    startExtractAuthorityButton.setDisable(true);
+                    staticFeatureCenterPane.setVisible(true);
+                    rightAuthorityInfoTextArea.setText("");
+                    //这里通过Java调用python代码进行权限的提取
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -703,8 +776,6 @@ public class MainUI extends Application {
                                 System.out.println("Java调用python程序执行" + execResult);
                                 //设置按钮可用
                                 startExtractAuthorityButton.setDisable(false);
-
-
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
@@ -712,6 +783,19 @@ public class MainUI extends Application {
                             }
                         }
                     }).start();
+                } else {
+                    //提示用户正确操作
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            globalMsgLabel.setText("请先选择要进行提取权限的文件！");
+                            globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
+                            alert.showAndWait();
+
+                        }
+                    });
+
+
                 }
             }
         });
@@ -778,6 +862,20 @@ public class MainUI extends Application {
                             }
                         }
                     }).start();
+                } else {
+
+                    //提示用户正确操作
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            globalMsgLabel.setText("请先选择训练样本！");
+                            globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
+                            alert.showAndWait();
+
+                        }
+                    });
+
+
                 }
             }
         });
@@ -810,20 +908,16 @@ public class MainUI extends Application {
         startDetectButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //设置按钮不可用
-                        startDetectButton.setDisable(true);
-                        //显示进度条
-                        applicationDetectionCenterPane.setVisible(true);
-                        //调用python程序提取权限
-                        if (null != detectApkPath) {
-
-//                            detectResultTextArea.setText("");
+                if (null != detectApkPath) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //设置按钮不可用
+                            startDetectButton.setDisable(true);
+                            //显示进度条
+                            applicationDetectionCenterPane.setVisible(true);
+                            //调用python程序提取权限
                             authorityList.getItems().clear();
-
                             try {
                                 String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", detectApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
@@ -831,7 +925,6 @@ public class MainUI extends Application {
                                 tempLabel.setPrefWidth(200);
                                 tempLabel.setText("该应用主要有如下权限:");
                                 authorityList.getItems().add(tempLabel);
-
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File("E:\\BiSheData\\temp\\res.txt");
                                 int wait = proc.waitFor();
@@ -886,13 +979,23 @@ public class MainUI extends Application {
                                 e.printStackTrace();
                             }
 
+                        }
+                    }).start();
+
+                } else {
+
+                    //提示用户正确操作
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            globalMsgLabel.setText("请先选择要检测的APK文件！");
+                            globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
+                            alert.showAndWait();
 
                         }
+                    });
 
-
-                    }
-                }).start();
-
+                }
             }
         });
 
@@ -915,10 +1018,7 @@ public class MainUI extends Application {
                     updateModelDataPath = absolutePath;
                     updateDataPathLabel.setText("选择的路径：" + absolutePath);
                     updateDataPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
-
                 }
-
-
             }
         });
 
@@ -926,16 +1026,16 @@ public class MainUI extends Application {
         startUpdateModelButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                if (null != updateModelDataPath&&null!=group.getSelectedToggle()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //设置按钮不可用
+                            startUpdateModelButton.setDisable(true);
+                            //显示进度条
+                            modelUpdateCenterPane.setVisible(true);
+                            //调用python程序提取权限
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //设置按钮不可用
-                        startUpdateModelButton.setDisable(true);
-                        //显示进度条
-                        modelUpdateCenterPane.setVisible(true);
-                        //调用python程序提取权限
-                        if (null != updateModelDataPath) {
                             modelUpdateResultTextArea.setText("");
                             modelUpdateResultTextArea.appendText("该样本主要有以下权限:\n");
                             try {
@@ -956,8 +1056,6 @@ public class MainUI extends Application {
                                                 @Override
                                                 public void run() {
                                                     modelUpdateResultTextArea.appendText(finalLine + "\n");
-
-
                                                 }
                                             });
                                         }
@@ -974,25 +1072,35 @@ public class MainUI extends Application {
                                     @Override
                                     public void run() {
                                         modelUpdateResultTextArea.appendText("模型更新完毕！\n");
-
-
                                     }
                                 });
                             } catch (
                                     Exception e) {
                                 e.printStackTrace();
                             }
+
+                            //设置按钮可用
+                            startUpdateModelButton.setDisable(false);
+                            //隐藏进度条
+                            modelUpdateCenterPane.setVisible(false);
                         }
-                        //设置按钮可用
-                        startUpdateModelButton.setDisable(false);
-                        //隐藏进度条
-                        modelUpdateCenterPane.setVisible(false);
-                    }
-                }).start();
+                    }).start();
+
+                }else{
+                    //提示用户正确操作
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            globalMsgLabel.setText("请先选择用于更新模型的样本以及确定应用属性！");
+                            globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
+                            alert.showAndWait();
+
+                        }
+                    });
+                }
             }
         });
 //----------------------------------各个按钮的点击事件结束----------------------------------------------------
-
     }
 
     /**
@@ -1010,7 +1118,6 @@ public class MainUI extends Application {
         }
         return absolutePath;
     }
-
 
     public static void main(String[] args) {
         launch(args);
