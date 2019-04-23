@@ -247,13 +247,22 @@ public class MainUI extends Application {
         //设置左侧VBox中按钮之间的间距
         staticFeatureLeftVBox.setSpacing(15);
 
+
         //中间部分
+        VBox staticFeatureCenterVBox = new VBox();
+        staticFeatureCenterVBox.setAlignment(Pos.CENTER);
+        //中间进度条的提示文字
+        Label staticFeatureCenterLabel = new Label();
+        staticFeatureCenterLabel.setPrefWidth(200);
         StackPane staticFeatureCenterPane = new StackPane();
         JFXSpinner staticFeatureSpinner = new JFXSpinner();
         staticFeatureCenterPane.getChildren().add(staticFeatureSpinner);
-        staticFeatureCenterPane.setVisible(false);
-        staticFeatureBorderPane.setCenter(staticFeatureCenterPane);
         staticFeatureCenterPane.setMaxSize(50, 50);
+        staticFeatureCenterVBox.getChildren().addAll(staticFeatureCenterLabel, staticFeatureCenterPane);
+        staticFeatureCenterVBox.setSpacing(10);
+        //设置中间部分初始不可见
+        staticFeatureCenterVBox.setVisible(false);
+
 
         //右侧部分
         VBox staticFeatureRightVBox = new VBox();
@@ -274,8 +283,11 @@ public class MainUI extends Application {
         staticFeatureBorderPane.setLeft(staticFeatureLeftVBox);
         //将右侧内容添加到布局
         staticFeatureBorderPane.setRight(staticFeatureRightVBox);
+        //将中间内容添加到布局
+        staticFeatureBorderPane.setCenter(staticFeatureCenterVBox);
         BorderPane.setMargin(staticFeatureLeftVBox, new Insets(80, 80, 50, 100));
         BorderPane.setMargin(staticFeatureRightVBox, new Insets(45, 100, 50, 80));
+        BorderPane.setMargin(staticFeatureCenterVBox, new Insets(150, 10, 50, 10));
         StaticFeatureExtractionTab.setContent(staticFeatureBorderPane);
 
         //--------模型训练Tab内容
@@ -310,18 +322,27 @@ public class MainUI extends Application {
         modelTrainingRightVBox.setSpacing(15);
 
         //中间部分
-        StackPane modelTrainingCenterPane = new StackPane();
-        JFXSpinner modelTrainingSpinner = new JFXSpinner();
-        modelTrainingCenterPane.getChildren().add(modelTrainingSpinner);
-        modelTrainingCenterPane.setVisible(false);
-        modelTrainingBorderPane.setCenter(modelTrainingCenterPane);
-        modelTrainingCenterPane.setMaxSize(50, 50);
+        VBox modelTrainingCenterVBox = new VBox();
+        staticFeatureCenterVBox.setAlignment(Pos.CENTER);
+        //中间进度条的提示文字
+        Label modelTrainingCenterLabel = new Label();
+        modelTrainingCenterLabel.setPrefWidth(200);
+        StackPane modelTrainingCenterStackPane = new StackPane();
+        JFXSpinner modelTrainingCenterSpinner = new JFXSpinner();
+        modelTrainingCenterStackPane.getChildren().add(modelTrainingCenterSpinner);
+        modelTrainingCenterStackPane.setMaxSize(50, 50);
+        modelTrainingCenterVBox.getChildren().addAll(modelTrainingCenterLabel, modelTrainingCenterStackPane);
+        modelTrainingCenterVBox.setSpacing(10);
+        //设置中间部分初始不可见
+        modelTrainingCenterVBox.setVisible(false);
 
 
         BorderPane.setMargin(modelTrainingLeftVBox, new Insets(45, 100, 50, 80));
         BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 100, 50, 80));
+        BorderPane.setMargin(modelTrainingCenterVBox, new Insets(150, 10, 50, 10));
         modelTrainingBorderPane.setLeft(modelTrainingLeftVBox);
         modelTrainingBorderPane.setRight(modelTrainingRightVBox);
+        modelTrainingBorderPane.setCenter(modelTrainingCenterVBox);
         modelTrainingTab.setContent(modelTrainingBorderPane);
 
 
@@ -375,11 +396,29 @@ public class MainUI extends Application {
         applicationDetectionRightVBox.setAlignment(Pos.TOP_CENTER);
         //将标签和TextArea加入到右侧VBox中
         applicationDetectionRightVBox.getChildren().addAll(detectResultLabel, detectResultStackPane);
+
+        //中间部分
+        VBox applicationDetectionCenterVBox = new VBox();
+        applicationDetectionCenterVBox.setAlignment(Pos.CENTER);
+        //中间进度条的提示文字
+        Label applicationDetectionCenterLabel = new Label();
+        staticFeatureCenterLabel.setPrefWidth(200);
+        StackPane applicationDetectionCenterStackPane = new StackPane();
+        JFXSpinner applicationDetectionCenterSpinner = new JFXSpinner();
+        applicationDetectionCenterStackPane.getChildren().add(applicationDetectionCenterSpinner);
+        applicationDetectionCenterStackPane.setMaxSize(50, 50);
+        applicationDetectionCenterVBox.getChildren().addAll(applicationDetectionCenterLabel, applicationDetectionCenterStackPane);
+        applicationDetectionCenterVBox.setSpacing(10);
+        //设置中间部分初始不可见
+        applicationDetectionCenterVBox.setVisible(false);
+
         //左右两侧内容加入到面板
         applicationDetectionBorderPane.setLeft(applicationDetectionLeftVBox);
         applicationDetectionBorderPane.setRight(applicationDetectionRightVBox);
+        applicationDetectionBorderPane.setCenter(applicationDetectionCenterVBox);
         BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(80, 10, 50, 100));
         BorderPane.setMargin(applicationDetectionRightVBox, new Insets(45, 100, 50, 10));
+        BorderPane.setMargin(applicationDetectionCenterVBox, new Insets(150, 10, 50, 10));
         applicationDetectionTab.setContent(applicationDetectionBorderPane);
 
         //-----------------------------------模型更新Tab内容
@@ -391,19 +430,27 @@ public class MainUI extends Application {
         modelUpdateLeftVBox.setPadding(new Insets(80, 80, 50, 100));
         modelUpdateLeftVBox.setSpacing(15);
 
-        //中间进度条
-        StackPane modelUpdateCenterPane = new StackPane();
-        JFXSpinner modelUpdateSpinner = new JFXSpinner();
-        modelUpdateCenterPane.getChildren().add(modelUpdateSpinner);
-        modelUpdateCenterPane.setVisible(false);
-        modelUpdateBorderPane.setCenter(modelUpdateCenterPane);
-        modelUpdateCenterPane.setMaxSize(50, 50);
+
+        //中间部分
+        VBox modelUpdateCenterVBox = new VBox();
+        modelUpdateCenterVBox.setAlignment(Pos.CENTER);
+        //中间进度条的提示文字
+        Label modelUpdateCenterLabel = new Label();
+        modelUpdateCenterLabel.setPrefWidth(200);
+        StackPane modelUpdateCenterStackPane = new StackPane();
+        JFXSpinner modelUpdateCenterSpinner = new JFXSpinner();
+        applicationDetectionCenterStackPane.getChildren().add(modelUpdateCenterSpinner);
+        modelUpdateCenterStackPane.setMaxSize(50, 50);
+        modelUpdateCenterVBox.getChildren().addAll(modelUpdateCenterLabel, applicationDetectionCenterStackPane);
+        modelUpdateCenterVBox.setSpacing(10);
+        //设置中间部分初始不可见
+        modelUpdateCenterVBox.setVisible(false);
 
 
         //右侧
         VBox modelUpdateRightVBox = new VBox();
         modelUpdateRightVBox.setSpacing(15);
-        modelUpdateRightVBox.setPadding(new Insets(45, 100, 50, 80));
+        modelUpdateRightVBox.setPadding(new Insets(45, 50, 50, 10));
         modelUpdateRightVBox.setAlignment(Pos.TOP_CENTER);
         //选择用于更新模型的样本按钮
         JFXButton chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
@@ -454,6 +501,11 @@ public class MainUI extends Application {
         //设置面板左右两侧的内容
         modelUpdateBorderPane.setLeft(modelUpdateLeftVBox);
         modelUpdateBorderPane.setRight(modelUpdateRightVBox);
+        modelUpdateBorderPane.setCenter(modelUpdateCenterVBox);
+
+        BorderPane.setMargin(modelUpdateLeftVBox, new Insets(80, 10, 50, 50));
+        BorderPane.setMargin(modelUpdateRightVBox, new Insets(45, 50, 50, 10));
+        BorderPane.setMargin(modelUpdateCenterVBox, new Insets(150, 10, 50, 10));
         ModelUpdatingTab.setContent(modelUpdateBorderPane);
 //----------------------------------设置各个Tab的内容结束----------------------------------------------------
         //显示舞台
@@ -576,7 +628,7 @@ public class MainUI extends Application {
 
                             //设置按钮可用
                             startDecompileButton.setDisable(false);
-                            reverseEngineeringCenterPane.setVisible(false);
+                            reverseEngineeringCenterVBox.setVisible(false);
 
                         }
                     }).start();
@@ -693,13 +745,35 @@ public class MainUI extends Application {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            rightDecompileInfoTextArea.setText("");
-                            rightDecompileInfoTextArea.appendText("开始反编译....\n");
-                            rightDecompileInfoTextArea.appendText("正在反编译反编译，预计需要9分40秒....\n");
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置按钮不可用
+                                    startDecompileButton.setDisable(true);
+                                    //设置中间部分可见
+                                    reverseEngineeringCenterVBox.setVisible(true);
+                                    //设置提示文字
+                                    reverseEngineeringCenterLabel.setText("正在进行反编译，请稍后...");
+                                    reverseEngineeringCenterLabel.setFont(Font.font("华文行楷", 15));
+                                    reverseEngineeringCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+
+                                    rightDecompileInfoTextArea.setText("");
+                                    rightDecompileInfoTextArea.appendText("开始反编译....\n");
+                                }
+                            });
+
                             deCompileService.batchDeCompile(multipleApkDirectoryPath, decompileResultSavePath);
-                            rightDecompileInfoTextArea.appendText("反编译完成！\n");
-                            //设置按钮可用
-                            startMultipleDecompileButton.setDisable(false);
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    rightDecompileInfoTextArea.appendText("反编译完成！\n");
+                                    //设置按钮可用
+                                    startMultipleDecompileButton.setDisable(false);
+                                    //设置中间部分不可见
+                                    reverseEngineeringCenterVBox.setVisible(false);
+                                }
+                            });
                         }
                     }, "批量反编译线程").start();
                 } else {
@@ -750,32 +824,70 @@ public class MainUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 if (null != extractAuthorityApkPath) {
-                    //设置按钮不可用
-                    startExtractAuthorityButton.setDisable(true);
-                    staticFeatureCenterPane.setVisible(true);
-                    rightAuthorityInfoTextArea.setText("");
                     //这里通过Java调用python代码进行权限的提取
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置按钮不可用
+                                    startExtractAuthorityButton.setDisable(true);
+                                    //设置进度条可见
+                                    staticFeatureCenterVBox.setVisible(true);
+                                    //设置提示文字
+                                    staticFeatureCenterLabel.setText("正在进行提取权限，请稍候...");
+                                    staticFeatureCenterLabel.setFont(Font.font("华文行楷", 15));
+                                    staticFeatureCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                                    rightAuthorityInfoTextArea.setText("");
+                                }
+                            });
                             String temp = "";
                             try {
-                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority.py", extractAuthorityApkPath};
+                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", extractAuthorityApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
-
-                                BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
-                                while ((temp = in.readLine()) != null) {
-                                    rightAuthorityInfoTextArea.appendText(temp);
-
-                                }
-                                staticFeatureCenterPane.setVisible(false);
-                                in.close();
-                                //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
+                                //执行完毕开始读取提取出的权限TXT
+                                File file = new File("E:\\BiSheData\\temp\\res.txt");
                                 int wait = proc.waitFor();
+                                if (wait == 0 && file.exists()) {
+                                    try (FileReader reader = new FileReader("E:\\BiSheData\\temp\\res.txt");
+                                         BufferedReader br = new BufferedReader(reader)
+                                    ) {
+                                        String line;
+                                        while ((line = br.readLine()) != null) {
+                                            //将权限显示在文本域
+                                            String finalLine = line;
+                                            Platform.runLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    rightAuthorityInfoTextArea.appendText(finalLine + "\n");
+                                                }
+                                            });
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    //删除临时文件
+                                    file.delete();
+
+                                } else {
+                                    System.out.println("权限结果文件不存在！");
+                                }
+
+                                //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
                                 String execResult = (wait == 0 ? "成功" : "失败");
                                 System.out.println("Java调用python程序执行" + execResult);
-                                //设置按钮可用
-                                startExtractAuthorityButton.setDisable(false);
+
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //设置按钮可用
+                                        startExtractAuthorityButton.setDisable(false);
+                                        //设置进度条不可见
+                                        staticFeatureCenterVBox.setVisible(false);
+//                                        staticFeatureCenterLabel.setText("");
+                                    }
+                                });
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
@@ -783,7 +895,10 @@ public class MainUI extends Application {
                             }
                         }
                     }).start();
+
+
                 } else {
+                    System.out.println("extractAuthorityApkPath为空");
                     //提示用户正确操作
                     Platform.runLater(new Runnable() {
                         @Override
@@ -834,10 +949,19 @@ public class MainUI extends Application {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            //设置按钮不可用
-                            startTrainButton.setDisable(true);
-                            modelTrainingCenterPane.setVisible(true);
-                            modelTrainingResultTextArea.setText("");
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置按钮不可用
+                                    startTrainButton.setDisable(true);
+                                    modelTrainingCenterVBox.setVisible(true);
+                                    //设置提示文字
+                                    modelTrainingCenterLabel.setText("正在训练模型...");
+                                    modelTrainingCenterLabel.setFont(Font.font("华文行楷", 15));
+                                    modelTrainingCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                                    modelTrainingResultTextArea.setText("");
+                                }
+                            });
                             String temp = "";
                             try {
                                 String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicCallByJava.py", csvFilePath};
@@ -847,7 +971,7 @@ public class MainUI extends Application {
                                 while ((temp = in.readLine()) != null) {
                                     modelTrainingResultTextArea.appendText(temp + "\n");
                                 }
-                                modelTrainingCenterPane.setVisible(false);
+                                modelTrainingCenterVBox.setVisible(false);
                                 in.close();
                                 //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
                                 int wait = proc.waitFor();
@@ -912,10 +1036,20 @@ public class MainUI extends Application {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            //设置按钮不可用
-                            startDetectButton.setDisable(true);
-                            //显示进度条
-                            applicationDetectionCenterPane.setVisible(true);
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置按钮不可用
+                                    startDetectButton.setDisable(true);
+                                    //显示进度条
+                                    applicationDetectionCenterVBox.setVisible(true);
+                                    //设置提示文字
+                                    applicationDetectionCenterLabel.setText("正在检测...");
+                                    applicationDetectionCenterLabel.setFont(Font.font("华文行楷", 15));
+                                    applicationDetectionCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                                }
+                            });
+
                             //调用python程序提取权限
                             authorityList.getItems().clear();
                             try {
@@ -970,7 +1104,7 @@ public class MainUI extends Application {
                                         authorityList.getItems().add(tempLabel2);
                                     }
                                 });
-                                applicationDetectionCenterPane.setVisible(false);
+                                applicationDetectionCenterVBox.setVisible(false);
 
                                 //设置按钮可用
                                 startDetectButton.setDisable(false);
@@ -1026,18 +1160,27 @@ public class MainUI extends Application {
         startUpdateModelButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (null != updateModelDataPath&&null!=group.getSelectedToggle()) {
+                if (null != updateModelDataPath && null != group.getSelectedToggle()) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            //设置按钮不可用
-                            startUpdateModelButton.setDisable(true);
-                            //显示进度条
-                            modelUpdateCenterPane.setVisible(true);
-                            //调用python程序提取权限
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置按钮不可用
+                                    startUpdateModelButton.setDisable(true);
+                                    //显示进度条
+                                    modelUpdateCenterVBox.setVisible(true);
+                                    //设置提示文字
+                                    modelUpdateCenterLabel.setText("正在更新模型...");
+                                    modelUpdateCenterLabel.setFont(Font.font("华文行楷", 15));
+                                    modelUpdateCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                                    //调用python程序提取权限
 
-                            modelUpdateResultTextArea.setText("");
-                            modelUpdateResultTextArea.appendText("该样本主要有以下权限:\n");
+                                    modelUpdateResultTextArea.setText("");
+                                    modelUpdateResultTextArea.appendText("该样本主要有以下权限:\n");
+                                }
+                            });
                             try {
                                 String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", updateModelDataPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
@@ -1082,11 +1225,11 @@ public class MainUI extends Application {
                             //设置按钮可用
                             startUpdateModelButton.setDisable(false);
                             //隐藏进度条
-                            modelUpdateCenterPane.setVisible(false);
+                            modelUpdateCenterVBox.setVisible(false);
                         }
                     }).start();
 
-                }else{
+                } else {
                     //提示用户正确操作
                     Platform.runLater(new Runnable() {
                         @Override
