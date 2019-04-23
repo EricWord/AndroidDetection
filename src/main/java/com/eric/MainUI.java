@@ -351,17 +351,9 @@ public class MainUI extends Application {
         //左侧
         VBox applicationDetectionLeftVBox = new VBox();
 
-        //中间进度条部分
-        StackPane applicationDetectionCenterPane = new StackPane();
-        JFXSpinner applicationDetectionSpinner = new JFXSpinner();
-        applicationDetectionCenterPane.getChildren().add(applicationDetectionSpinner);
-        applicationDetectionCenterPane.setVisible(false);
-        applicationDetectionBorderPane.setCenter(applicationDetectionCenterPane);
-        applicationDetectionCenterPane.setMaxSize(50, 50);
-
 
         //右侧
-        VBox applicationDetectionRightVBox = new VBox();
+    /*    VBox applicationDetectionRightVBox = new VBox();
         //选择要检测的apk文件按钮
         JFXButton chooseOneTargetApkButton = new JFXButton("选择要检测的Apk文件");
         chooseOneTargetApkButton.getStyleClass().add("button-raised");
@@ -396,13 +388,43 @@ public class MainUI extends Application {
         applicationDetectionRightVBox.setAlignment(Pos.TOP_CENTER);
         //将标签和TextArea加入到右侧VBox中
         applicationDetectionRightVBox.getChildren().addAll(detectResultLabel, detectResultStackPane);
+*/
+
+
+        //右侧
+        VBox applicationDetectionRightVBox = new VBox();
+        //选择要检测的apk文件按钮
+        JFXButton chooseOneTargetApkButton = new JFXButton("选择要检测的Apk文件");
+        chooseOneTargetApkButton.getStyleClass().add("button-raised");
+        //要检测的Apk文件的路径
+        Label targetApkPath = new Label();
+        //开始检测按钮
+        JFXButton startDetectButton = new JFXButton("开始检测");
+        startDetectButton.getStyleClass().add("button-raised");
+        //检测结果显示label
+        Label detectResultLabel = new Label("----------------检测结果----------------");
+        //检测结果TextArea
+        TextArea detectResultTextArea = new TextArea("此处将显示检测的结果，包括应用为正常应用还是恶意应用以及得出相关结论的依据");
+        //设置显示的行数
+        detectResultTextArea.setPrefRowCount(35);
+        //自动换行
+        detectResultTextArea.setWrapText(true);
+        applicationDetectionLeftVBox.setSpacing(15);
+        applicationDetectionLeftVBox.setAlignment(Pos.TOP_LEFT);
+        //将上述按钮添加到左侧VBox
+        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton, targetApkPath, startDetectButton);
+        applicationDetectionRightVBox.setSpacing(15);
+        applicationDetectionRightVBox.setAlignment(Pos.TOP_CENTER);
+        //将标签和TextArea加入到右侧VBox中
+        applicationDetectionRightVBox.getChildren().addAll(detectResultLabel, detectResultTextArea);
+
 
         //中间部分
         VBox applicationDetectionCenterVBox = new VBox();
         applicationDetectionCenterVBox.setAlignment(Pos.CENTER);
         //中间进度条的提示文字
         Label applicationDetectionCenterLabel = new Label();
-        staticFeatureCenterLabel.setPrefWidth(200);
+//        applicationDetectionCenterLabel.setPrefWidth(200);
         StackPane applicationDetectionCenterStackPane = new StackPane();
         JFXSpinner applicationDetectionCenterSpinner = new JFXSpinner();
         applicationDetectionCenterStackPane.getChildren().add(applicationDetectionCenterSpinner);
@@ -439,9 +461,9 @@ public class MainUI extends Application {
         modelUpdateCenterLabel.setPrefWidth(200);
         StackPane modelUpdateCenterStackPane = new StackPane();
         JFXSpinner modelUpdateCenterSpinner = new JFXSpinner();
-        applicationDetectionCenterStackPane.getChildren().add(modelUpdateCenterSpinner);
+        modelUpdateCenterStackPane.getChildren().add(modelUpdateCenterSpinner);
         modelUpdateCenterStackPane.setMaxSize(50, 50);
-        modelUpdateCenterVBox.getChildren().addAll(modelUpdateCenterLabel, applicationDetectionCenterStackPane);
+        modelUpdateCenterVBox.getChildren().addAll(modelUpdateCenterLabel, modelUpdateCenterStackPane);
         modelUpdateCenterVBox.setSpacing(10);
         //设置中间部分初始不可见
         modelUpdateCenterVBox.setVisible(false);
@@ -1047,18 +1069,16 @@ public class MainUI extends Application {
                                     applicationDetectionCenterLabel.setText("正在检测...");
                                     applicationDetectionCenterLabel.setFont(Font.font("华文行楷", 15));
                                     applicationDetectionCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                                    detectResultTextArea.setText("");
                                 }
                             });
 
                             //调用python程序提取权限
-                            authorityList.getItems().clear();
                             try {
                                 String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", detectApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
-                                Label tempLabel = new Label();
-                                tempLabel.setPrefWidth(200);
-                                tempLabel.setText("该应用主要有如下权限:");
-                                authorityList.getItems().add(tempLabel);
+
+                                detectResultTextArea.appendText("该应用主要有如下权限:\n");
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File("E:\\BiSheData\\temp\\res.txt");
                                 int wait = proc.waitFor();
@@ -1073,11 +1093,7 @@ public class MainUI extends Application {
                                             Platform.runLater(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    Label tempLabel = new Label();
-                                                    tempLabel.setPrefWidth(200);
-                                                    tempLabel.setText(finalLine);
-                                                    //更新JavaFX的主线程的代码放在此处
-                                                    authorityList.getItems().add(tempLabel);
+                                                    detectResultTextArea.appendText(finalLine + "\n");
                                                 }
                                             });
                                         }
@@ -1094,14 +1110,9 @@ public class MainUI extends Application {
                                     @Override
                                     public void run() {
                                         //更新JavaFX的主线程的代码放在此处
-                                        Label tempLabel = new Label();
-                                        tempLabel.setPrefWidth(200);
-                                        tempLabel.setText(">>>>>>预测结果<<<<<<");
-                                        authorityList.getItems().add(tempLabel);
-                                        Label tempLabel2 = new Label();
-                                        tempLabel2.setPrefWidth(200);
-                                        tempLabel2.setText("该应用为正常应用的概率为98%");
-                                        authorityList.getItems().add(tempLabel2);
+                                        detectResultTextArea.appendText(">>>>>>预测结果<<<<<<\n");
+                                        detectResultTextArea.appendText("该应用为正常应用的概率为98%\n");
+
                                     }
                                 });
                                 applicationDetectionCenterVBox.setVisible(false);
