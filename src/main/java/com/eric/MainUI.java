@@ -13,6 +13,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
@@ -24,6 +27,7 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import java.awt.*;
 import java.io.*;
 import java.util.List;
 import java.util.Locale;
@@ -541,18 +545,30 @@ public class MainUI extends Application {
                             });
 
                             //反编译结果存放路径
-                            String dest=decompileResultSavePath + File.separator + "DecompileResults_" + stringDate;
-                            APKTool.decode(singleApkPath,dest);
+                            String dest = decompileResultSavePath + File.separator + "DecompileResults_" + stringDate;
+                            APKTool.decode(singleApkPath, dest);
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    rightDecompileInfoTextArea.appendText("反编译完成，结果存放路径：" + decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
+                                    rightDecompileInfoTextArea.appendText("反编译完成，结果存放路径："+"\n" + dest);
                                 }
                             });
+                            //打开反编译结果存放路径
+                            try {
+                                Desktop.getDesktop().open(new File(dest));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
 
                             //设置按钮可用
-                            startDecompileButton.setDisable(false);
-                            reverseEngineeringCenterVBox.setVisible(false);
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startDecompileButton.setDisable(false);
+                                    reverseEngineeringCenterVBox.setVisible(false);
+                                }
+                            });
 
                         }
                     }).start();

@@ -2,7 +2,9 @@ package com.eric.test;
 
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 
 /*
  *@description:普通测试类，不涉及数据库连接，mapper文件
@@ -31,6 +33,19 @@ public class CommonTest {
         String[] list = file.list();
         for (String s : list) {
             System.out.println(s);
+        }
+
+    }
+
+    /**
+     * 打开文件夹测试
+     */
+    @Test
+    public void testOpenDir(){
+        try {
+            Desktop.getDesktop().open(new File("G:\\7BiShe\\DeCompileResults\\badApksDecompileResult"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
