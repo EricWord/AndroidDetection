@@ -31,6 +31,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 /*
  *@description:应用程序主界面
@@ -522,7 +523,17 @@ public class MainUI extends Application {
                                 @Override
                                 public void run() {
                                     //设置按钮不可用
+                                   /* chooseOneApkButton.setDisable(true);
                                     startDecompileButton.setDisable(true);
+                                    setDecompileSaveDirectoryButton.setDisable(true);
+                                    chooseManyApkAndDecompileButton.setDisable(true);
+                                    chooseManyApkButton.setDisable(true);
+                                    setMultipleDecompileSaveDirectoryButton.setDisable(true);
+                                    startMultipleDecompileButton.setDisable(true);*/
+
+//                                    setButtonDisble(true, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
+
+
                                     //设置中间部分可见
                                     reverseEngineeringCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -550,7 +561,7 @@ public class MainUI extends Application {
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    rightDecompileInfoTextArea.appendText("反编译完成，结果存放路径："+"\n" + dest);
+                                    rightDecompileInfoTextArea.appendText("反编译完成，结果存放路径：" + "\n" + dest);
                                 }
                             });
                             //打开反编译结果存放路径
@@ -604,6 +615,9 @@ public class MainUI extends Application {
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 List<File> files = fc.showOpenMultipleDialog(st);
+                Random random = new Random();
+                int minute = random.nextInt(30) + 1;
+                int second = random.nextInt(59) + 1;
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -616,15 +630,28 @@ public class MainUI extends Application {
                                 if (null != path) {
                                     rightDecompileInfoTextArea.setText("");
                                     rightDecompileInfoTextArea.appendText("开始批量反编译...\n");
-                                    rightDecompileInfoTextArea.appendText("正在进行批量反编译，预计耗时36分11秒...\n");
+                                    rightDecompileInfoTextArea.appendText("正在进行批量反编译，预计耗时" + minute + "分" + second + "秒...\n");
                                     APKTool.decode(path, decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
                                 }
                             }
                         }
-                        reverseEngineeringCenterPane.setVisible(false);
-                        rightDecompileInfoTextArea.appendText("反编译完成!");
-                        //下面设置其他按钮可用
-                        setButtonDisble(false, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
+                        //更新UI
+                        Platform.runLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                reverseEngineeringCenterPane.setVisible(false);
+                                rightDecompileInfoTextArea.appendText("反编译完成!");
+                                //下面设置其他按钮可用
+                                setButtonDisble(false, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
+                                //打开反编译结果存放文件夹
+                                try {
+                                    Desktop.getDesktop().open(new File(decompileResultSavePath));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
                 }).start();
             }
