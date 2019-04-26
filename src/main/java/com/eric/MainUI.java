@@ -288,6 +288,7 @@ public class MainUI extends Application {
         JFXButton startTrainButton = new JFXButton("开始训练");
         startTrainButton.getStyleClass().add("button-raised");
         VBox modelTrainingLeftVBox = new VBox();
+        modelTrainingLeftVBox.setAlignment(Pos.CENTER);
         VBox modelTrainingRightVBox = new VBox();
         modelTrainingLeftVBox.setSpacing(15);
         //模型训练结果显示label
@@ -321,8 +322,8 @@ public class MainUI extends Application {
         //设置中间部分初始不可见
         modelTrainingCenterVBox.setVisible(false);
 
-        BorderPane.setMargin(modelTrainingLeftVBox, new Insets(45, 100, 50, 80));
-        BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 100, 50, 80));
+        BorderPane.setMargin(modelTrainingLeftVBox, new Insets(90, 10, 50, 50));
+        BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 50, 50, 10));
         BorderPane.setMargin(modelTrainingCenterVBox, new Insets(150, 10, 50, 10));
         modelTrainingBorderPane.setLeft(modelTrainingLeftVBox);
         modelTrainingBorderPane.setRight(modelTrainingRightVBox);
@@ -539,7 +540,9 @@ public class MainUI extends Application {
                                 }
                             });
 
-                            APKTool.decode(singleApkPath, decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
+                            //反编译结果存放路径
+                            String dest=decompileResultSavePath + File.separator + "DecompileResults_" + stringDate;
+                            APKTool.decode(singleApkPath,dest);
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -866,9 +869,22 @@ public class MainUI extends Application {
 
                                 BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
                                 while ((temp = in.readLine()) != null) {
-                                    modelTrainingResultTextArea.appendText(temp + "\n");
+                                    //更新UI
+                                    String finalTemp = temp;
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            modelTrainingResultTextArea.appendText(finalTemp + "\n");
+                                        }
+                                    });
                                 }
-                                modelTrainingCenterVBox.setVisible(false);
+                                //更新UI
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        modelTrainingCenterVBox.setVisible(false);
+                                    }
+                                });
                                 in.close();
                                 //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
                                 int wait = proc.waitFor();
