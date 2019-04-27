@@ -194,31 +194,39 @@ public class CSVService {
         for (Apk apk : apks) {
             dataList.add(apk.getPackageName());
             //遍历每一个权限，然后查找权限-apk映射表，确定当前apk有没有该权限
-            for (Authority authority : authorities) {
-                boolean flag = false;
-                AuthorityApkMapExample authorityApkMapExample = new AuthorityApkMapExample();
-                AuthorityApkMapExample.Criteria criteria = authorityApkMapExample.createCriteria();
-                criteria.andAuthorityIdEqualTo(authority.getAuthorityId());
-                List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
-                for (AuthorityApkMap authorityApkMap : authorityApkMaps) {
-                    if (authorityApkMap.getApkId() == apk.getApkId()) {
-                        flag = true;
-                    }
-                }
-                if (flag) {
-                    dataList.add(1+"");
-                } else {
-                    dataList.add(0+"");
-                }
+            //上面注释掉的代码应该有问题，不应该遍历权限来确定映射关系
+            //而是应该遍历apk来确定映射关系
+            AuthorityApkMapExample authorityApkMapExample = new AuthorityApkMapExample();
+            AuthorityApkMapExample.Criteria criteria = authorityApkMapExample.createCriteria();
+            criteria.andApkIdEqualTo(apk.getApkId());
+            //获取到权限关系映射
+            List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
+            //根据映射关系可以确定当前apk都有哪些权限
+            List<String> currentApkAuthorityList = new ArrayList<>();
+            for (AuthorityApkMap authorityApkMap : authorityApkMaps) {
+                Authority authority = authorityMapper.selectByPrimaryKey(authorityApkMap.getAuthorityId());
+                currentApkAuthorityList.add(authority.getAuthorityContent());
             }
+
+            for (Authority authority : authorities) {
+                if (currentApkAuthorityList.contains(authority.getAuthorityContent())) {
+                    dataList.add(1 + "");
+
+                } else {
+                    dataList.add(0 + "");
+
+                }
+
+            }
+
             //添加属性
             if (apk.getApkAttribute() == 0) {
-                dataList.add(0+"");
+                dataList.add(0 + "");
                 continue;
 
             }
             if (apk.getApkAttribute() == 1) {
-                dataList.add(1+"");
+                dataList.add(1 + "");
                 continue;
 
             }
