@@ -997,6 +997,20 @@ public class MainUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 if (null != detectApkPath) {
+                    //将路径按照斜线分割以便获取包名
+                    String[] split = detectApkPath.split("\\\\");
+                    /**
+                     * 1.应用检测有必要获取包名吗？
+                     * 2.数据都要存入数据库吗？
+                     * 解答上面两个问题首先要搞清楚应用检测的流程
+                     * 首先，要检测应用肯定需要CSV文件
+                     * 在生成CSV文件是需要包名，当然包名为空串也可以，因为检测的时候并不需要包名
+                     * 所以这么看来没有必要获取包名
+                     *那么在这里数据需要存库吗？
+                     * 很明显不需要，因为这里只是检测，到模型更新那块可能要入库
+                     * 所以这里只需要构造出CSV格式的文件供模型调用即可
+                     */
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
