@@ -80,6 +80,9 @@ public class MainUI extends Application {
     private JFXButton startDetectButton;
     private JFXButton chooseOneUpdateDataButton;
     private JFXButton startUpdateModelButton;
+    private JFXRadioButton modelUpdateGoodApkRadio;
+    private JFXRadioButton modelUpdateBadApkRadio;
+    private JFXRadioButton modelUpdateUnknownRadio;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -446,15 +449,16 @@ public class MainUI extends Application {
         chooseOneUpdateDataButton.getStyleClass().add("button-raised");
         //是否已知样本属性
         final ToggleGroup group = new ToggleGroup();
-        JFXRadioButton modelUpdateGoodApkRadio = new JFXRadioButton("正常样本");
+        modelUpdateGoodApkRadio = new JFXRadioButton("正常样本");
+//        modelUpdateGoodApkRadio.setDisable(true);
         modelUpdateGoodApkRadio.setPadding(new Insets(10));
         modelUpdateGoodApkRadio.setToggleGroup(group);
 
-        JFXRadioButton modelUpdateBadApkRadio = new JFXRadioButton("恶意样本");
+        modelUpdateBadApkRadio = new JFXRadioButton("恶意样本");
         modelUpdateBadApkRadio.setPadding(new Insets(10));
         modelUpdateBadApkRadio.setToggleGroup(group);
 
-        JFXRadioButton modelUpdateUnknownRadio = new JFXRadioButton("未知属性");
+        modelUpdateUnknownRadio = new JFXRadioButton("未知属性");
         modelUpdateUnknownRadio.setPadding(new Insets(10));
         modelUpdateUnknownRadio.setToggleGroup(group);
 
@@ -790,6 +794,7 @@ public class MainUI extends Application {
                                 public void run() {
                                     //设置按钮不可用
                                     startExtractAuthorityButton.setDisable(true);
+                                    chooseAuthorityDirectoryButton.setDisable(true);
                                     //设置进度条可见
                                     staticFeatureCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -839,6 +844,7 @@ public class MainUI extends Application {
                                     public void run() {
                                         //设置按钮可用
                                         startExtractAuthorityButton.setDisable(false);
+                                        chooseAuthorityDirectoryButton.setDisable(false);
                                         //设置进度条不可见
                                         staticFeatureCenterVBox.setVisible(false);
                                     }
@@ -902,6 +908,7 @@ public class MainUI extends Application {
                                 public void run() {
                                     //设置按钮不可用
                                     startTrainButton.setDisable(true);
+                                    chooseTrainDataButton.setDisable(true);
                                     modelTrainingCenterVBox.setVisible(true);
                                     //设置提示文字
                                     modelTrainingCenterLabel.setText("正在训练模型...");
@@ -940,6 +947,7 @@ public class MainUI extends Application {
                                 System.out.println("Java调用python程序执行" + execResult);
                                 //设置按钮可用
                                 startTrainButton.setDisable(false);
+                                chooseTrainDataButton.setDisable(false);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
@@ -997,6 +1005,7 @@ public class MainUI extends Application {
                                 public void run() {
                                     //设置按钮不可用
                                     startDetectButton.setDisable(true);
+                                    chooseOneTargetApkButton.setDisable(true);
                                     //显示进度条
                                     applicationDetectionCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -1048,6 +1057,7 @@ public class MainUI extends Application {
                                 applicationDetectionCenterVBox.setVisible(false);
                                 //设置按钮可用
                                 startDetectButton.setDisable(false);
+                                chooseOneTargetApkButton.setDisable(false);
                             } catch (
                                     Exception e) {
                                 e.printStackTrace();
@@ -1104,6 +1114,9 @@ public class MainUI extends Application {
                                 public void run() {
                                     //设置按钮不可用
                                     startUpdateModelButton.setDisable(true);
+                                    chooseOneUpdateDataButton.setDisable(true);
+                                    //设置单选按钮不可用
+                                    setRadioDisable(true);
                                     //显示进度条
                                     modelUpdateCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -1154,10 +1167,19 @@ public class MainUI extends Application {
                                     Exception e) {
                                 e.printStackTrace();
                             }
-                            //设置按钮可用
-                            startUpdateModelButton.setDisable(false);
-                            //隐藏进度条
-                            modelUpdateCenterVBox.setVisible(false);
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置按钮可用
+                                    startUpdateModelButton.setDisable(false);
+                                    chooseOneUpdateDataButton.setDisable(false);
+                                    //设置单选按钮不可用
+                                    setRadioDisable(false);
+                                    //隐藏进度条
+                                    modelUpdateCenterVBox.setVisible(false);
+                                }
+                            });
+
                         }
                     }).start();
 
@@ -1212,6 +1234,18 @@ public class MainUI extends Application {
         chooseManyApkButton.setDisable(flag);
         setMultipleDecompileSaveDirectoryButton.setDisable(flag);
         startMultipleDecompileButton.setDisable(flag);
+
+    }
+
+    /**
+     * 设置单选按钮为不可用
+     *
+     * @param flag true表示不可用
+     */
+    public void setRadioDisable(Boolean flag) {
+        modelUpdateGoodApkRadio.setDisable(flag);
+        modelUpdateBadApkRadio.setDisable(flag);
+        modelUpdateUnknownRadio.setDisable(flag);
 
     }
 //----------------------------------抽取的公共方法结束----------------------------------------------------
