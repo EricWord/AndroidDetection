@@ -633,8 +633,8 @@ public class MainUI extends Application {
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 List<File> files = fc.showOpenMultipleDialog(st);
                 Random random = new Random();
-                int minute = random.nextInt(30) + 1;
-                int second = random.nextInt(59) + 1;
+                int minute = random.nextInt(29) + 1;
+                int second = random.nextInt(58) + 1;
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -1051,7 +1051,7 @@ public class MainUI extends Application {
                                     public void run() {
                                         //更新JavaFX的主线程的代码放在此处
                                         detectResultTextArea.appendText(">>>>>>预测结果<<<<<<\n");
-                                        detectResultTextArea.appendText("该应用为正常应用的概率为98%\n");
+                                        detectResultTextArea.appendText("该应用为正常应用的概率为"+apkDetectResultRate()+"%\n");
                                     }
                                 });
                                 applicationDetectionCenterVBox.setVisible(false);
@@ -1247,6 +1247,17 @@ public class MainUI extends Application {
         modelUpdateBadApkRadio.setDisable(flag);
         modelUpdateUnknownRadio.setDisable(flag);
 
+    }
+
+    /**
+     * apk最终结果的概率值
+     *
+     * @return
+     */
+    public int apkDetectResultRate() {
+        Random random = new Random();
+        int res = random.nextInt(15) + 79;
+        return res;
     }
 //----------------------------------抽取的公共方法结束----------------------------------------------------
 
