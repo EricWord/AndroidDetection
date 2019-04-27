@@ -238,5 +238,86 @@ public class CSVService {
 
     }
 
+    /**
+     * 创建用于初始训练模型使用的数据集、增强训练模型使用的数据集
+     *
+     * @param des     数据集存放路径
+     * @param goodNum 数据集中正常样本的数量
+     * @param badNum  数据集中恶意样本的数量
+     */
+    public void createPartCSV(String des, int goodNum, int badNum) {
+        DateTime dateTime = new DateTime();
+        //当前时间
+        String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
+        /**
+         * 实现思路：
+         * 1.生成表头
+         * 2.生成每一行 表头中的数据只需要包含应用名称+各种权限+应用属性
+         *  2.1
+         */
+        //1.生成表头
+        //构造符合工具类要求的表头List
+        List<String> head = new ArrayList<>();
+        head.add("package_name");
+        List<Authority> authorities = authorityMapper.selectByExample(null);
+        for (Authority authority : authorities) {
+            String authorityContent = authority.getAuthorityContent();
+            head.add(authorityContent);
+        }
+        head.add("apk_attribute");
+
+        //2.生成每一行数据,构造每一行的数据
+        List<String> dataList = new ArrayList<>();
+
+        //获取所有的apk
+        List<Apk> apks = apkMapper.selectByExample(null);
+        //对每一个apk进行操作
+        for (Apk apk : apks) {
+            dataList.add(apk.getPackageName());
+            //遍历每一个权限，然后查找权限-apk映射表，确定当前apk有没有该权限
+            //上面注释掉的代码应该有问题，不应该遍历权限来确定映射关系
+            //而是应该遍历apk来确定映射关系
+            AuthorityApkMapExample authorityApkMapExample = new AuthorityApkMapExample();
+            AuthorityApkMapExample.Criteria criteria = authorityApkMapExample.createCriteria();
+            criteria.andApkIdEqualTo(apk.getApkId());
+            //获取到权限关系映射
+            List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
+            //根据映射关系可以确定当前apk都有哪些权限
+            List<String> currentApkAuthorityList = new ArrayList<>();
+            for (AuthorityApkMap authorityApkMap : authorityApkMaps) {
+                Authority authority = authorityMapper.selectByPrimaryKey(authorityApkMap.getAuthorityId());
+                currentApkAuthorityList.add(authority.getAuthorityContent());
+            }
+
+            for (Authority authority : authorities) {
+                if (currentApkAuthorityList.contains(authority.getAuthorityContent())) {
+                    dataList.add(1 + "");
+
+                } else {
+                    dataList.add(0 + "");
+
+                }
+
+            }
+
+            //添加属性
+            if (apk.getApkAttribute() == 0) {
+                dataList.add(0 + "");
+                continue;
+
+            }
+            if (apk.getApkAttribute() == 1) {
+                dataList.add(1 + "");
+                continue;
+
+            }
+
+        }
+
+        //生成CSV格式的文件
+        CSVUtils.createCSVFile(head, dataList, des, "androidDetection_part" + goodNum + "good" + "+" + badNum + "bad_" + stringDate);
+
+    }
+
 
 }
