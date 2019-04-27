@@ -12,10 +12,9 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
@@ -58,6 +57,30 @@ public class MainUI extends Application {
     //用于更新模型的样本所在的路径
     private String updateModelDataPath;
 
+
+    //首页
+    private Tab indexTab;
+    private Tab reverseEngineeringTab;
+    private Tab staticFeatureExtractionTab;
+    private Tab modelTrainingTab;
+    private Tab applicationDetectionTab;
+    private Tab modelUpdatingTab;
+    private JFXButton chooseOneApkButton;
+    private JFXButton setDecompileSaveDirectoryButton;
+    private JFXButton startDecompileButton;
+    private JFXButton chooseManyApkAndDecompileButton;
+    private JFXButton chooseManyApkButton;
+    private JFXButton setMultipleDecompileSaveDirectoryButton;
+    private JFXButton startMultipleDecompileButton;
+    private JFXButton chooseAuthorityDirectoryButton;
+    private JFXButton startExtractAuthorityButton;
+    private JFXButton chooseTrainDataButton;
+    private JFXButton startTrainButton;
+    private JFXButton chooseOneTargetApkButton;
+    private JFXButton startDetectButton;
+    private JFXButton chooseOneUpdateDataButton;
+    private JFXButton startUpdateModelButton;
+
     @Override
     public void start(Stage stage) throws Exception {
         //绝对布局
@@ -81,23 +104,23 @@ public class MainUI extends Application {
         tabPane.setPrefHeight(700);
         tabPane.setPrefWidth(1300);
         //首页Tab 默认
-        Tab indexTab = new Tab("首页");
-        Tab reverseEngineeringTab = new Tab("逆向工程");
-        Tab StaticFeatureExtractionTab = new Tab("静态特征提取");
-        Tab modelTrainingTab = new Tab("模型训练");
-        Tab applicationDetectionTab = new Tab("应用检测");
-        Tab ModelUpdatingTab = new Tab("模型更新");
-        tabPane.getTabs().addAll(indexTab, reverseEngineeringTab, StaticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, ModelUpdatingTab);
+        indexTab = new Tab("首页");
+        reverseEngineeringTab = new Tab("逆向工程");
+        staticFeatureExtractionTab = new Tab("静态特征提取");
+        modelTrainingTab = new Tab("模型训练");
+        applicationDetectionTab = new Tab("应用检测");
+        modelUpdatingTab = new Tab("模型更新");
+        tabPane.getTabs().addAll(indexTab, reverseEngineeringTab, staticFeatureExtractionTab, modelTrainingTab, applicationDetectionTab, modelUpdatingTab);
         SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
         selectionModel.select(0);
 
         //设置不可关闭
         indexTab.setClosable(false);
         reverseEngineeringTab.setClosable(false);
-        StaticFeatureExtractionTab.setClosable(false);
+        staticFeatureExtractionTab.setClosable(false);
         modelTrainingTab.setClosable(false);
         applicationDetectionTab.setClosable(false);
-        ModelUpdatingTab.setClosable(false);
+        modelUpdatingTab.setClosable(false);
         an.getChildren().add(tabPane);
 
         //提示框(全局通用)
@@ -134,33 +157,33 @@ public class MainUI extends Application {
         //单个Apk文件反编译Label
         Label singelApkDecompileLabel = new Label("-------------------单个Apk文件反编译-------------------");
         //选择单个APK文件按钮
-        JFXButton chooseOneApkButton = new JFXButton("选择单个Apk文件");
+        chooseOneApkButton = new JFXButton("选择单个Apk文件");
         chooseOneApkButton.getStyleClass().add("button-raised");
         //单个apk文件的路径
         Label singleApkPathLabel = new Label();
         //设置反编译结果存放文件夹按钮
-        JFXButton setDecompileSaveDirectoryButton = new JFXButton("设置反编译结果存放文件夹");
+        setDecompileSaveDirectoryButton = new JFXButton("设置反编译结果存放文件夹");
         setDecompileSaveDirectoryButton.getStyleClass().add("button-raised");
         //反编译结果存放文件夹路径
         Label decompileResultSaveDirectoryPathLabel = new Label();
         //开始反编译按钮
-        JFXButton startDecompileButton = new JFXButton("开始反编译");
+        startDecompileButton = new JFXButton("开始反编译");
         startDecompileButton.getStyleClass().add("button-raised");
         //多个Apk文件反编译Label
         Label multipleApkDecompileLabel = new Label("-------------------多个Apk文件反编译-------------------");
         //选择多个APK文件按钮
-        JFXButton chooseManyApkAndDecompileButton = new JFXButton("选择多个Apk文件并反编译");
+        chooseManyApkAndDecompileButton = new JFXButton("选择多个Apk文件并反编译");
         chooseManyApkAndDecompileButton.getStyleClass().add("button-raised");
-        JFXButton chooseManyApkButton = new JFXButton("选择多个Apk文件所在文件夹");
+        chooseManyApkButton = new JFXButton("选择多个Apk文件所在文件夹");
         chooseManyApkButton.getStyleClass().add("button-raised");
         //多个Apk文件的路径
         Label multipleApkPathLabel = new Label();
         //设置反编译结果存放文件夹按钮
-        JFXButton setMultipleDecompileSaveDirectoryButton = new JFXButton("设置批量反编译结果存放文件夹");
+        setMultipleDecompileSaveDirectoryButton = new JFXButton("设置批量反编译结果存放文件夹");
         setMultipleDecompileSaveDirectoryButton.getStyleClass().add("button-raised");
         Label multipleDecompileSavePathLabel = new Label();
         //开始批量反编译按钮
-        JFXButton startMultipleDecompileButton = new JFXButton("开始批量反编译");
+        startMultipleDecompileButton = new JFXButton("开始批量反编译");
         startMultipleDecompileButton.getStyleClass().add("button-raised");
 
         //将上述按钮添加到VBox
@@ -227,12 +250,12 @@ public class MainUI extends Application {
         //左侧部分的内容
         VBox staticFeatureLeftVBox = new VBox();
         //选择权限特征文件夹按钮
-        JFXButton chooseAuthorityDirectoryButton = new JFXButton("选择要提取权限特征的APK文件");
+        chooseAuthorityDirectoryButton = new JFXButton("选择要提取权限特征的APK文件");
         chooseAuthorityDirectoryButton.getStyleClass().add("button-raised");
         //权限特征所文件夹的路径
         Label AuthorityDirectoryLabel = new Label();
         //开始提取权限按钮
-        JFXButton startExtractAuthorityButton = new JFXButton("开始提取权限特征");
+        startExtractAuthorityButton = new JFXButton("开始提取权限特征");
         startExtractAuthorityButton.getStyleClass().add("button-raised");
         //将上述按钮添加到VBox
         staticFeatureLeftVBox.getChildren().addAll(chooseAuthorityDirectoryButton, AuthorityDirectoryLabel, startExtractAuthorityButton);
@@ -278,19 +301,19 @@ public class MainUI extends Application {
         BorderPane.setMargin(staticFeatureLeftVBox, new Insets(80, 80, 50, 100));
         BorderPane.setMargin(staticFeatureRightVBox, new Insets(45, 100, 50, 80));
         BorderPane.setMargin(staticFeatureCenterVBox, new Insets(150, 10, 50, 10));
-        StaticFeatureExtractionTab.setContent(staticFeatureBorderPane);
+        staticFeatureExtractionTab.setContent(staticFeatureBorderPane);
 
         //--------模型训练Tab内容
         BorderPane modelTrainingBorderPane = new BorderPane();
         //设置大小
         modelTrainingBorderPane.setPrefSize(750, 1400);
         //选择训练样本按钮
-        JFXButton chooseTrainDataButton = new JFXButton("选择训练样本");
+        chooseTrainDataButton = new JFXButton("选择训练样本");
         chooseTrainDataButton.getStyleClass().add("button-raised");
         //训练样本所在路径
         Label trainDataPathLabel = new Label();
         //开始训练按钮
-        JFXButton startTrainButton = new JFXButton("开始训练");
+        startTrainButton = new JFXButton("开始训练");
         startTrainButton.getStyleClass().add("button-raised");
         VBox modelTrainingLeftVBox = new VBox();
         modelTrainingLeftVBox.setAlignment(Pos.CENTER);
@@ -342,12 +365,12 @@ public class MainUI extends Application {
         //右侧
         VBox applicationDetectionRightVBox = new VBox();
         //选择要检测的apk文件按钮
-        JFXButton chooseOneTargetApkButton = new JFXButton("选择要检测的Apk文件");
+        chooseOneTargetApkButton = new JFXButton("选择要检测的Apk文件");
         chooseOneTargetApkButton.getStyleClass().add("button-raised");
         //要检测的Apk文件的路径
         Label targetApkPath = new Label();
         //开始检测按钮
-        JFXButton startDetectButton = new JFXButton("开始检测");
+        startDetectButton = new JFXButton("开始检测");
         startDetectButton.getStyleClass().add("button-raised");
         //检测结果显示label
         Label detectResultLabel = new Label("----------------检测结果----------------");
@@ -419,7 +442,7 @@ public class MainUI extends Application {
         modelUpdateRightVBox.setPadding(new Insets(45, 50, 50, 10));
         modelUpdateRightVBox.setAlignment(Pos.TOP_CENTER);
         //选择用于更新模型的样本按钮
-        JFXButton chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
+        chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
         chooseOneUpdateDataButton.getStyleClass().add("button-raised");
         //是否已知样本属性
         final ToggleGroup group = new ToggleGroup();
@@ -448,7 +471,7 @@ public class MainUI extends Application {
         //用于更新模型的样本所在的路径
         Label updateDataPathLabel = new Label();
         //开始更新模型按钮
-        JFXButton startUpdateModelButton = new JFXButton("开始更新模型");
+        startUpdateModelButton = new JFXButton("开始更新模型");
         startUpdateModelButton.getStyleClass().add("button-raised");
         //将上述按钮添加到左侧的VBox
         modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, modelUpdateHBox, startUpdateModelButton);
@@ -468,7 +491,7 @@ public class MainUI extends Application {
         BorderPane.setMargin(modelUpdateLeftVBox, new Insets(80, 10, 50, 50));
         BorderPane.setMargin(modelUpdateRightVBox, new Insets(45, 50, 50, 10));
         BorderPane.setMargin(modelUpdateCenterVBox, new Insets(150, 10, 50, 10));
-        ModelUpdatingTab.setContent(modelUpdateBorderPane);
+        modelUpdatingTab.setContent(modelUpdateBorderPane);
 //----------------------------------设置各个Tab的内容结束----------------------------------------------------
         //显示舞台
         stage.show();
@@ -523,17 +546,7 @@ public class MainUI extends Application {
                                 @Override
                                 public void run() {
                                     //设置按钮不可用
-                                   /* chooseOneApkButton.setDisable(true);
-                                    startDecompileButton.setDisable(true);
-                                    setDecompileSaveDirectoryButton.setDisable(true);
-                                    chooseManyApkAndDecompileButton.setDisable(true);
-                                    chooseManyApkButton.setDisable(true);
-                                    setMultipleDecompileSaveDirectoryButton.setDisable(true);
-                                    startMultipleDecompileButton.setDisable(true);*/
-
-//                                    setButtonDisble(true, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
-
-
+                                    setReverseEngineeringButtonDisable(true);
                                     //设置中间部分可见
                                     reverseEngineeringCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -576,7 +589,7 @@ public class MainUI extends Application {
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    startDecompileButton.setDisable(false);
+                                    setReverseEngineeringButtonDisable(false);
                                     reverseEngineeringCenterVBox.setVisible(false);
                                 }
                             });
@@ -602,7 +615,7 @@ public class MainUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 //下面设置其他不相关按钮不可用
-                setButtonDisble(true, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
+                setReverseEngineeringButtonDisable(true);
                 //当前时间
                 DateTime dateTime = new DateTime();
                 String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
@@ -643,7 +656,7 @@ public class MainUI extends Application {
                                 reverseEngineeringCenterPane.setVisible(false);
                                 rightDecompileInfoTextArea.appendText("反编译完成!");
                                 //下面设置其他按钮可用
-                                setButtonDisble(false, chooseOneApkButton, setDecompileSaveDirectoryButton, startDecompileButton, chooseManyApkAndDecompileButton, chooseManyApkButton, setMultipleDecompileSaveDirectoryButton, startMultipleDecompileButton);
+                                setReverseEngineeringButtonDisable(false);
                                 //打开反编译结果存放文件夹
                                 try {
                                     Desktop.getDesktop().open(new File(decompileResultSavePath));
@@ -656,15 +669,7 @@ public class MainUI extends Application {
                 }).start();
             }
 
-            public void setButtonDisble(boolean b, Button chooseOneApkButton, Button setDecompileSaveDirectoryButton, Button startDecompileButton, Button chooseManyApkAndDecompileButton, Button chooseManyApkButton, Button setMultipleDecompileSaveDirectoryButton, Button startMultipleDecompileButton) {
-                chooseOneApkButton.setDisable(b);
-                setDecompileSaveDirectoryButton.setDisable(b);
-                startDecompileButton.setDisable(b);
-                chooseManyApkAndDecompileButton.setDisable(b);
-                chooseManyApkButton.setDisable(b);
-                setMultipleDecompileSaveDirectoryButton.setDisable(b);
-                startMultipleDecompileButton.setDisable(b);
-            }
+
         });
 
         //选择多个APK所在的文件夹按钮点击事件
@@ -707,7 +712,7 @@ public class MainUI extends Application {
                                 @Override
                                 public void run() {
                                     //设置按钮不可用
-                                    startDecompileButton.setDisable(true);
+                                    setReverseEngineeringButtonDisable(true);
                                     //设置中间部分可见
                                     reverseEngineeringCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -725,7 +730,7 @@ public class MainUI extends Application {
                                 public void run() {
                                     rightDecompileInfoTextArea.appendText("反编译完成！\n");
                                     //设置按钮可用
-                                    startMultipleDecompileButton.setDisable(false);
+                                    setReverseEngineeringButtonDisable(false);
                                     //设置中间部分不可见
                                     reverseEngineeringCenterVBox.setVisible(false);
                                 }
@@ -1173,6 +1178,9 @@ public class MainUI extends Application {
 //----------------------------------各个按钮的点击事件结束----------------------------------------------------
     }
 
+//----------------------------------抽取的公共方法开始----------------------------------------------------
+
+
     /**
      * 设置文件夹
      */
@@ -1188,6 +1196,25 @@ public class MainUI extends Application {
         }
         return absolutePath;
     }
+
+
+    /**
+     * 设置逆向工程页面的按钮的状态，主要是是否可以有效
+     *
+     * @param flag true表示按钮不可用
+     */
+    public void setReverseEngineeringButtonDisable(Boolean flag) {
+
+        chooseOneApkButton.setDisable(flag);
+        startDecompileButton.setDisable(flag);
+        setDecompileSaveDirectoryButton.setDisable(flag);
+        chooseManyApkAndDecompileButton.setDisable(flag);
+        chooseManyApkButton.setDisable(flag);
+        setMultipleDecompileSaveDirectoryButton.setDisable(flag);
+        startMultipleDecompileButton.setDisable(flag);
+
+    }
+//----------------------------------抽取的公共方法结束----------------------------------------------------
 
     public static void main(String[] args) {
         launch(args);
