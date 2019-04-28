@@ -2,6 +2,7 @@ package com.eric;
 
 import com.eric.constrant.AuthorityConstrant;
 import com.eric.service.DeCompileService;
+import com.eric.tools.csv.CSVUtils;
 import com.eric.tools.decode.APKTool;
 import com.eric.tools.ui.UIUtils;
 import com.jfoenix.animation.alert.JFXAlertAnimation;
@@ -29,10 +30,8 @@ import org.joda.time.DateTime;
 
 import java.awt.*;
 import java.io.*;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 /*
  *@description:应用程序主界面
@@ -59,9 +58,6 @@ public class MainUI extends Application {
     private String detectApkPath;
     //用于更新模型的样本所在的路径
     private String updateModelDataPath;
-
-
-
 
 
     //首页
@@ -1021,6 +1017,21 @@ public class MainUI extends Application {
                      */
                     //所有的权限
                     List<String> allAuthorityList = Arrays.asList(AuthorityConstrant.AUTHORITY_ARRAY);
+                    //1.生成表头
+                    //构造符合工具类要求的表头List
+                    List<String> head = new ArrayList<>();
+                    head.add("package_name");
+                    for (String au : allAuthorityList) {
+                        head.add(au);
+
+                    }
+                    head.add("apk_attribute");
+                    //2.生成每一行数据,构造每一行的数据
+                    List<String> dataList = new ArrayList<>();
+                    //添加包名，包名没用，默认unknown
+                    dataList.add("unknown");
+                    //当前应用的权限
+                    List<String> currentApkAuthorityList = new ArrayList<>();
 
                     new Thread(new Runnable() {
                         @Override
@@ -1054,7 +1065,8 @@ public class MainUI extends Application {
                                     ) {
                                         String line;
                                         while ((line = br.readLine()) != null) {
-                                            //这里不用从数据库中读取权限枚举，直接构造一个静态的常量list即可
+                                            currentApkAuthorityList.add(line);
+
                                             //将权限显示在文本域
                                             String finalLine = line;
                                             Platform.runLater(new Runnable() {
@@ -1064,11 +1076,45 @@ public class MainUI extends Application {
                                                 }
                                             });
                                         }
+                                        for (String au : allAuthorityList) {
+                                            if (currentApkAuthorityList.contains(au)) {
+                                                dataList.add(1 + "");
+                                            } else {
+                                                dataList.add(0 + "");
+                                            }
+
+
+                                        }
+                                        //最后一个应用属性未知，默认值为2
+                                        dataList.add(2+"");
+                                        //创建CSV格式的文件
+                                        CSVUtils.createCSVFile(head,dataList,"E:\\BiSheData\\temp","srcApkFeature");
+                                        File apkDetectTempFile = new File("E:\\BiSheData\\temp\\srcApkFeature.csv");
+
+
+                                        String[] apkDetectArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py", "E:\\BiSheData\\temp\\srcApkFeature.csv"};
+                                        Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
+
+                                        BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
+                                        String apkDetecTemp="";
+                                        while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
+                                            //更新UI
+                                            String finalTemp = apkDetecTemp;
+                                            Platform.runLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    modelTrainingResultTextArea.appendText("该应用为"+finalTemp+"应用" + "\n");
+                                                }
+                                            });
+                                        }
+                                        apkDetectTempFile.delete();
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                     //删除临时文件
                                     file.delete();
+
+
                                 } else {
                                     System.out.println("权限结果文件不存在！");
                                 }
