@@ -292,5 +292,15 @@ public class ServiceTest {
 
     }
 
+    @Test
+    public void testGetAllAuthority(){
+        List<String> allAuthorityList = authorityService.getAllAuthorityList();
+        for (String s : allAuthorityList) {
+            System.out.println("\""+s+"\",");
+
+        }
+
+    }
+
 
 }

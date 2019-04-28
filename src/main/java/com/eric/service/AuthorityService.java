@@ -408,7 +408,7 @@ public class AuthorityService {
             String line;
             while ((line = br.readLine()) != null) {
                 //非空
-                if(!StringUtils.isEmpty(line)){
+                if (!StringUtils.isEmpty(line)) {
                     auList.add(line);
                 }
 
@@ -434,7 +434,7 @@ public class AuthorityService {
         File file = new File(src);
         if (file.isDirectory()) {
             File[] files = file.listFiles();
-            int i=0;
+            int i = 0;
             for (File f : files) {
                 String path = f.getAbsolutePath();
                 String[] pathArr = path.split("\\\\");
@@ -451,9 +451,9 @@ public class AuthorityService {
                 //获取当前apk的id 这个地方这么获得的话得到的值是null,改进后的结果如下：
                 apks = apkMapper.selectByExample(apkExample);
                 //如果数据库中只有一条记录
-                Integer apkId =-1;
-                if(apks.size()==1){
-                    apkId =apks.get(0).getApkId();
+                Integer apkId = -1;
+                if (apks.size() == 1) {
+                    apkId = apks.get(0).getApkId();
 
                 }
 
@@ -466,10 +466,10 @@ public class AuthorityService {
                     //理论上数据库中存在该权限记录的话只有一条
                     //并且只处理只有一条记录的情况
                     //没有或者多余1条的都不处理
-                    if(authorities.size()==1){
+                    if (authorities.size() == 1) {
                         //获取权限id
                         Integer authorityId = authorities.get(0).getAuthorityId();
-                        if(null!=authorityId&&apkId!=-1){
+                        if (null != authorityId && apkId != -1) {
                             AuthorityApkMapExample authorityApkMapExample = getAuthorityApkMapExample(authorityId, apkId);
                             List<AuthorityApkMap> authorityApkMaps = authorityApkMapMapper.selectByExample(authorityApkMapExample);
                             //如果数据库中没有该映射关系则插入，其他情况不处理
@@ -482,11 +482,27 @@ public class AuthorityService {
                     }
                 }
                 i++;
-                System.out.println("已经完成"+i+"个");
+                System.out.println("已经完成" + i + "个");
 
             }
         }
 
+    }
+
+
+    /**
+     *
+     * 获取所有的权限
+     * @return 权限List
+     */
+    public List<String> getAllAuthorityList() {
+        List<Authority> authorityList = authorityMapper.selectByExample(null);
+        List<String> aus = new ArrayList<>();
+        for (Authority authority : authorityList) {
+            aus.add(authority.getAuthorityContent());
+
+        }
+        return aus;
     }
 
 }

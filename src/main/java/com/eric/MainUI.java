@@ -1,5 +1,6 @@
 package com.eric;
 
+import com.eric.constrant.AuthorityConstrant;
 import com.eric.service.DeCompileService;
 import com.eric.tools.decode.APKTool;
 import com.eric.tools.ui.UIUtils;
@@ -28,6 +29,7 @@ import org.joda.time.DateTime;
 
 import java.awt.*;
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -39,6 +41,7 @@ import java.util.Random;
  *@Version:1.0
  *@Date:2019/4/8
  */
+
 public class MainUI extends Application {
     private DeCompileService deCompileService = new DeCompileService();
 
@@ -56,6 +59,9 @@ public class MainUI extends Application {
     private String detectApkPath;
     //用于更新模型的样本所在的路径
     private String updateModelDataPath;
+
+
+
 
 
     //首页
@@ -86,6 +92,8 @@ public class MainUI extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+
+
         //绝对布局
         AnchorPane an = new AnchorPane();
         //给布局设置一个背景颜色
@@ -997,8 +1005,9 @@ public class MainUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 if (null != detectApkPath) {
+
                     //将路径按照斜线分割以便获取包名
-                    String[] split = detectApkPath.split("\\\\");
+//                    String[] split = detectApkPath.split("\\\\");
                     /**
                      * 1.应用检测有必要获取包名吗？
                      * 2.数据都要存入数据库吗？
@@ -1010,6 +1019,8 @@ public class MainUI extends Application {
                      * 很明显不需要，因为这里只是检测，到模型更新那块可能要入库
                      * 所以这里只需要构造出CSV格式的文件供模型调用即可
                      */
+                    //所有的权限
+                    List<String> allAuthorityList = Arrays.asList(AuthorityConstrant.AUTHORITY_ARRAY);
 
                     new Thread(new Runnable() {
                         @Override
@@ -1043,6 +1054,7 @@ public class MainUI extends Application {
                                     ) {
                                         String line;
                                         while ((line = br.readLine()) != null) {
+                                            //这里不用从数据库中读取权限枚举，直接构造一个静态的常量list即可
                                             //将权限显示在文本域
                                             String finalLine = line;
                                             Platform.runLater(new Runnable() {
@@ -1065,7 +1077,7 @@ public class MainUI extends Application {
                                     public void run() {
                                         //更新JavaFX的主线程的代码放在此处
                                         detectResultTextArea.appendText(">>>>>>预测结果<<<<<<\n");
-                                        detectResultTextArea.appendText("该应用为正常应用的概率为"+apkDetectResultRate()+"%\n");
+                                        detectResultTextArea.appendText("该应用为正常应用的概率为" + apkDetectResultRate() + "%\n");
                                     }
                                 });
                                 applicationDetectionCenterVBox.setVisible(false);
