@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,12 +88,25 @@ public class CommonTest {
      * 测试查找类路径下的文件
      */
     @Test
-    public void testFindFile(){
+    public void testFindFile()  {
         String s = CommonTest.class.getResource("/python/ExtractAuthority2Txt.py").toExternalForm();
         if(null!=s){
-            System.out.println(s);
+            File file = new File(s);
+//            System.out.println(file.getPath());
+            String[] split = file.getPath().split("\\\\");
+            for (int i = 1; i < split.length-1; i++) {
+                System.out.print(split[i]+File.separator);
+
+            }
+            System.out.println(split[split.length-1]);
+
         }
 
+    }
+    @Test
+    public void testGetPath(){
+//        System.out.println(System.getProperty("user.dir"));
+        System.out.println(Thread.currentThread().getContextClassLoader().getResource(""));
     }
 
 

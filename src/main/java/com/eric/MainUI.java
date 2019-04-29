@@ -86,6 +86,10 @@ public class MainUI extends Application {
     private JFXRadioButton modelUpdateBadApkRadio;
     private JFXRadioButton modelUpdateUnknownRadio;
 
+
+    //项目中的python程序基础路径
+//    private String pythonFileBasePath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "python" + File.separator;
+
     @Override
     public void start(Stage stage) throws Exception {
 
@@ -645,7 +649,14 @@ public class MainUI extends Application {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        reverseEngineeringCenterPane.setVisible(true);
+                        //批量反编译结果存放文件夹
+                        String batchDecompileResultPath = "C:\\AndroidDetection" + File.separator + "DecompileResults_" + stringDate;
+                        //设置中间提示部分的内容可见
+                        reverseEngineeringCenterVBox.setVisible(true);
+                        //设置提示文字
+                        reverseEngineeringCenterLabel.setText("正在批量反编译...");
+                        reverseEngineeringCenterLabel.setFont(Font.font("华文行楷", 15));
+                        reverseEngineeringCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
 
                         if (null != files) {
                             for (File file : files) {
@@ -655,7 +666,7 @@ public class MainUI extends Application {
                                     rightDecompileInfoTextArea.setText("");
                                     rightDecompileInfoTextArea.appendText("开始批量反编译...\n");
                                     rightDecompileInfoTextArea.appendText("正在进行批量反编译，预计耗时" + minute + "分" + second + "秒...\n");
-                                    APKTool.decode(path, decompileResultSavePath + File.separator + "DecompileResults_" + stringDate);
+                                    APKTool.decode(path, batchDecompileResultPath);
                                 }
                             }
                         }
@@ -666,11 +677,13 @@ public class MainUI extends Application {
                             public void run() {
                                 reverseEngineeringCenterPane.setVisible(false);
                                 rightDecompileInfoTextArea.appendText("反编译完成!");
+                                //设置中间提示部分的内容不可见
+                                reverseEngineeringCenterVBox.setVisible(false);
                                 //下面设置其他按钮可用
                                 setReverseEngineeringButtonDisable(false);
                                 //打开反编译结果存放文件夹
                                 try {
-                                    Desktop.getDesktop().open(new File(decompileResultSavePath));
+                                    Desktop.getDesktop().open(new File(batchDecompileResultPath));
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -811,11 +824,12 @@ public class MainUI extends Application {
                                     rightAuthorityInfoTextArea.setText("");
                                 }
                             });
-                            String temp = "";
                             try {
                                 //获取python文件的路径
-                                String extractAuthority2TxtPyPath = MainUI.class.getResource("/python/ExtractAuthority2Txt.py").toExternalForm();
-                                String[] pyArgs = new String[]{"python", extractAuthority2TxtPyPath, extractAuthorityApkPath};
+                                //下面这个路径是公司电脑路径
+                                String extractAuthority2TxtPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py";
+                                String[] pyArgs = new String[]{"python ", extractAuthority2TxtPath, extractAuthorityApkPath};
+//                                System.out.println(pythonFileBasePath + "ExtractAuthority2Txt.py");
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File("C:\\AndroidDetection\\temp\\res.txt");
@@ -929,9 +943,10 @@ public class MainUI extends Application {
                             String temp = "";
                             try {
                                 //获取python文件的路径
-                                String logicCallByJavaPyPath = MainUI.class.getResource("/python/LogicCallByJava.py").toExternalForm();
-                                String[] pyArgs = new String[]{"python", logicCallByJavaPyPath, csvFilePath};
-                                Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+                                //下面这个路径是 公司电脑上的路径
+                                String logicCallByJavaPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicCallByJava.py";
+                                String[] logicCallByJavaPyArgs = new String[]{"python ", logicCallByJavaPyPath, csvFilePath};
+                                Process proc = Runtime.getRuntime().exec(logicCallByJavaPyArgs);// 执行py文件
 
                                 BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
                                 while ((temp = in.readLine()) != null) {
@@ -1009,17 +1024,6 @@ public class MainUI extends Application {
             public void handle(ActionEvent event) {
                 if (null != detectApkPath) {
 
-                    /**
-                     * 1.应用检测有必要获取包名吗？
-                     * 2.数据都要存入数据库吗？
-                     * 解答上面两个问题首先要搞清楚应用检测的流程
-                     * 首先，要检测应用肯定需要CSV文件
-                     * 在生成CSV文件是需要包名，当然包名为空串也可以，因为检测的时候并不需要包名
-                     * 所以这么看来没有必要获取包名
-                     *那么在这里数据需要存库吗？
-                     * 很明显不需要，因为这里只是检测，到模型更新那块可能要入库
-                     * 所以这里只需要构造出CSV格式的文件供模型调用即可
-                     */
                     //所有的权限
                     List<String> allAuthorityList = Arrays.asList(AuthorityConstrant.AUTHORITY_ARRAY);
                     //1.生成表头
@@ -1037,7 +1041,6 @@ public class MainUI extends Application {
                     dataList.add("unknown");
                     //当前应用的权限
                     List<String> currentApkAuthorityList = new ArrayList<>();
-
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -1059,7 +1062,7 @@ public class MainUI extends Application {
                             //调用python程序提取权限
                             try {
                                 //获取python文件路径
-                                String extractAuthority2TxtPyPath = MainUI.class.getResource("/python/ExtractAuthority2Txt.py").toExternalForm();
+                                String extractAuthority2TxtPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py";
                                 String[] pyArgs = new String[]{"python", extractAuthority2TxtPyPath, detectApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 detectResultTextArea.appendText("该应用主要有如下权限:\n");
@@ -1073,17 +1076,16 @@ public class MainUI extends Application {
                                         String line;
                                         while ((line = br.readLine()) != null) {
                                             currentApkAuthorityList.add(line);
-
                                             //将权限显示在文本域
                                             String finalLine = line;
+                                        }
+                                        for (String au : allAuthorityList) {
                                             Platform.runLater(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    detectResultTextArea.appendText(finalLine + "\n");
+                                                    detectResultTextArea.appendText(au + "\n");
                                                 }
                                             });
-                                        }
-                                        for (String au : allAuthorityList) {
                                             if (currentApkAuthorityList.contains(au)) {
                                                 dataList.add(1 + "");
                                             } else {
@@ -1093,30 +1095,30 @@ public class MainUI extends Application {
 
                                         }
                                         //最后一个应用属性未知，默认值为2
-                                        dataList.add(2+"");
+                                        dataList.add(2 + "");
                                         //创建CSV格式的文件
-                                        CSVUtils.createCSVFile(head,dataList,"C:\\AndroidDetection\\temp","srcApkFeature");
+                                        CSVUtils.createCSVFile(head, dataList, "C:\\AndroidDetection\\temp", "srcApkFeature");
                                         File apkDetectTempFile = new File("C:\\AndroidDetection\\temp\\srcApkFeature.csv");
 
 
                                         //获取pthon文件路径
-                                        String logicPredictModelPyPath = MainUI.class.getResource("/python/LogicPredictModel.py").toExternalForm();
-                                        String[] apkDetectArgs = new String[]{"python", logicPredictModelPyPath, "C:\\AndroidDetection\\temp\\srcApkFeature.csv"};
+                                        String logicPredictModelPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py";
+                                        String[] apkDetectArgs = new String[]{"python ", "C:\\AndroidDetection\\temp\\srcApkFeature.csv","C:\\AndroidDetection\\temp\\predict_model.pkl"};
                                         Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
 
                                         BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
-                                        String apkDetecTemp="";
+                                        String apkDetecTemp = "";
                                         while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
                                             //更新UI
                                             String finalTemp = apkDetecTemp;
                                             Platform.runLater(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    modelTrainingResultTextArea.appendText("该应用为"+finalTemp+"应用" + "\n");
+                                                    modelTrainingResultTextArea.appendText("该应用为" + finalTemp + "应用" + "\n");
                                                 }
                                             });
                                         }
-                                        apkDetectTempFile.delete();
+//                                        apkDetectTempFile.delete();
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -1127,14 +1129,6 @@ public class MainUI extends Application {
                                 } else {
                                     System.out.println("权限结果文件不存在！");
                                 }
-                                Platform.runLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //更新JavaFX的主线程的代码放在此处
-                                        detectResultTextArea.appendText(">>>>>>预测结果<<<<<<\n");
-                                        detectResultTextArea.appendText("该应用为正常应用的概率为" + apkDetectResultRate() + "%\n");
-                                    }
-                                });
                                 applicationDetectionCenterVBox.setVisible(false);
                                 //设置按钮可用
                                 startDetectButton.setDisable(false);
@@ -1292,7 +1286,7 @@ public class MainUI extends Application {
     public String setDirectory() {
         Stage st = new Stage();
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(new File("C:" + File.separator ));
+        dc.setInitialDirectory(new File("C:" + File.separator));
         dc.setTitle("选择文件夹");
         File file = dc.showDialog(st);
         String absolutePath = null;
