@@ -66,5 +66,33 @@ public class CommonTest {
 
     }
 
+    /**
+     * 测试项目中的文件路径该怎么填才能正确定位文件
+     */
+
+    @Test
+    public void testFilePath(){
+        File file = new File("/src/main/java/com/eric/python/ExtractAuthority2Txt.py");
+        if(file.exists()){
+            System.out.println("文件存在");
+        }else{
+            System.out.println("文件不存在！");
+        }
+
+
+    }
+
+    /**
+     * 测试查找类路径下的文件
+     */
+    @Test
+    public void testFindFile(){
+        String s = CommonTest.class.getResource("/python/ExtractAuthority2Txt.py").toExternalForm();
+        if(null!=s){
+            System.out.println(s);
+        }
+
+    }
+
 
 }

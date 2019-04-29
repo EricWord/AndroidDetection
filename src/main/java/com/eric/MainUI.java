@@ -25,8 +25,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.springframework.util.StringUtils;
 
 import java.awt.*;
 import java.io.*;
@@ -105,7 +105,10 @@ public class MainUI extends Application {
         //设置标题
         stage.setTitle("基于在线学习的恶意Android应用检测系统");
         //设置左上角的图标
-        stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
+        //图标的路径
+        String iconPath = MainUI.class.getResource("/images/detectIcon.png").toExternalForm();
+        stage.getIcons().add(new Image(iconPath));
+//        stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
         JFXTabPane tabPane = new JFXTabPane();
         tabPane.setPrefHeight(50);
         tabPane.setPrefHeight(700);
@@ -517,7 +520,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("E:\\BiSheData"));
+                fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -632,7 +635,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择多个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("E:\\BiSheData"));
+                fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 List<File> files = fc.showOpenMultipleDialog(st);
@@ -761,7 +764,7 @@ public class MainUI extends Application {
             }
         });
 
-        //选择权限特征的APK文件按钮点击事件
+        //选择要提取权限特征的APK文件按钮点击事件
         chooseAuthorityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -770,7 +773,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("E:\\BiSheData"));
+                fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -810,13 +813,15 @@ public class MainUI extends Application {
                             });
                             String temp = "";
                             try {
-                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", extractAuthorityApkPath};
+                                //获取python文件的路径
+                                String extractAuthority2TxtPyPath = MainUI.class.getResource("/python/ExtractAuthority2Txt.py").toExternalForm();
+                                String[] pyArgs = new String[]{"python", extractAuthority2TxtPyPath, extractAuthorityApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 //执行完毕开始读取提取出的权限TXT
-                                File file = new File("E:\\BiSheData\\temp\\res.txt");
+                                File file = new File("C:\\AndroidDetection\\temp\\res.txt");
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
-                                    try (FileReader reader = new FileReader("E:\\BiSheData\\temp\\res.txt");
+                                    try (FileReader reader = new FileReader("C:\\AndroidDetection\\temp\\res.txt");
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
@@ -884,7 +889,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择训练样本文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("E:\\BiSheData"));
+                fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.csv", "*.txt"));
                 File file = fc.showOpenDialog(st);
@@ -923,7 +928,9 @@ public class MainUI extends Application {
                             });
                             String temp = "";
                             try {
-                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicCallByJava.py", csvFilePath};
+                                //获取python文件的路径
+                                String logicCallByJavaPyPath = MainUI.class.getResource("/python/LogicCallByJava.py").toExternalForm();
+                                String[] pyArgs = new String[]{"python", logicCallByJavaPyPath, csvFilePath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
 
                                 BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
@@ -981,8 +988,8 @@ public class MainUI extends Application {
                 FileChooser fc = new FileChooser();
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
-                //设置初始路径
-                fc.setInitialDirectory(new File("E:\\BiSheData"));
+                //设置初始路径,这里不要填太具体化的文件夹，如果换了台电脑可能会没有这个磁盘，一般填C盘，因为这个电脑上一般情况下都有
+                fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -1002,8 +1009,6 @@ public class MainUI extends Application {
             public void handle(ActionEvent event) {
                 if (null != detectApkPath) {
 
-                    //将路径按照斜线分割以便获取包名
-//                    String[] split = detectApkPath.split("\\\\");
                     /**
                      * 1.应用检测有必要获取包名吗？
                      * 2.数据都要存入数据库吗？
@@ -1053,14 +1058,16 @@ public class MainUI extends Application {
                             });
                             //调用python程序提取权限
                             try {
-                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", detectApkPath};
+                                //获取python文件路径
+                                String extractAuthority2TxtPyPath = MainUI.class.getResource("/python/ExtractAuthority2Txt.py").toExternalForm();
+                                String[] pyArgs = new String[]{"python", extractAuthority2TxtPyPath, detectApkPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 detectResultTextArea.appendText("该应用主要有如下权限:\n");
                                 //执行完毕开始读取提取出的权限TXT
-                                File file = new File("E:\\BiSheData\\temp\\res.txt");
+                                File file = new File("C:\\AndroidDetection\\temp\\res.txt");
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
-                                    try (FileReader reader = new FileReader("E:\\BiSheData\\temp\\res.txt");
+                                    try (FileReader reader = new FileReader("C:\\AndroidDetection\\temp\\res.txt");
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
@@ -1088,11 +1095,13 @@ public class MainUI extends Application {
                                         //最后一个应用属性未知，默认值为2
                                         dataList.add(2+"");
                                         //创建CSV格式的文件
-                                        CSVUtils.createCSVFile(head,dataList,"E:\\BiSheData\\temp","srcApkFeature");
-                                        File apkDetectTempFile = new File("E:\\BiSheData\\temp\\srcApkFeature.csv");
+                                        CSVUtils.createCSVFile(head,dataList,"C:\\AndroidDetection\\temp","srcApkFeature");
+                                        File apkDetectTempFile = new File("C:\\AndroidDetection\\temp\\srcApkFeature.csv");
 
 
-                                        String[] apkDetectArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py", "E:\\BiSheData\\temp\\srcApkFeature.csv"};
+                                        //获取pthon文件路径
+                                        String logicPredictModelPyPath = MainUI.class.getResource("/python/LogicPredictModel.py").toExternalForm();
+                                        String[] apkDetectArgs = new String[]{"python", logicPredictModelPyPath, "C:\\AndroidDetection\\temp\\srcApkFeature.csv"};
                                         Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
 
                                         BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
@@ -1159,7 +1168,7 @@ public class MainUI extends Application {
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
                 //设置初始路径
-                fc.setInitialDirectory(new File("E:\\BiSheData"));
+                fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
                 File file = fc.showOpenDialog(st);
@@ -1201,13 +1210,15 @@ public class MainUI extends Application {
                                 }
                             });
                             try {
-                                String[] pyArgs = new String[]{"python", "E:\\projects\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py", updateModelDataPath};
+                                //获取python文件路径
+                                String extractAuthority2TxtPyPath = MainUI.class.getResource("").toExternalForm();
+                                String[] pyArgs = new String[]{"python", extractAuthority2TxtPyPath, updateModelDataPath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 //执行完毕开始读取提取出的权限TXT
-                                File file = new File("E:\\BiSheData\\temp\\res.txt");
+                                File file = new File("C:\\AndroidDetection\\temp\\res.txt");
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
-                                    try (FileReader reader = new FileReader("E:\\BiSheData\\temp\\res.txt");
+                                    try (FileReader reader = new FileReader("C:\\AndroidDetection\\temp\\res.txt");
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
@@ -1281,7 +1292,7 @@ public class MainUI extends Application {
     public String setDirectory() {
         Stage st = new Stage();
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(new File("E:" + File.separator + "BiSheData"));
+        dc.setInitialDirectory(new File("C:" + File.separator ));
         dc.setTitle("选择文件夹");
         File file = dc.showDialog(st);
         String absolutePath = null;
