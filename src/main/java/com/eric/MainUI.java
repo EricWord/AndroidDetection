@@ -1097,26 +1097,42 @@ public class MainUI extends Application {
                                         //最后一个应用属性未知，默认值为2
                                         dataList.add(2 + "");
                                         //创建CSV格式的文件
-                                        CSVUtils.createCSVFile(head, dataList, "C:\\AndroidDetection\\temp", "srcApkFeature");
+                                        //CSV文件的输出路径
+
                                         File apkDetectTempFile = new File("C:\\AndroidDetection\\temp\\srcApkFeature.csv");
+                                        //先判断 这个文件是否存在，如果存在，将其删除，重新生成
+                                        if (apkDetectTempFile.exists()) {
+                                            apkDetectTempFile.delete();
+                                        }
+                                        CSVUtils.createCSVFile(head, dataList, "C:\\AndroidDetection\\temp", "srcApkFeature");
 
 
                                         //获取pthon文件路径
-                                        String logicPredictModelPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py";
-                                        String[] apkDetectArgs = new String[]{"python ", "C:\\AndroidDetection\\temp\\srcApkFeature.csv","C:\\AndroidDetection\\temp\\predict_model.pkl"};
-                                        Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
+                                        String logicPredictModelPyPath = "C:\\AndroidDetection\\temp\\predict_model.pkl";
+                                        String logicPredictModelCSVPath = "C:\\AndroidDetection\\temp\\srcApkFeature.csv";
+                                        //先判断调用python程序必须的两个文件是否存在
+                                        File logicPredictModelPyFile = new File(logicPredictModelPyPath);
+                                        File logicPredictModelCSVFile = new File(logicPredictModelCSVPath);
+                                        //两个文件都存在
+                                        if (logicPredictModelPyFile.exists() && logicPredictModelCSVFile.exists()) {
+                                            //调用python程序
+                                            String[] apkDetectArgs = new String[]{"python ", logicPredictModelCSVPath, logicPredictModelPyPath};
+                                            Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
 
-                                        BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
-                                        String apkDetecTemp = "";
-                                        while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
-                                            //更新UI
-                                            String finalTemp = apkDetecTemp;
-                                            Platform.runLater(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    modelTrainingResultTextArea.appendText("该应用为" + finalTemp + "应用" + "\n");
-                                                }
-                                            });
+                                            BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
+                                            String apkDetecTemp = "";
+                                            while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
+                                                //更新UI
+                                                String finalTemp = apkDetecTemp;
+                                                Platform.runLater(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        modelTrainingResultTextArea.appendText("该应用为" + finalTemp + "应用" + "\n");
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            System.out.println("缺少调用python程序的预测模型文件或者csv数据集文件");
                                         }
 //                                        apkDetectTempFile.delete();
                                     } catch (IOException e) {
