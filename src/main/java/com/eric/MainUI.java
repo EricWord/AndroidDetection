@@ -337,6 +337,8 @@ public class MainUI extends Application {
         Label modelTrainingResultLabel = new Label("----------------训练结果----------------");
         //模型训练结果TextArea
         TextArea modelTrainingResultTextArea = new TextArea("此处将显示模型训练的结果");
+        //文本域中的文字居中显示
+//        modelTrainingResultTextArea.
         //设置显示的行数
         modelTrainingResultTextArea.setPrefRowCount(35);
         //自动换行
@@ -1022,19 +1024,22 @@ public class MainUI extends Application {
         startDetectButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                System.out.println("开始检测按钮已点击...");
                 if (null != detectApkPath) {
-
                     //所有的权限
                     List<String> allAuthorityList = Arrays.asList(AuthorityConstrant.AUTHORITY_ARRAY);
                     //1.生成表头
                     //构造符合工具类要求的表头List
                     List<String> head = new ArrayList<>();
+                    System.out.println("开始构造csv文件表头...");
                     head.add("package_name");
                     for (String au : allAuthorityList) {
                         head.add(au);
 
                     }
                     head.add("apk_attribute");
+                    System.out.println("csv表头构建完毕");
+                    System.out.println("开始构造csv每一行数据...");
                     //2.生成每一行数据,构造每一行的数据
                     List<String> dataList = new ArrayList<>();
                     //添加包名，包名没用，默认unknown
@@ -1063,13 +1068,15 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件路径
                                 String extractAuthority2TxtPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py";
-                                String[] pyArgs = new String[]{"python", extractAuthority2TxtPyPath, detectApkPath};
-                                Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
+                                String[] extractAuthority2TxtPyArgs = new String[]{"python ", extractAuthority2TxtPyPath, detectApkPath};
+                                System.out.println("开始执行提取权限到txt的python文件...");
+                                Process proc = Runtime.getRuntime().exec(extractAuthority2TxtPyArgs);// 执行py文件
                                 detectResultTextArea.appendText("该应用主要有如下权限:\n");
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File("C:\\AndroidDetection\\temp\\res.txt");
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
+                                    System.out.println("提取权限到txt的python程序执行成功！");
                                     try (FileReader reader = new FileReader("C:\\AndroidDetection\\temp\\res.txt");
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
@@ -1078,14 +1085,14 @@ public class MainUI extends Application {
                                             currentApkAuthorityList.add(line);
                                             //将权限显示在文本域
                                             String finalLine = line;
-                                        }
-                                        for (String au : allAuthorityList) {
                                             Platform.runLater(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    detectResultTextArea.appendText(au + "\n");
+                                                    detectResultTextArea.appendText(finalLine + "\n");
                                                 }
                                             });
+                                        }
+                                        for (String au : allAuthorityList) {
                                             if (currentApkAuthorityList.contains(au)) {
                                                 dataList.add(1 + "");
                                             } else {
@@ -1096,6 +1103,7 @@ public class MainUI extends Application {
                                         }
                                         //最后一个应用属性未知，默认值为2
                                         dataList.add(2 + "");
+                                        System.out.println("csv每一行的数据构造完毕");
                                         //创建CSV格式的文件
                                         //CSV文件的输出路径
 
@@ -1106,28 +1114,32 @@ public class MainUI extends Application {
                                         }
                                         CSVUtils.createCSVFile(head, dataList, "C:\\AndroidDetection\\temp", "srcApkFeature");
 
+                                        System.out.println("csv文件生成完毕");
 
                                         //获取pthon文件路径
-                                        String logicPredictModelPyPath = "C:\\AndroidDetection\\temp\\predict_model.pkl";
+                                        String logicPredictModelPklPath = "C:\\AndroidDetection\\temp\\predict_model.pkl";
                                         String logicPredictModelCSVPath = "C:\\AndroidDetection\\temp\\srcApkFeature.csv";
+                                        String logicPredictModelPyPath="D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py";
                                         //先判断调用python程序必须的两个文件是否存在
                                         File logicPredictModelPyFile = new File(logicPredictModelPyPath);
                                         File logicPredictModelCSVFile = new File(logicPredictModelCSVPath);
                                         //两个文件都存在
                                         if (logicPredictModelPyFile.exists() && logicPredictModelCSVFile.exists()) {
+                                            System.out.println("调用预测模型需要的两个文件都存在，开始调用预测模型...");
                                             //调用python程序
-                                            String[] apkDetectArgs = new String[]{"python ", logicPredictModelCSVPath, logicPredictModelPyPath};
+                                            String[] apkDetectArgs = new String[]{"python ", logicPredictModelPyPath,logicPredictModelCSVPath, logicPredictModelPklPath};
                                             Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
 
                                             BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
                                             String apkDetecTemp = "";
                                             while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
+                                                System.out.println("调用预测模型后的结果为:"+apkDetecTemp);
                                                 //更新UI
                                                 String finalTemp = apkDetecTemp;
                                                 Platform.runLater(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        modelTrainingResultTextArea.appendText("该应用为" + finalTemp + "应用" + "\n");
+                                                        detectResultTextArea.appendText("该应用为" + finalTemp + "应用" + "\n");
                                                     }
                                                 });
                                             }
@@ -1138,12 +1150,13 @@ public class MainUI extends Application {
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
+                                    System.out.println("执行完毕，删除临时文件");
                                     //删除临时文件
                                     file.delete();
 
 
                                 } else {
-                                    System.out.println("权限结果文件不存在！");
+                                    System.out.println("权限结果文件不存在！执行python程序失败！");
                                 }
                                 applicationDetectionCenterVBox.setVisible(false);
                                 //设置按钮可用

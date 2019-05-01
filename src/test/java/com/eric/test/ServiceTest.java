@@ -302,5 +302,22 @@ public class ServiceTest {
 
     }
 
+    @Test
+    public void testCreatePartCSV(){
+        csvService.createPartCSV("E:\\BiSheData\\temp\\",100,100);
+
+    }
+
+    @Test
+    public void testCreateRemainSinglePartCSV(){
+        csvService.createRemainSinglePartCSV("E:\\BiSheData\\temp\\",100,2500,0);
+
+    }
+    @Test
+    public void testCreatePartCSVWithBaseNum(){
+        csvService.createPartCSVWithBaseNum("E:\\BiSheData\\temp\\",150,150,100);
+
+    }
+
 
 }

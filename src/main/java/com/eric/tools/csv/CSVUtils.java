@@ -86,16 +86,16 @@ public class CSVUtils {
             if (i == 0) {
                 csvWriter.newLine();
             }
-            if (i != row.size() - 1) {
-                csvWriter.write(row.get(i) + ",");
-                //换行逻辑判断
-                if ((i + 1) % headLength == 0) {
-                    //写入换行
-                    csvWriter.newLine();
-                }
-            } else {
+            //换行逻辑判断
+            if ((i + 1) % headLength == 0) {
                 csvWriter.write(row.get(i));
+                //写入换行
+                csvWriter.newLine();
+            } else {
+
+                csvWriter.write(row.get(i) + ",");
             }
+
         }
         //写入换行
         csvWriter.newLine();
