@@ -58,6 +58,10 @@ public class MainUI extends Application {
     private String detectApkPath;
     //用于更新模型的样本所在的路径
     private String updateModelDataPath;
+    //要更新的模型的存放路径
+    private String preUpdateModelPath;
+    //模型更新后的存放路径
+    private String afterUpdateModelPath;
 
 
     //首页
@@ -82,6 +86,8 @@ public class MainUI extends Application {
     private JFXButton startDetectButton;
     private JFXButton chooseOneUpdateDataButton;
     private JFXButton startUpdateModelButton;
+    private JFXButton choosePreUpdateModelPathButton;
+    private JFXButton chooseAfterUpdateModelSavePathButton;
     private JFXRadioButton modelUpdateGoodApkRadio;
     private JFXRadioButton modelUpdateBadApkRadio;
     private JFXRadioButton modelUpdateUnknownRadio;
@@ -460,8 +466,12 @@ public class MainUI extends Application {
         //选择用于更新模型的样本按钮
         chooseOneUpdateDataButton = new JFXButton("选择用于更新模型的样本");
         chooseOneUpdateDataButton.getStyleClass().add("button-raised");
+        choosePreUpdateModelPathButton = new JFXButton("选择要更新的模型");
+        choosePreUpdateModelPathButton.getStyleClass().add("button-raised");
+        chooseAfterUpdateModelSavePathButton = new JFXButton("选择更新后的模型的存放路径");
+        chooseAfterUpdateModelSavePathButton.getStyleClass().add("button-raised");
         //是否已知样本属性
-        final ToggleGroup group = new ToggleGroup();
+ /*       final ToggleGroup group = new ToggleGroup();
         modelUpdateGoodApkRadio = new JFXRadioButton("正常样本");
 //        modelUpdateGoodApkRadio.setDisable(true);
         modelUpdateGoodApkRadio.setPadding(new Insets(10));
@@ -477,13 +487,13 @@ public class MainUI extends Application {
 
         //应用属性
         Label modelUpdateApkAttributeLabel = new Label();
-        modelUpdateApkAttributeLabel.setText("应用属性：");
+        modelUpdateApkAttributeLabel.setText("应用属性：");*/
 
         //水平布局
-        HBox modelUpdateHBox = new HBox();
-        modelUpdateHBox.getChildren().addAll(modelUpdateApkAttributeLabel, modelUpdateGoodApkRadio, modelUpdateBadApkRadio, modelUpdateUnknownRadio);
+       /* HBox modelUpdateHBox = new HBox();
+        modelUpdateHBox.getChildren().addAll(modelUpdateGoodApkRadio, modelUpdateBadApkRadio, modelUpdateUnknownRadio);
         modelUpdateHBox.setSpacing(10);
-        modelUpdateHBox.setAlignment(Pos.CENTER);
+        modelUpdateHBox.setAlignment(Pos.CENTER);*/
 
         //用于更新模型的样本所在的路径
         Label updateDataPathLabel = new Label();
@@ -491,7 +501,7 @@ public class MainUI extends Application {
         startUpdateModelButton = new JFXButton("开始更新模型");
         startUpdateModelButton.getStyleClass().add("button-raised");
         //将上述按钮添加到左侧的VBox
-        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, modelUpdateHBox, startUpdateModelButton);
+        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, choosePreUpdateModelPathButton,chooseAfterUpdateModelSavePathButton, startUpdateModelButton);
         //模型更新结果显示label
         Label modelUpdateResultLabel = new Label("----------------更新结果----------------");
         //模型更新结果TextArea
@@ -1119,7 +1129,7 @@ public class MainUI extends Application {
                                         //获取pthon文件路径
                                         String logicPredictModelPklPath = "C:\\AndroidDetection\\temp\\predict_model.pkl";
                                         String logicPredictModelCSVPath = "C:\\AndroidDetection\\temp\\srcApkFeature.csv";
-                                        String logicPredictModelPyPath="D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py";
+                                        String logicPredictModelPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py";
                                         //先判断调用python程序必须的两个文件是否存在
                                         File logicPredictModelPyFile = new File(logicPredictModelPyPath);
                                         File logicPredictModelCSVFile = new File(logicPredictModelCSVPath);
@@ -1127,13 +1137,13 @@ public class MainUI extends Application {
                                         if (logicPredictModelPyFile.exists() && logicPredictModelCSVFile.exists()) {
                                             System.out.println("调用预测模型需要的两个文件都存在，开始调用预测模型...");
                                             //调用python程序
-                                            String[] apkDetectArgs = new String[]{"python ", logicPredictModelPyPath,logicPredictModelCSVPath, logicPredictModelPklPath};
+                                            String[] apkDetectArgs = new String[]{"python ", logicPredictModelPyPath, logicPredictModelCSVPath, logicPredictModelPklPath};
                                             Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
 
                                             BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
                                             String apkDetecTemp = "";
                                             while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
-                                                System.out.println("调用预测模型后的结果为:"+apkDetecTemp);
+                                                System.out.println("调用预测模型后的结果为:" + apkDetecTemp);
                                                 //更新UI
                                                 String finalTemp = apkDetecTemp;
                                                 Platform.runLater(new Runnable() {
@@ -1189,11 +1199,11 @@ public class MainUI extends Application {
                 Stage st = new Stage();
                 FileChooser fc = new FileChooser();
                 //设置标题
-                fc.setTitle("选择单个Apk文件");
+                fc.setTitle("选择CSV文件");
                 //设置初始路径
                 fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
-                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.csv"));
                 File file = fc.showOpenDialog(st);
                 if (null != file) {
                     //文件路径
@@ -1205,11 +1215,27 @@ public class MainUI extends Application {
             }
         });
 
+
+        //选择要更新的模型的路径按钮点击事件
+        choosePreUpdateModelPathButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+            }
+        });
+        //选择更新后的模型存放路径按钮点击事件
+        chooseAfterUpdateModelSavePathButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+            }
+        });
+
         //开始更新模型按钮
         startUpdateModelButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (null != updateModelDataPath && null != group.getSelectedToggle()) {
+                if (null != updateModelDataPath && null != preUpdateModelPath && null != afterUpdateModelPath) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -1229,39 +1255,30 @@ public class MainUI extends Application {
                                     modelUpdateCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
                                     //调用python程序提取权限
                                     modelUpdateResultTextArea.setText("");
-                                    modelUpdateResultTextArea.appendText("该样本主要有以下权限:\n");
                                 }
                             });
                             try {
                                 //获取python文件路径
-                                String extractAuthority2TxtPyPath = MainUI.class.getResource("").toExternalForm();
-                                String[] pyArgs = new String[]{"python", extractAuthority2TxtPyPath, updateModelDataPath};
-                                Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
-                                //执行完毕开始读取提取出的权限TXT
-                                File file = new File("C:\\AndroidDetection\\temp\\res.txt");
-                                int wait = proc.waitFor();
-                                if (wait == 0 && file.exists()) {
-                                    try (FileReader reader = new FileReader("C:\\AndroidDetection\\temp\\res.txt");
-                                         BufferedReader br = new BufferedReader(reader)
-                                    ) {
-                                        String line;
-                                        while ((line = br.readLine()) != null) {
-                                            //将权限显示在文本域
-                                            String finalLine = line;
-                                            Platform.runLater(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    modelUpdateResultTextArea.appendText(finalLine + "\n");
-                                                }
-                                            });
-                                        }
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                String updateLogicPredictModelPyPath = "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\UpdateLogicPredictModel.py";
+                                String[] updateLogicPredictModelPyArgs = new String[]{"python", updateLogicPredictModelPyPath, updateModelDataPath, preUpdateModelPath, afterUpdateModelPath};
+                                Process updateLogicPredictModelProc = Runtime.getRuntime().exec(updateLogicPredictModelPyArgs);// 执行py文件
+                                int wait = updateLogicPredictModelProc.waitFor();
+                                if (wait == 0) {
+                                    //获取调用python程序后的输出结果
+                                    BufferedReader updateLogicPredictModelIn = new BufferedReader(new InputStreamReader(updateLogicPredictModelProc.getInputStream(), "GBK"));
+                                    String temp="";
+                                    while ((temp = updateLogicPredictModelIn.readLine()) != null) {
+                                        //更新UI
+                                        String finalTemp = temp;
+                                        Platform.runLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                modelUpdateResultTextArea.appendText(finalTemp + "\n");
+                                            }
+                                        });
                                     }
-                                    //删除临时文件
-                                    file.delete();
                                 } else {
-                                    System.out.println("权限结果文件不存在！");
+                                    System.out.println("调用python程序失败！");
                                 }
                                 Platform.runLater(new Runnable() {
                                     @Override
