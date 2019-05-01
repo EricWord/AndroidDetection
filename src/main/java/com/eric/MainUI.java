@@ -497,11 +497,15 @@ public class MainUI extends Application {
 
         //用于更新模型的样本所在的路径
         Label updateDataPathLabel = new Label();
+        //要更新的模型的路径
+        Label preUpdateModelPathLabel = new Label();
+        //更新后的模型存放路径
+        Label afterUpdateModelPathLabel = new Label();
         //开始更新模型按钮
         startUpdateModelButton = new JFXButton("开始更新模型");
         startUpdateModelButton.getStyleClass().add("button-raised");
         //将上述按钮添加到左侧的VBox
-        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, choosePreUpdateModelPathButton,chooseAfterUpdateModelSavePathButton, startUpdateModelButton);
+        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, choosePreUpdateModelPathButton,preUpdateModelPathLabel,chooseAfterUpdateModelSavePathButton, afterUpdateModelPathLabel,startUpdateModelButton,modelUpdateCenterVBox);
         //模型更新结果显示label
         Label modelUpdateResultLabel = new Label("----------------更新结果----------------");
         //模型更新结果TextArea
@@ -513,7 +517,7 @@ public class MainUI extends Application {
         //设置面板左右两侧的内容
         modelUpdateBorderPane.setLeft(modelUpdateLeftVBox);
         modelUpdateBorderPane.setRight(modelUpdateRightVBox);
-        modelUpdateBorderPane.setCenter(modelUpdateCenterVBox);
+//        modelUpdateBorderPane.setCenter(modelUpdateCenterVBox);
 
         BorderPane.setMargin(modelUpdateLeftVBox, new Insets(80, 10, 50, 50));
         BorderPane.setMargin(modelUpdateRightVBox, new Insets(45, 50, 50, 10));
@@ -1220,6 +1224,22 @@ public class MainUI extends Application {
         choosePreUpdateModelPathButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                Stage st = new Stage();
+                FileChooser fc = new FileChooser();
+                //设置标题
+                fc.setTitle("选择模型文件");
+                //设置初始路径
+                fc.setInitialDirectory(new File("C:\\"));
+                //设置打开的文件类型
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.pkl"));
+                File file = fc.showOpenDialog(st);
+                if (null != file) {
+                    //文件路径
+                    String absolutePath = file.getAbsolutePath();
+                    preUpdateModelPath = absolutePath;
+                    preUpdateModelPathLabel.setText("选择的路径：" + absolutePath);
+                    preUpdateModelPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                }
 
             }
         });
@@ -1227,7 +1247,11 @@ public class MainUI extends Application {
         chooseAfterUpdateModelSavePathButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
+                afterUpdateModelPath = setDirectory();
+                if (null != afterUpdateModelPath) {
+                    afterUpdateModelPathLabel.setText("选择的文件夹路径为:" + afterUpdateModelPath);
+                    afterUpdateModelPathLabel.setTextFill(Paint.valueOf("#7B68EE"));
+                }
             }
         });
 
@@ -1245,8 +1269,10 @@ public class MainUI extends Application {
                                     //设置按钮不可用
                                     startUpdateModelButton.setDisable(true);
                                     chooseOneUpdateDataButton.setDisable(true);
+                                    choosePreUpdateModelPathButton.setDisable(true);
+                                    chooseAfterUpdateModelSavePathButton.setDisable(true);
                                     //设置单选按钮不可用
-                                    setRadioDisable(true);
+//                                    setRadioDisable(true);
                                     //显示进度条
                                     modelUpdateCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -1260,7 +1286,7 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件路径
                                 String updateLogicPredictModelPyPath = "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\UpdateLogicPredictModel.py";
-                                String[] updateLogicPredictModelPyArgs = new String[]{"python", updateLogicPredictModelPyPath, updateModelDataPath, preUpdateModelPath, afterUpdateModelPath};
+                                String[] updateLogicPredictModelPyArgs = new String[]{"python", updateLogicPredictModelPyPath, updateModelDataPath, preUpdateModelPath, afterUpdateModelPath+File.separator+"after_update_model.pkl"};
                                 Process updateLogicPredictModelProc = Runtime.getRuntime().exec(updateLogicPredictModelPyArgs);// 执行py文件
                                 int wait = updateLogicPredictModelProc.waitFor();
                                 if (wait == 0) {
@@ -1296,8 +1322,10 @@ public class MainUI extends Application {
                                     //设置按钮可用
                                     startUpdateModelButton.setDisable(false);
                                     chooseOneUpdateDataButton.setDisable(false);
+                                    choosePreUpdateModelPathButton.setDisable(false);
+                                    chooseAfterUpdateModelSavePathButton.setDisable(false);
                                     //设置单选按钮不可用
-                                    setRadioDisable(false);
+//                                    setRadioDisable(false);
                                     //隐藏进度条
                                     modelUpdateCenterVBox.setVisible(false);
                                 }
@@ -1365,12 +1393,12 @@ public class MainUI extends Application {
      *
      * @param flag true表示不可用
      */
-    public void setRadioDisable(Boolean flag) {
+  /*  public void setRadioDisable(Boolean flag) {
         modelUpdateGoodApkRadio.setDisable(flag);
         modelUpdateBadApkRadio.setDisable(flag);
         modelUpdateUnknownRadio.setDisable(flag);
 
-    }
+    }*/
 
     /**
      * apk最终结果的概率值

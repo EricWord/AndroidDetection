@@ -315,7 +315,7 @@ public class ServiceTest {
     }
     @Test
     public void testCreatePartCSVWithBaseNum(){
-        csvService.createPartCSVWithBaseNum("E:\\BiSheData\\temp\\",150,150,100);
+        csvService.createPartCSVWithBaseNum("E:\\BiSheData\\temp\\",2400,2400,100);
 
     }
 
