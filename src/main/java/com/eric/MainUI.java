@@ -813,7 +813,8 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件的路径
                                 //下面这个路径是公司电脑路径
-                                String extractAuthority2TxtPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py";
+                                String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
+                                String extractAuthority2TxtPath = BASE_PATH+extractAuthority2TxtPyName;
                                 String[] pyArgs = new String[]{"python ", extractAuthority2TxtPath, extractAuthorityApkPath};
 //                                System.out.println(pythonFileBasePath + "ExtractAuthority2Txt.py");
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
@@ -930,7 +931,8 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件的路径
                                 //下面这个路径是 公司电脑上的路径
-                                String logicCallByJavaPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicCallByJava.py";
+                                String logicCallByJavaPyPyName = "LogicCallByJava.py";
+                                String logicCallByJavaPyPath = BASE_PATH+logicCallByJavaPyPyName;
                                 String[] logicCallByJavaPyArgs = new String[]{"python ", logicCallByJavaPyPath, csvFilePath};
                                 Process proc = Runtime.getRuntime().exec(logicCallByJavaPyArgs);// 执行py文件
 
@@ -1051,7 +1053,8 @@ public class MainUI extends Application {
                             //调用python程序提取权限
                             try {
                                 //获取python文件路径
-                                String extractAuthority2TxtPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\featureProject\\ExtractAuthority2Txt.py";
+                                String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
+                                String extractAuthority2TxtPyPath = BASE_PATH+extractAuthority2TxtPyName;
                                 String[] extractAuthority2TxtPyArgs = new String[]{"python ", extractAuthority2TxtPyPath, detectApkPath};
                                 System.out.println("开始执行提取权限到txt的python文件...");
                                 Process proc = Runtime.getRuntime().exec(extractAuthority2TxtPyArgs);// 执行py文件
@@ -1253,7 +1256,8 @@ public class MainUI extends Application {
                             });
                             try {
                                 //获取python文件路径
-                                String updateLogicPredictModelPyPath = "E:\\projects\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\UpdateLogicPredictModel.py";
+                                String updateLogicPredictModelPyName = "UpdateLogicPredictModel.py";
+                                String updateLogicPredictModelPyPath = BASE_PATH+updateLogicPredictModelPyName;
                                 String[] updateLogicPredictModelPyArgs = new String[]{"python", updateLogicPredictModelPyPath, updateModelDataPath, preUpdateModelPath, afterUpdateModelPath+File.separator+"after_update_model.pkl"};
                                 Process updateLogicPredictModelProc = Runtime.getRuntime().exec(updateLogicPredictModelPyArgs);// 执行py文件
                                 int wait = updateLogicPredictModelProc.waitFor();
