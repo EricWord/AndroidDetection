@@ -815,13 +815,14 @@ public class MainUI extends Application {
                                 //构造python文件的路径
                                 String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
                                 String extractAuthority2TxtPath = PYTHON_BASE_PATH+extractAuthority2TxtPyName;
-                                String[] pyArgs = new String[]{"python ", extractAuthority2TxtPath, extractAuthorityApkPath};
+                                String authoritySavePath=TEMP_BASE_PATH+File.separator+"res.txt";
+                                String[] pyArgs = new String[]{"python ", extractAuthority2TxtPath, extractAuthorityApkPath,authoritySavePath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 //执行完毕开始读取提取出的权限TXT
-                                File file = new File(TEMP_BASE_PATH+File.separator+"res.txt");
+                                File file = new File(authoritySavePath);
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
-                                    try (FileReader reader = new FileReader(TEMP_BASE_PATH+File.separator+"res.txt");
+                                    try (FileReader reader = new FileReader(authoritySavePath);
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
@@ -931,7 +932,8 @@ public class MainUI extends Application {
                                 //构造python文件的路径
                                 String logicCallByJavaPyPyName = "LogicCallByJava.py";
                                 String logicCallByJavaPyPath = PYTHON_BASE_PATH+logicCallByJavaPyPyName;
-                                String[] logicCallByJavaPyArgs = new String[]{"python ", logicCallByJavaPyPath, csvFilePath};
+                                String modelSavePath=TEMP_BASE_PATH+File.separator+"predict_model.pkl";
+                                String[] logicCallByJavaPyArgs = new String[]{"python ", logicCallByJavaPyPath, csvFilePath,modelSavePath};
                                 Process proc = Runtime.getRuntime().exec(logicCallByJavaPyArgs);// 执行py文件
 
                                 BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
