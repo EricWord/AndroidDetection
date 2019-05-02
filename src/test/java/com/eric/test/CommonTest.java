@@ -3,10 +3,10 @@ package com.eric.test;
 import org.junit.Test;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,8 +105,32 @@ public class CommonTest {
     }
     @Test
     public void testGetPath(){
-//        System.out.println(System.getProperty("user.dir"));
-        System.out.println(Thread.currentThread().getContextClassLoader().getResource(""));
+        System.out.println(System.getProperty("user.dir"));
+//        System.out.println(Thread.currentThread().getContextClassLoader().getResource(""));
+    }
+
+    /**
+     * 测试执行项目中的python文件
+     */
+    @Test
+    public void testExecPythonInCurrentDir() throws IOException {
+        //基础路径  E:\projects\AndroidDetection
+        String basePath = System.getProperty("user.dir");
+
+        //要执行的python文件的名称
+        String pyName="LogicCallByJava.py";
+        //最终文件的绝对路径
+        String finalPyPath=basePath+File.separator+"src"+File.separator+"main"+File.separator+"python"+File.separator+pyName;
+        String csvFilePath="G:\\7BiShe\\dataset\\method1\\androidDetection_part_2500good_2500bad.csv";
+        String[] logicCallByJavaPyArgs = new String[]{"python ", finalPyPath, csvFilePath};
+        Process proc = Runtime.getRuntime().exec(logicCallByJavaPyArgs);// 执行py文件
+        BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
+        String temp="";
+        while ((temp = in.readLine()) != null) {
+            System.out.println(temp);
+
+        }
+
     }
 
 

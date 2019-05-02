@@ -42,6 +42,10 @@ import java.util.*;
  */
 
 public class MainUI extends Application {
+
+    //基础路径 例如：E:\projects\AndroidDetection\src\main\python
+    //直接在基础路径后面加上要执行的python文件名称即可
+    private static final String BASE_PATH=System.getProperty("user.dir")+File.separator+"src"+File.separator+"main"+File.separator+"python"+File.separator;
     private DeCompileService deCompileService = new DeCompileService();
 
     //单个Apk文件路径
@@ -88,13 +92,7 @@ public class MainUI extends Application {
     private JFXButton startUpdateModelButton;
     private JFXButton choosePreUpdateModelPathButton;
     private JFXButton chooseAfterUpdateModelSavePathButton;
-    private JFXRadioButton modelUpdateGoodApkRadio;
-    private JFXRadioButton modelUpdateBadApkRadio;
-    private JFXRadioButton modelUpdateUnknownRadio;
 
-
-    //项目中的python程序基础路径
-//    private String pythonFileBasePath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "python" + File.separator;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -118,7 +116,6 @@ public class MainUI extends Application {
         //图标的路径
         String iconPath = MainUI.class.getResource("/images/detectIcon.png").toExternalForm();
         stage.getIcons().add(new Image(iconPath));
-//        stage.getIcons().add(new Image("file:E:\\projects\\AndroidDetection\\src\\main\\java\\images\\detectIcon.png"));
         JFXTabPane tabPane = new JFXTabPane();
         tabPane.setPrefHeight(50);
         tabPane.setPrefHeight(700);
@@ -343,8 +340,6 @@ public class MainUI extends Application {
         Label modelTrainingResultLabel = new Label("----------------训练结果----------------");
         //模型训练结果TextArea
         TextArea modelTrainingResultTextArea = new TextArea("此处将显示模型训练的结果");
-        //文本域中的文字居中显示
-//        modelTrainingResultTextArea.
         //设置显示的行数
         modelTrainingResultTextArea.setPrefRowCount(35);
         //自动换行
@@ -470,30 +465,6 @@ public class MainUI extends Application {
         choosePreUpdateModelPathButton.getStyleClass().add("button-raised");
         chooseAfterUpdateModelSavePathButton = new JFXButton("选择更新后的模型的存放路径");
         chooseAfterUpdateModelSavePathButton.getStyleClass().add("button-raised");
-        //是否已知样本属性
- /*       final ToggleGroup group = new ToggleGroup();
-        modelUpdateGoodApkRadio = new JFXRadioButton("正常样本");
-//        modelUpdateGoodApkRadio.setDisable(true);
-        modelUpdateGoodApkRadio.setPadding(new Insets(10));
-        modelUpdateGoodApkRadio.setToggleGroup(group);
-
-        modelUpdateBadApkRadio = new JFXRadioButton("恶意样本");
-        modelUpdateBadApkRadio.setPadding(new Insets(10));
-        modelUpdateBadApkRadio.setToggleGroup(group);
-
-        modelUpdateUnknownRadio = new JFXRadioButton("未知属性");
-        modelUpdateUnknownRadio.setPadding(new Insets(10));
-        modelUpdateUnknownRadio.setToggleGroup(group);
-
-        //应用属性
-        Label modelUpdateApkAttributeLabel = new Label();
-        modelUpdateApkAttributeLabel.setText("应用属性：");*/
-
-        //水平布局
-       /* HBox modelUpdateHBox = new HBox();
-        modelUpdateHBox.getChildren().addAll(modelUpdateGoodApkRadio, modelUpdateBadApkRadio, modelUpdateUnknownRadio);
-        modelUpdateHBox.setSpacing(10);
-        modelUpdateHBox.setAlignment(Pos.CENTER);*/
 
         //用于更新模型的样本所在的路径
         Label updateDataPathLabel = new Label();
@@ -517,7 +488,6 @@ public class MainUI extends Application {
         //设置面板左右两侧的内容
         modelUpdateBorderPane.setLeft(modelUpdateLeftVBox);
         modelUpdateBorderPane.setRight(modelUpdateRightVBox);
-//        modelUpdateBorderPane.setCenter(modelUpdateCenterVBox);
 
         BorderPane.setMargin(modelUpdateLeftVBox, new Insets(80, 10, 50, 50));
         BorderPane.setMargin(modelUpdateRightVBox, new Insets(45, 50, 50, 10));
@@ -1271,8 +1241,6 @@ public class MainUI extends Application {
                                     chooseOneUpdateDataButton.setDisable(true);
                                     choosePreUpdateModelPathButton.setDisable(true);
                                     chooseAfterUpdateModelSavePathButton.setDisable(true);
-                                    //设置单选按钮不可用
-//                                    setRadioDisable(true);
                                     //显示进度条
                                     modelUpdateCenterVBox.setVisible(true);
                                     //设置提示文字
@@ -1324,8 +1292,6 @@ public class MainUI extends Application {
                                     chooseOneUpdateDataButton.setDisable(false);
                                     choosePreUpdateModelPathButton.setDisable(false);
                                     chooseAfterUpdateModelSavePathButton.setDisable(false);
-                                    //设置单选按钮不可用
-//                                    setRadioDisable(false);
                                     //隐藏进度条
                                     modelUpdateCenterVBox.setVisible(false);
                                 }
@@ -1387,18 +1353,6 @@ public class MainUI extends Application {
         startMultipleDecompileButton.setDisable(flag);
 
     }
-
-    /**
-     * 设置单选按钮为不可用
-     *
-     * @param flag true表示不可用
-     */
-  /*  public void setRadioDisable(Boolean flag) {
-        modelUpdateGoodApkRadio.setDisable(flag);
-        modelUpdateBadApkRadio.setDisable(flag);
-        modelUpdateUnknownRadio.setDisable(flag);
-
-    }*/
 
     /**
      * apk最终结果的概率值
