@@ -44,12 +44,12 @@ import java.util.*;
 public class MainUI extends Application {
 
     //基础路径 例如：E:\projects\AndroidDetection\
-    private static final String BASE_PATH=System.getProperty("user.dir")+File.separator;
+    private static final String BASE_PATH = System.getProperty("user.dir") + File.separator;
     //Python基础路径 例如：E:\projects\AndroidDetection\src\main\python
     //直接在基础路径后面加上要执行的python文件名称即可
-    private static final String PYTHON_BASE_PATH=System.getProperty("user.dir")+File.separator+"src"+File.separator+"main"+File.separator+"python"+File.separator;
+    private static final String PYTHON_BASE_PATH = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "python" + File.separator;
     //程序中用到的临时文件基础路径 例如：E:\projects\AndroidDetection\temp
-    private static final String TEMP_BASE_PATH=BASE_PATH+"temp";
+    private static final String TEMP_BASE_PATH = BASE_PATH + "temp";
     private DeCompileService deCompileService = new DeCompileService();
 
     //单个Apk文件路径
@@ -357,6 +357,7 @@ public class MainUI extends Application {
 
         //中间部分
         VBox modelTrainingCenterVBox = new VBox();
+        modelTrainingCenterVBox.setAlignment(Pos.CENTER);
         staticFeatureCenterVBox.setAlignment(Pos.CENTER);
         //中间进度条的提示文字
         Label modelTrainingCenterLabel = new Label();
@@ -370,7 +371,7 @@ public class MainUI extends Application {
         //设置中间部分初始不可见
         modelTrainingCenterVBox.setVisible(false);
 
-        modelTrainingLeftVBox.getChildren().addAll(chooseTrainDataButton, trainDataPathLabel, startTrainButton,modelTrainingCenterVBox);
+        modelTrainingLeftVBox.getChildren().addAll(chooseTrainDataButton, trainDataPathLabel, startTrainButton, modelTrainingCenterVBox);
         BorderPane.setMargin(modelTrainingLeftVBox, new Insets(90, 10, 50, 50));
         BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 50, 50, 10));
         BorderPane.setMargin(modelTrainingCenterVBox, new Insets(150, 10, 50, 10));
@@ -420,7 +421,7 @@ public class MainUI extends Application {
         applicationDetectionCenterVBox.setSpacing(10);
         //设置中间部分初始不可见
         applicationDetectionCenterVBox.setVisible(false);
-        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton, targetApkPath, startDetectButton,applicationDetectionCenterVBox);
+        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton, targetApkPath, startDetectButton, applicationDetectionCenterVBox);
 
         //左右两侧内容加入到面板
         applicationDetectionBorderPane.setLeft(applicationDetectionLeftVBox);
@@ -477,7 +478,7 @@ public class MainUI extends Application {
         startUpdateModelButton = new JFXButton("开始更新模型");
         startUpdateModelButton.getStyleClass().add("button-raised");
         //将上述按钮添加到左侧的VBox
-        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, choosePreUpdateModelPathButton,preUpdateModelPathLabel,chooseAfterUpdateModelSavePathButton, afterUpdateModelPathLabel,startUpdateModelButton,modelUpdateCenterVBox);
+        modelUpdateLeftVBox.getChildren().addAll(chooseOneUpdateDataButton, updateDataPathLabel, choosePreUpdateModelPathButton, preUpdateModelPathLabel, chooseAfterUpdateModelSavePathButton, afterUpdateModelPathLabel, startUpdateModelButton, modelUpdateCenterVBox);
         //模型更新结果显示label
         Label modelUpdateResultLabel = new Label("----------------更新结果----------------");
         //模型更新结果TextArea
@@ -637,7 +638,7 @@ public class MainUI extends Application {
                     @Override
                     public void run() {
                         //批量反编译结果存放文件夹
-                        String batchDecompileResultPath = TEMP_BASE_PATH+ File.separator + "DecompileResults_" + stringDate;
+                        String batchDecompileResultPath = TEMP_BASE_PATH + File.separator + "DecompileResults_" + stringDate;
                         //设置中间提示部分的内容可见
                         reverseEngineeringCenterVBox.setVisible(true);
                         //设置提示文字
@@ -814,9 +815,9 @@ public class MainUI extends Application {
                             try {
                                 //构造python文件的路径
                                 String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
-                                String extractAuthority2TxtPath = PYTHON_BASE_PATH+extractAuthority2TxtPyName;
-                                String authoritySavePath=TEMP_BASE_PATH+File.separator+"res.txt";
-                                String[] pyArgs = new String[]{"python ", extractAuthority2TxtPath, extractAuthorityApkPath,authoritySavePath};
+                                String extractAuthority2TxtPath = PYTHON_BASE_PATH + extractAuthority2TxtPyName;
+                                String authoritySavePath = TEMP_BASE_PATH + File.separator + "res.txt";
+                                String[] pyArgs = new String[]{"python ", extractAuthority2TxtPath, extractAuthorityApkPath, authoritySavePath};
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File(authoritySavePath);
@@ -931,9 +932,14 @@ public class MainUI extends Application {
                             try {
                                 //构造python文件的路径
                                 String logicCallByJavaPyPyName = "LogicCallByJava.py";
-                                String logicCallByJavaPyPath = PYTHON_BASE_PATH+logicCallByJavaPyPyName;
-                                String modelSavePath=TEMP_BASE_PATH+File.separator+"predict_model.pkl";
-                                String[] logicCallByJavaPyArgs = new String[]{"python ", logicCallByJavaPyPath, csvFilePath,modelSavePath};
+                                String logicCallByJavaPyPath = PYTHON_BASE_PATH + logicCallByJavaPyPyName;
+                                String modelSavePath = TEMP_BASE_PATH + File.separator + "predict_model.pkl";
+                                //判断模型是否已经存在，如果存在，先将其删除
+                                File modelFile = new File(modelSavePath);
+                                if (modelFile.exists()) {
+                                    modelFile.delete();
+                                }
+                                String[] logicCallByJavaPyArgs = new String[]{"python ", logicCallByJavaPyPath, csvFilePath, modelSavePath};
                                 Process proc = Runtime.getRuntime().exec(logicCallByJavaPyArgs);// 执行py文件
 
                                 BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "GBK"));
@@ -1054,17 +1060,23 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件路径
                                 String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
-                                String extractAuthority2TxtPyPath = PYTHON_BASE_PATH+extractAuthority2TxtPyName;
-                                String[] extractAuthority2TxtPyArgs = new String[]{"python ", extractAuthority2TxtPyPath, detectApkPath};
+                                String extractAuthority2TxtPyPath = PYTHON_BASE_PATH + extractAuthority2TxtPyName;
+                                String authorityResSavePath = TEMP_BASE_PATH + File.separator + "res.txt";
+                                //先判断权限结果txt文件是否存在，如果存在将其删除
+                                File authorityFile = new File(authorityResSavePath);
+                                if (authorityFile.exists()) {
+                                    authorityFile.delete();
+                                }
+                                String[] extractAuthority2TxtPyArgs = new String[]{"python ", extractAuthority2TxtPyPath, detectApkPath, authorityResSavePath};
                                 System.out.println("开始执行提取权限到txt的python文件...");
                                 Process proc = Runtime.getRuntime().exec(extractAuthority2TxtPyArgs);// 执行py文件
                                 detectResultTextArea.appendText("该应用主要有如下权限:\n");
                                 //执行完毕开始读取提取出的权限TXT
-                                File file = new File(TEMP_BASE_PATH+File.separator+"res.txt");
+                                File file = new File(authorityResSavePath);
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
                                     System.out.println("提取权限到txt的python程序执行成功！");
-                                    try (FileReader reader = new FileReader(TEMP_BASE_PATH+File.separator+"res.txt");
+                                    try (FileReader reader = new FileReader(authorityResSavePath);
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
@@ -1094,7 +1106,7 @@ public class MainUI extends Application {
                                         //创建CSV格式的文件
                                         //CSV文件的输出路径
 
-                                        File apkDetectTempFile = new File(TEMP_BASE_PATH+File.separator+"srcApkFeature.csv");
+                                        File apkDetectTempFile = new File(TEMP_BASE_PATH + File.separator + "srcApkFeature.csv");
                                         //先判断 这个文件是否存在，如果存在，将其删除，重新生成
                                         if (apkDetectTempFile.exists()) {
                                             apkDetectTempFile.delete();
@@ -1104,10 +1116,10 @@ public class MainUI extends Application {
                                         System.out.println("csv文件生成完毕");
 
                                         //获取pthon文件路径
-                                        String logicPredictModelPklPath = TEMP_BASE_PATH+File.separator+"predict_model.pkl";
-                                        String logicPredictModelCSVPath = TEMP_BASE_PATH+File.separator+"srcApkFeature.csv";
+                                        String logicPredictModelPklPath = TEMP_BASE_PATH + File.separator + "predict_model.pkl";
+                                        String logicPredictModelCSVPath = TEMP_BASE_PATH + File.separator + "srcApkFeature.csv";
                                         String logicPredictModelPyName = "LogicPredictModel.py";
-                                        String logicPredictModelPyPath = PYTHON_BASE_PATH+"LogicPredictModel.py";
+                                        String logicPredictModelPyPath = PYTHON_BASE_PATH + "LogicPredictModel.py";
                                         //先判断调用python程序必须的两个文件是否存在
                                         File logicPredictModelPyFile = new File(logicPredictModelPyPath);
                                         File logicPredictModelCSVFile = new File(logicPredictModelCSVPath);
@@ -1257,14 +1269,20 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件路径
                                 String updateLogicPredictModelPyName = "UpdateLogicPredictModel.py";
-                                String updateLogicPredictModelPyPath = PYTHON_BASE_PATH+updateLogicPredictModelPyName;
-                                String[] updateLogicPredictModelPyArgs = new String[]{"python", updateLogicPredictModelPyPath, updateModelDataPath, preUpdateModelPath, afterUpdateModelPath+File.separator+"after_update_model.pkl"};
+                                String updateLogicPredictModelPyPath = PYTHON_BASE_PATH + updateLogicPredictModelPyName;
+                                //判断是否已经存在更新后的模型，如果存在，将其删除
+                                File afterUpdateModelFile = new File(afterUpdateModelPath);
+                                if (afterUpdateModelFile.exists()) {
+                                    afterUpdateModelFile.delete();
+
+                                }
+                                String[] updateLogicPredictModelPyArgs = new String[]{"python", updateLogicPredictModelPyPath, updateModelDataPath, preUpdateModelPath, afterUpdateModelPath + File.separator + "after_update_model.pkl"};
                                 Process updateLogicPredictModelProc = Runtime.getRuntime().exec(updateLogicPredictModelPyArgs);// 执行py文件
                                 int wait = updateLogicPredictModelProc.waitFor();
                                 if (wait == 0) {
                                     //获取调用python程序后的输出结果
                                     BufferedReader updateLogicPredictModelIn = new BufferedReader(new InputStreamReader(updateLogicPredictModelProc.getInputStream(), "GBK"));
-                                    String temp="";
+                                    String temp = "";
                                     while ((temp = updateLogicPredictModelIn.readLine()) != null) {
                                         //更新UI
                                         String finalTemp = temp;
