@@ -185,6 +185,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <compilerVersion>1.8</compilerVersion>
                     <encoding>UTF-8</encoding>
                     <compilerArguments>
                         <!-- 对应jar放置在项目中的位置-->
@@ -194,7 +195,7 @@
                 </configuration>
             </plugin>
 
-            <plugin>
+           <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
@@ -207,6 +208,15 @@
                             <mainClass>com.eric.MainUI</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>-->
+
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>8.8.3</version>
+                <configuration>
+                    <mainClass>com.eric.MainUI</mainClass>
                 </configuration>
             </plugin>
 
