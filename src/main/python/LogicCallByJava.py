@@ -13,13 +13,13 @@ from sklearn.externals import joblib
 # 控制台调用Java程序传递参数用到
 import sys
 
-def logic(path):
+def logic(csvPath,pklSavePath):
     # 设置显示的最大列、宽等参数，消掉打印不完全中间的省略号
     pd.set_option('display.max_columns', 1000)
     pd.set_option('display.width', 1000)
     pd.set_option('display.max_colwidth', 1000)
     # 1.读取数据
-    data=pd.read_csv(path)
+    data=pd.read_csv(csvPath)
     # 特征
     x=data.iloc[:,1:-1]
     # 标签
@@ -35,18 +35,11 @@ def logic(path):
     # 实例化 LogisticRegression
     estimator = LogisticRegression()
     estimator.fit(x_train,y_train)
-    # 逻辑回归的模型参数：回归系数和偏置
-    # print(estimator.coef_)
-    # print(estimator.intercept_)
-
     # 保存模型 保存路径
-    joblib.dump(estimator,"E:\\BiSheData\\temp\\predict_model.pkl")
-    # 加载模型
-    # estimator=joblib.load("ridge_2019_04_16 15_04_05.pkl")
-
+    # "E:\\BiSheData\\temp\\predict_model.pkl"
+    joblib.dump(estimator,pklSavePath)
     # 模型品评估
     y_predict=estimator.predict(x_test)
-
 
     # 查看精确率和召回率
     report=classification_report(y_test,y_predict,labels=[0,1],target_names=["正常","恶意"])
@@ -58,4 +51,4 @@ if __name__ == "__main__":
     for i in range(1, len(sys.argv)):
         a.append((sys.argv[i]))
 
-    print(logic(a[0]))
+    print(logic(a[0],a[1]))
