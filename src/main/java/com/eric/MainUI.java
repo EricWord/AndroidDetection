@@ -43,9 +43,13 @@ import java.util.*;
 
 public class MainUI extends Application {
 
-    //基础路径 例如：E:\projects\AndroidDetection\src\main\python
+    //基础路径 例如：E:\projects\AndroidDetection\
+    private static final String BASE_PATH=System.getProperty("user.dir")+File.separator;
+    //Python基础路径 例如：E:\projects\AndroidDetection\src\main\python
     //直接在基础路径后面加上要执行的python文件名称即可
-    private static final String BASE_PATH=System.getProperty("user.dir")+File.separator+"src"+File.separator+"main"+File.separator+"python"+File.separator;
+    private static final String PYTHON_BASE_PATH=System.getProperty("user.dir")+File.separator+"src"+File.separator+"main"+File.separator+"python"+File.separator;
+    //程序中用到的临时文件基础路径 例如：E:\projects\AndroidDetection\temp
+    private static final String TEMP_BASE_PATH=BASE_PATH+"temp";
     private DeCompileService deCompileService = new DeCompileService();
 
     //单个Apk文件路径
@@ -633,7 +637,7 @@ public class MainUI extends Application {
                     @Override
                     public void run() {
                         //批量反编译结果存放文件夹
-                        String batchDecompileResultPath = "C:\\AndroidDetection" + File.separator + "DecompileResults_" + stringDate;
+                        String batchDecompileResultPath = TEMP_BASE_PATH+ File.separator + "DecompileResults_" + stringDate;
                         //设置中间提示部分的内容可见
                         reverseEngineeringCenterVBox.setVisible(true);
                         //设置提示文字
@@ -808,18 +812,16 @@ public class MainUI extends Application {
                                 }
                             });
                             try {
-                                //获取python文件的路径
-                                //下面这个路径是公司电脑路径
+                                //构造python文件的路径
                                 String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
-                                String extractAuthority2TxtPath = BASE_PATH+extractAuthority2TxtPyName;
+                                String extractAuthority2TxtPath = PYTHON_BASE_PATH+extractAuthority2TxtPyName;
                                 String[] pyArgs = new String[]{"python ", extractAuthority2TxtPath, extractAuthorityApkPath};
-//                                System.out.println(pythonFileBasePath + "ExtractAuthority2Txt.py");
                                 Process proc = Runtime.getRuntime().exec(pyArgs);// 执行py文件
                                 //执行完毕开始读取提取出的权限TXT
-                                File file = new File("C:\\AndroidDetection\\temp\\res.txt");
+                                File file = new File(TEMP_BASE_PATH+File.separator+"res.txt");
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
-                                    try (FileReader reader = new FileReader("C:\\AndroidDetection\\temp\\res.txt");
+                                    try (FileReader reader = new FileReader(TEMP_BASE_PATH+File.separator+"res.txt");
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
@@ -926,10 +928,9 @@ public class MainUI extends Application {
                             });
                             String temp = "";
                             try {
-                                //获取python文件的路径
-                                //下面这个路径是 公司电脑上的路径
+                                //构造python文件的路径
                                 String logicCallByJavaPyPyName = "LogicCallByJava.py";
-                                String logicCallByJavaPyPath = BASE_PATH+logicCallByJavaPyPyName;
+                                String logicCallByJavaPyPath = PYTHON_BASE_PATH+logicCallByJavaPyPyName;
                                 String[] logicCallByJavaPyArgs = new String[]{"python ", logicCallByJavaPyPath, csvFilePath};
                                 Process proc = Runtime.getRuntime().exec(logicCallByJavaPyArgs);// 执行py文件
 
@@ -1051,17 +1052,17 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件路径
                                 String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
-                                String extractAuthority2TxtPyPath = BASE_PATH+extractAuthority2TxtPyName;
+                                String extractAuthority2TxtPyPath = PYTHON_BASE_PATH+extractAuthority2TxtPyName;
                                 String[] extractAuthority2TxtPyArgs = new String[]{"python ", extractAuthority2TxtPyPath, detectApkPath};
                                 System.out.println("开始执行提取权限到txt的python文件...");
                                 Process proc = Runtime.getRuntime().exec(extractAuthority2TxtPyArgs);// 执行py文件
                                 detectResultTextArea.appendText("该应用主要有如下权限:\n");
                                 //执行完毕开始读取提取出的权限TXT
-                                File file = new File("C:\\AndroidDetection\\temp\\res.txt");
+                                File file = new File(TEMP_BASE_PATH+File.separator+"res.txt");
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
                                     System.out.println("提取权限到txt的python程序执行成功！");
-                                    try (FileReader reader = new FileReader("C:\\AndroidDetection\\temp\\res.txt");
+                                    try (FileReader reader = new FileReader(TEMP_BASE_PATH+File.separator+"res.txt");
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
                                         String line;
@@ -1091,19 +1092,20 @@ public class MainUI extends Application {
                                         //创建CSV格式的文件
                                         //CSV文件的输出路径
 
-                                        File apkDetectTempFile = new File("C:\\AndroidDetection\\temp\\srcApkFeature.csv");
+                                        File apkDetectTempFile = new File(TEMP_BASE_PATH+File.separator+"srcApkFeature.csv");
                                         //先判断 这个文件是否存在，如果存在，将其删除，重新生成
                                         if (apkDetectTempFile.exists()) {
                                             apkDetectTempFile.delete();
                                         }
-                                        CSVUtils.createCSVFile(head, dataList, "C:\\AndroidDetection\\temp", "srcApkFeature");
+                                        CSVUtils.createCSVFile(head, dataList, TEMP_BASE_PATH, "srcApkFeature");
 
                                         System.out.println("csv文件生成完毕");
 
                                         //获取pthon文件路径
-                                        String logicPredictModelPklPath = "C:\\AndroidDetection\\temp\\predict_model.pkl";
-                                        String logicPredictModelCSVPath = "C:\\AndroidDetection\\temp\\srcApkFeature.csv";
-                                        String logicPredictModelPyPath = "D:\\cuigs\\BSProject\\AndroidDetectionPythonVersion\\logicregressionAlgorithm\\LogicPredictModel.py";
+                                        String logicPredictModelPklPath = TEMP_BASE_PATH+File.separator+"predict_model.pkl";
+                                        String logicPredictModelCSVPath = TEMP_BASE_PATH+File.separator+"srcApkFeature.csv";
+                                        String logicPredictModelPyName = "LogicPredictModel.py";
+                                        String logicPredictModelPyPath = PYTHON_BASE_PATH+"LogicPredictModel.py";
                                         //先判断调用python程序必须的两个文件是否存在
                                         File logicPredictModelPyFile = new File(logicPredictModelPyPath);
                                         File logicPredictModelCSVFile = new File(logicPredictModelCSVPath);
@@ -1253,7 +1255,7 @@ public class MainUI extends Application {
                             try {
                                 //获取python文件路径
                                 String updateLogicPredictModelPyName = "UpdateLogicPredictModel.py";
-                                String updateLogicPredictModelPyPath = BASE_PATH+updateLogicPredictModelPyName;
+                                String updateLogicPredictModelPyPath = PYTHON_BASE_PATH+updateLogicPredictModelPyName;
                                 String[] updateLogicPredictModelPyArgs = new String[]{"python", updateLogicPredictModelPyPath, updateModelDataPath, preUpdateModelPath, afterUpdateModelPath+File.separator+"after_update_model.pkl"};
                                 Process updateLogicPredictModelProc = Runtime.getRuntime().exec(updateLogicPredictModelPyArgs);// 执行py文件
                                 int wait = updateLogicPredictModelProc.waitFor();
