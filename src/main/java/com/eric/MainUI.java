@@ -345,7 +345,6 @@ public class MainUI extends Application {
         //自动换行
         modelTrainingResultTextArea.setWrapText(true);
         //将按钮添加进布局
-        modelTrainingLeftVBox.getChildren().addAll(chooseTrainDataButton, trainDataPathLabel, startTrainButton);
         modelTrainingLeftVBox.setAlignment(Pos.TOP_LEFT);
 
         modelTrainingRightVBox.getChildren().addAll(modelTrainingResultLabel, modelTrainingResultTextArea);
@@ -367,12 +366,12 @@ public class MainUI extends Application {
         //设置中间部分初始不可见
         modelTrainingCenterVBox.setVisible(false);
 
+        modelTrainingLeftVBox.getChildren().addAll(chooseTrainDataButton, trainDataPathLabel, startTrainButton,modelTrainingCenterVBox);
         BorderPane.setMargin(modelTrainingLeftVBox, new Insets(90, 10, 50, 50));
         BorderPane.setMargin(modelTrainingRightVBox, new Insets(45, 50, 50, 10));
         BorderPane.setMargin(modelTrainingCenterVBox, new Insets(150, 10, 50, 10));
         modelTrainingBorderPane.setLeft(modelTrainingLeftVBox);
         modelTrainingBorderPane.setRight(modelTrainingRightVBox);
-        modelTrainingBorderPane.setCenter(modelTrainingCenterVBox);
         modelTrainingTab.setContent(modelTrainingBorderPane);
 
         //------------------------应用检测Tab按钮
@@ -398,9 +397,7 @@ public class MainUI extends Application {
         //自动换行
         detectResultTextArea.setWrapText(true);
         applicationDetectionLeftVBox.setSpacing(15);
-        applicationDetectionLeftVBox.setAlignment(Pos.TOP_LEFT);
-        //将上述按钮添加到左侧VBox
-        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton, targetApkPath, startDetectButton);
+        applicationDetectionLeftVBox.setAlignment(Pos.TOP_CENTER);
         applicationDetectionRightVBox.setSpacing(15);
         applicationDetectionRightVBox.setAlignment(Pos.TOP_CENTER);
         //将标签和TextArea加入到右侧VBox中
@@ -419,11 +416,11 @@ public class MainUI extends Application {
         applicationDetectionCenterVBox.setSpacing(10);
         //设置中间部分初始不可见
         applicationDetectionCenterVBox.setVisible(false);
+        applicationDetectionLeftVBox.getChildren().addAll(chooseOneTargetApkButton, targetApkPath, startDetectButton,applicationDetectionCenterVBox);
 
         //左右两侧内容加入到面板
         applicationDetectionBorderPane.setLeft(applicationDetectionLeftVBox);
         applicationDetectionBorderPane.setRight(applicationDetectionRightVBox);
-        applicationDetectionBorderPane.setCenter(applicationDetectionCenterVBox);
         BorderPane.setMargin(applicationDetectionLeftVBox, new Insets(80, 10, 50, 100));
         BorderPane.setMargin(applicationDetectionRightVBox, new Insets(45, 100, 50, 10));
         BorderPane.setMargin(applicationDetectionCenterVBox, new Insets(150, 10, 50, 10));
@@ -1133,7 +1130,6 @@ public class MainUI extends Application {
                                         } else {
                                             System.out.println("缺少调用python程序的预测模型文件或者csv数据集文件");
                                         }
-//                                        apkDetectTempFile.delete();
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -1309,7 +1305,7 @@ public class MainUI extends Application {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            globalMsgLabel.setText("请先选择用于更新模型的样本以及确定应用属性！");
+                            globalMsgLabel.setText("请先选择用于更新模型的样本以及模型更新后的存放路径！");
                             globalMsgLabel.setTextFill(Paint.valueOf("#FF0000"));
                             alert.showAndWait();
 
