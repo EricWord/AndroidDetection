@@ -22,6 +22,7 @@ def predict(csvPath,modelPath):
     estimator = joblib.load(modelPath)
     # 调用模型进行预测
     predictResult=estimator.predict(x)
+	#print("predictResult="+predictResult)
     # 返回预测结果
     res=""
     if(predictResult==0):

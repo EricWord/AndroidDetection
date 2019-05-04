@@ -304,7 +304,7 @@ public class ServiceTest {
 
     @Test
     public void testCreatePartCSV(){
-        csvService.createPartCSV("E:\\BiSheData\\temp\\",100,100);
+        csvService.createPartCSV("E:\\BiSheData\\temp\\",10,100);
 
     }
 

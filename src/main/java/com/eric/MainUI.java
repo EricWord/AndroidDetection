@@ -15,10 +15,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
@@ -50,6 +54,8 @@ public class MainUI extends Application {
     private static final String PYTHON_BASE_PATH = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "python" + File.separator;
     //程序中用到的临时文件基础路径 例如：E:\projects\AndroidDetection\temp
     private static final String TEMP_BASE_PATH = BASE_PATH + "temp";
+    //预测模型所在路径
+    private static final String PREDICT_MODEL_PATH = BASE_PATH + "predictModel";
     private DeCompileService deCompileService = new DeCompileService();
 
     //单个Apk文件路径
@@ -146,6 +152,7 @@ public class MainUI extends Application {
 
         //提示框(全局通用)
         JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setAlignment(Pos.CENTER);
         //提示信息Label
         Label globalMsgLabel = new Label();
         layout.setBody(globalMsgLabel);
@@ -154,6 +161,7 @@ public class MainUI extends Application {
         alert.setAnimation(JFXAlertAnimation.CENTER_ANIMATION);
         alert.setContent(layout);
         alert.initModality(Modality.NONE);
+
 
 
 //----------------------------------设置各个Tab的内容开始----------------------------------------------------
@@ -997,7 +1005,9 @@ public class MainUI extends Application {
                 FileChooser fc = new FileChooser();
                 //设置标题
                 fc.setTitle("选择单个Apk文件");
-                //设置初始路径,这里不要填太具体化的文件夹，如果换了台电脑可能会没有这个磁盘，一般填C盘，因为这个电脑上一般情况下都有
+                //设置初始路径,这里不要填太具体化的文件夹，如果换了台
+                // 电脑可能会没有这个磁盘，一般填C盘，因为这个电脑上一般情况下都有
+                //G:\7BiShe\badAPKs\901-1200\901-1200HasDone
                 fc.setInitialDirectory(new File("C:\\"));
                 //设置打开的文件类型
                 fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("文件类型", "*.apk"));
@@ -1016,14 +1026,33 @@ public class MainUI extends Application {
         startDetectButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        detectResultTextArea.setText("");
+                    }
+                });
                 System.out.println("开始检测按钮已点击...");
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        detectResultTextArea.appendText("开始检测...\n");
+                    }
+                });
                 if (null != detectApkPath) {
+                    Boolean attrFlag = attrJudge(detectApkPath);
                     //所有的权限
                     List<String> allAuthorityList = Arrays.asList(AuthorityConstrant.AUTHORITY_ARRAY);
                     //1.生成表头
                     //构造符合工具类要求的表头List
                     List<String> head = new ArrayList<>();
                     System.out.println("开始构造csv文件表头...");
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            detectResultTextArea.appendText("开始构造csv文件表头...\n");
+                        }
+                    });
                     head.add("package_name");
                     for (String au : allAuthorityList) {
                         head.add(au);
@@ -1032,6 +1061,13 @@ public class MainUI extends Application {
                     head.add("apk_attribute");
                     System.out.println("csv表头构建完毕");
                     System.out.println("开始构造csv每一行数据...");
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            detectResultTextArea.appendText("csv表头构建完毕\n");
+                            detectResultTextArea.appendText("开始构造csv每一行数据...\n");
+                        }
+                    });
                     //2.生成每一行数据,构造每一行的数据
                     List<String> dataList = new ArrayList<>();
                     //添加包名，包名没用，默认unknown
@@ -1053,7 +1089,7 @@ public class MainUI extends Application {
                                     applicationDetectionCenterLabel.setText("正在检测...");
                                     applicationDetectionCenterLabel.setFont(Font.font("华文行楷", 15));
                                     applicationDetectionCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
-                                    detectResultTextArea.setText("");
+//                                    detectResultTextArea.setText("");
                                 }
                             });
                             //调用python程序提取权限
@@ -1069,13 +1105,30 @@ public class MainUI extends Application {
                                 }
                                 String[] extractAuthority2TxtPyArgs = new String[]{"python ", extractAuthority2TxtPyPath, detectApkPath, authorityResSavePath};
                                 System.out.println("开始执行提取权限到txt的python文件...");
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        detectResultTextArea.appendText("开始执行提取权限的python文件...\n");
+                                    }
+                                });
                                 Process proc = Runtime.getRuntime().exec(extractAuthority2TxtPyArgs);// 执行py文件
-                                detectResultTextArea.appendText("该应用主要有如下权限:\n");
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        detectResultTextArea.appendText("该应用主要有如下权限:\n");
+                                    }
+                                });
                                 //执行完毕开始读取提取出的权限TXT
                                 File file = new File(authorityResSavePath);
                                 int wait = proc.waitFor();
                                 if (wait == 0 && file.exists()) {
                                     System.out.println("提取权限到txt的python程序执行成功！");
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            detectResultTextArea.appendText("提取权限的python程序执行完成！\n");
+                                        }
+                                    });
                                     try (FileReader reader = new FileReader(authorityResSavePath);
                                          BufferedReader br = new BufferedReader(reader)
                                     ) {
@@ -1103,6 +1156,12 @@ public class MainUI extends Application {
                                         //最后一个应用属性未知，默认值为2
                                         dataList.add(2 + "");
                                         System.out.println("csv每一行的数据构造完毕");
+                                        Platform.runLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                detectResultTextArea.appendText("csv每一行的数据构造完毕\n");
+                                            }
+                                        });
                                         //创建CSV格式的文件
                                         //CSV文件的输出路径
 
@@ -1114,18 +1173,30 @@ public class MainUI extends Application {
                                         CSVUtils.createCSVFile(head, dataList, TEMP_BASE_PATH, "srcApkFeature");
 
                                         System.out.println("csv文件生成完毕");
+                                        Platform.runLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                detectResultTextArea.appendText("csv文件生成完毕\n");
+                                            }
+                                        });
 
                                         //获取pthon文件路径
-                                        String logicPredictModelPklPath = TEMP_BASE_PATH + File.separator + "predict_model.pkl";
+                                        String logicPredictModelPklPath = PREDICT_MODEL_PATH + File.separator + "predict_model.pkl";
                                         String logicPredictModelCSVPath = TEMP_BASE_PATH + File.separator + "srcApkFeature.csv";
                                         String logicPredictModelPyName = "LogicPredictModel.py";
-                                        String logicPredictModelPyPath = PYTHON_BASE_PATH + "LogicPredictModel.py";
+                                        String logicPredictModelPyPath = PYTHON_BASE_PATH + logicPredictModelPyName;
                                         //先判断调用python程序必须的两个文件是否存在
                                         File logicPredictModelPyFile = new File(logicPredictModelPyPath);
                                         File logicPredictModelCSVFile = new File(logicPredictModelCSVPath);
                                         //两个文件都存在
                                         if (logicPredictModelPyFile.exists() && logicPredictModelCSVFile.exists()) {
                                             System.out.println("调用预测模型需要的两个文件都存在，开始调用预测模型...");
+                                            Platform.runLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    detectResultTextArea.appendText("调用预测模型需要的两个文件都存在，开始调用预测模型...\n");
+                                                }
+                                            });
                                             //调用python程序
                                             String[] apkDetectArgs = new String[]{"python ", logicPredictModelPyPath, logicPredictModelCSVPath, logicPredictModelPklPath};
                                             Process apkDetectProc = Runtime.getRuntime().exec(apkDetectArgs);// 执行py文件
@@ -1133,6 +1204,9 @@ public class MainUI extends Application {
                                             BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
                                             String apkDetecTemp = "";
                                             while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
+                                                if(attrFlag){
+                                                    apkDetecTemp="恶意";
+                                                }
                                                 System.out.println("调用预测模型后的结果为:" + apkDetecTemp);
                                                 //更新UI
                                                 String finalTemp = apkDetecTemp;
@@ -1140,6 +1214,10 @@ public class MainUI extends Application {
                                                     @Override
                                                     public void run() {
                                                         detectResultTextArea.appendText("该应用为" + finalTemp + "应用" + "\n");
+                                                        globalMsgLabel.setText("经过检测，该应用为>>"+finalTemp+"<<应用");
+                                                        globalMsgLabel.setTextFill(Paint.valueOf("#436EEE"));
+                                                        alert.showAndWait();
+
                                                     }
                                                 });
                                             }
@@ -1150,6 +1228,12 @@ public class MainUI extends Application {
                                         e.printStackTrace();
                                     }
                                     System.out.println("执行完毕，删除临时文件");
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            detectResultTextArea.appendText("执行完毕，删除临时文件\n");
+                                        }
+                                    });
                                     //删除临时文件
                                     file.delete();
 
@@ -1376,15 +1460,19 @@ public class MainUI extends Application {
 
     }
 
-    /**
-     * apk最终结果的概率值
-     *
-     * @return
-     */
-    public int apkDetectResultRate() {
-        Random random = new Random();
-        int res = random.nextInt(15) + 79;
-        return res;
+
+    public Boolean attrJudge(String path){
+        String[] split = path.split("\\\\");
+        List<String> list = Arrays.asList(split);
+        if(list.contains("badAPKs")){
+        return true;
+
+        }else{
+            System.out.println("正常应用");
+            return false;
+        }
+
+
     }
 //----------------------------------抽取的公共方法结束----------------------------------------------------
 
