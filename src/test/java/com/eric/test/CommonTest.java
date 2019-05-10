@@ -287,5 +287,13 @@ public class CommonTest {
 
     }
 
+    @Test
+    public void testReadTxt() throws IOException {
+
+
+
+
+    }
+
 
 }

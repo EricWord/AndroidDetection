@@ -8,6 +8,44 @@ package com.eric.constrant;
  * @Email: xiao_cui_vip@163.com
  */
 public class AuthorityConstrant {
+    public static String INFO[]={
+            "brut.androlib.ApkDecoder decode",
+            "Using Apktool 2.3.4 on apk",
+            "brut.androlib.res.AndrolibResources loadMainPkg",
+            "Loading resource table...",
+            "brut.androlib.res.AndrolibResources decodeManifestWithResources",
+            "Decoding AndroidManifest.xml with resources...",
+            "brut.androlib.res.AndrolibResources getFrameworkDir",
+            "brut.androlib.res.AndrolibResources getFrameworkDir",
+            "brut.androlib.res.AndrolibResources loadFrameworkPkg",
+            "Loading resource table from file: C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\1.apk",
+            "brut.androlib.res.AndrolibResources adjustPackageManifest",
+            "Regular manifest package...",
+            "brut.androlib.res.AndrolibResources decode",
+            "Decoding file-resources...",
+            "brut.androlib.res.AndrolibResources decode",
+            "Decoding values */* XMLs...",
+            "brut.androlib.Androlib decodeSourcesSmali",
+            "Baksmaling classes.dex...",
+            "brut.androlib.Androlib decodeSourcesSmali",
+            "Baksmaling classes2.dex...",
+            "brut.androlib.Androlib decodeRawFiles",
+            "Copying assets and libs...",
+            "brut.androlib.Androlib decodeUnknownFiles",
+            "Copying unknown files...",
+            "brut.androlib.Androlib writeOriginalFiles",
+            "Copying original files..."
+
+    };
+
+
+
+
+
+
+
+
+
     public static String AUTHORITY_ARRAY[]={
             "ACCESS_CHECKIN_PROPERTIES",
             "ACCESS_COARSE_LOCATION",
