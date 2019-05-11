@@ -8,6 +8,7 @@ package com.eric.constrant;
  * @Email: xiao_cui_vip@163.com
  */
 public class AuthorityConstrant {
+    //提取权限时的提示信息
     public static String INFO[]={
             "brut.androlib.ApkDecoder decode",
             "Using Apktool 2.3.4 on apk",

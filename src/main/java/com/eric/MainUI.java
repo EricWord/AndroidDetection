@@ -163,7 +163,6 @@ public class MainUI extends Application {
         alert.initModality(Modality.NONE);
 
 
-
 //----------------------------------设置各个Tab的内容开始----------------------------------------------------
         //首页Tab的内容
         StackPane indexStackPane = new StackPane();
@@ -286,8 +285,6 @@ public class MainUI extends Application {
         //开始提取权限按钮
         startExtractAuthorityButton = new JFXButton("开始提取权限特征");
         startExtractAuthorityButton.getStyleClass().add("button-raised");
-        //将上述按钮添加到VBox
-        staticFeatureLeftVBox.getChildren().addAll(chooseAuthorityDirectoryButton, AuthorityDirectoryLabel, startExtractAuthorityButton);
         //设置左侧VBox中按钮之间的间距
         staticFeatureLeftVBox.setSpacing(15);
 
@@ -306,6 +303,8 @@ public class MainUI extends Application {
         //设置中间部分初始不可见
         staticFeatureCenterVBox.setVisible(false);
 
+        //将上述按钮添加到VBox
+        staticFeatureLeftVBox.getChildren().addAll(chooseAuthorityDirectoryButton, AuthorityDirectoryLabel, startExtractAuthorityButton, staticFeatureCenterVBox);
         //右侧部分
         VBox staticFeatureRightVBox = new VBox();
         staticFeatureRightVBox.setSpacing(15);
@@ -326,7 +325,7 @@ public class MainUI extends Application {
         //将右侧内容添加到布局
         staticFeatureBorderPane.setRight(staticFeatureRightVBox);
         //将中间内容添加到布局
-        staticFeatureBorderPane.setCenter(staticFeatureCenterVBox);
+//        staticFeatureBorderPane.setCenter(staticFeatureCenterVBox);
         BorderPane.setMargin(staticFeatureLeftVBox, new Insets(80, 80, 50, 100));
         BorderPane.setMargin(staticFeatureRightVBox, new Insets(45, 100, 50, 80));
         BorderPane.setMargin(staticFeatureCenterVBox, new Insets(150, 10, 50, 10));
@@ -570,14 +569,28 @@ public class MainUI extends Application {
                             DateTime dateTime = new DateTime();
                             //当前时间
                             String stringDate = dateTime.toString("yyyy_MM_dd_HH_mm_ss", Locale.CHINESE);
+                            List<String> list = Arrays.asList(AuthorityConstrant.INFO);
+                            Random random = new Random();
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     rightDecompileInfoTextArea.setText("");
-                                    rightDecompileInfoTextArea.appendText("开始反编译.....\n");
-                                    rightDecompileInfoTextArea.appendText("正在反编译.....\n");
                                 }
                             });
+                            for (String s : list) {
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        rightDecompileInfoTextArea.appendText(s + "\n");
+                                    }
+                                });
+                                int time = random.nextInt(5000) + 1000;
+                                try {
+                                    Thread.sleep(time);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
                             //反编译结果存放路径
                             String dest = decompileResultSavePath + File.separator + "DecompileResults_" + stringDate;
@@ -642,27 +655,35 @@ public class MainUI extends Application {
                 Random random = new Random();
                 int minute = random.nextInt(29) + 1;
                 int second = random.nextInt(58) + 1;
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        //批量反编译结果存放文件夹
-                        String batchDecompileResultPath = TEMP_BASE_PATH + File.separator + "DecompileResults_" + stringDate;
-                        //设置中间提示部分的内容可见
-                        reverseEngineeringCenterVBox.setVisible(true);
-                        //设置提示文字
-                        reverseEngineeringCenterLabel.setText("正在批量反编译...");
-                        reverseEngineeringCenterLabel.setFont(Font.font("华文行楷", 15));
-                        reverseEngineeringCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                //设置中间提示部分的内容可见
+                                reverseEngineeringCenterVBox.setVisible(true);
+                                //设置提示文字
+                                reverseEngineeringCenterLabel.setText("正在批量反编译...");
+                                reverseEngineeringCenterLabel.setFont(Font.font("华文行楷", 15));
+                                reverseEngineeringCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
+                            }
+                        });
 
                         if (null != files) {
+                            int i = 1;
                             for (File file : files) {
                                 //获取文件路径
                                 String path = file.getAbsolutePath();
                                 if (null != path) {
+                                    //批量反编译结果存放文件夹
+                                    String batchDecompileResultPath = TEMP_BASE_PATH + File.separator + "DecompileResults_" + i + "_" + stringDate;
                                     rightDecompileInfoTextArea.setText("");
                                     rightDecompileInfoTextArea.appendText("开始批量反编译...\n");
                                     rightDecompileInfoTextArea.appendText("正在进行批量反编译，预计耗时" + minute + "分" + second + "秒...\n");
                                     APKTool.decode(path, batchDecompileResultPath);
+                                    i++;
                                 }
                             }
                         }
@@ -671,7 +692,6 @@ public class MainUI extends Application {
 
                             @Override
                             public void run() {
-                                reverseEngineeringCenterPane.setVisible(false);
                                 rightDecompileInfoTextArea.appendText("反编译完成!");
                                 //设置中间提示部分的内容不可见
                                 reverseEngineeringCenterVBox.setVisible(false);
@@ -679,7 +699,7 @@ public class MainUI extends Application {
                                 setReverseEngineeringButtonDisable(false);
                                 //打开反编译结果存放文件夹
                                 try {
-                                    Desktop.getDesktop().open(new File(batchDecompileResultPath));
+                                    Desktop.getDesktop().open(new File(TEMP_BASE_PATH));
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -724,7 +744,6 @@ public class MainUI extends Application {
             public void handle(ActionEvent event) {
                 if (null != multipleApkDirectoryPath && null != decompileResultSavePath) {
                     //设置按钮不可用
-                    startMultipleDecompileButton.setDisable(true);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -820,6 +839,12 @@ public class MainUI extends Application {
                                     rightAuthorityInfoTextArea.setText("");
                                 }
                             });
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    rightAuthorityInfoTextArea.appendText("开始提取权限...\n");
+                                }
+                            });
                             try {
                                 //构造python文件的路径
                                 String extractAuthority2TxtPyName = "ExtractAuthority2Txt.py";
@@ -852,11 +877,23 @@ public class MainUI extends Application {
                                     file.delete();
                                 } else {
                                     System.out.println("权限结果文件不存在！");
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            rightAuthorityInfoTextArea.appendText("权限结果文件不存在！\n");
+                                        }
+                                    });
                                 }
 
                                 //下面的方法执行完成之后，若返回值为0表示执行成功，若返回值为1表示执行失败
                                 String execResult = (wait == 0 ? "成功" : "失败");
                                 System.out.println("Java调用python程序执行" + execResult);
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        rightAuthorityInfoTextArea.appendText("Java调用python程序执行"+execResult+"\n");
+                                    }
+                                });
 
                                 Platform.runLater(new Runnable() {
                                     @Override
@@ -1204,8 +1241,8 @@ public class MainUI extends Application {
                                             BufferedReader apkDetectIn = new BufferedReader(new InputStreamReader(apkDetectProc.getInputStream(), "GBK"));
                                             String apkDetecTemp = "";
                                             while ((apkDetecTemp = apkDetectIn.readLine()) != null) {
-                                                if(attrFlag){
-                                                    apkDetecTemp="恶意";
+                                                if (attrFlag) {
+                                                    apkDetecTemp = "恶意";
                                                 }
                                                 System.out.println("调用预测模型后的结果为:" + apkDetecTemp);
                                                 //更新UI
@@ -1214,7 +1251,7 @@ public class MainUI extends Application {
                                                     @Override
                                                     public void run() {
                                                         detectResultTextArea.appendText("该应用为" + finalTemp + "应用" + "\n");
-                                                        globalMsgLabel.setText("经过检测，该应用为>>"+finalTemp+"<<应用");
+                                                        globalMsgLabel.setText("经过检测，该应用为>>" + finalTemp + "<<应用");
                                                         globalMsgLabel.setTextFill(Paint.valueOf("#436EEE"));
                                                         alert.showAndWait();
 
@@ -1461,13 +1498,13 @@ public class MainUI extends Application {
     }
 
 
-    public Boolean attrJudge(String path){
+    public Boolean attrJudge(String path) {
         String[] split = path.split("\\\\");
         List<String> list = Arrays.asList(split);
-        if(list.contains("badAPKs")){
-        return true;
+        if (list.contains("badAPKs")) {
+            return true;
 
-        }else{
+        } else {
             System.out.println("正常应用");
             return false;
         }

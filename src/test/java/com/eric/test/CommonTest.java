@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /*
  *@description:普通测试类，不涉及数据库连接，mapper文件
@@ -288,9 +289,16 @@ public class CommonTest {
     }
 
     @Test
-    public void testReadTxt() throws IOException {
+    public void testReadTxt() throws  InterruptedException {
+        List<String> list = Arrays.asList(AuthorityConstrant.INFO);
+        Random random = new Random();
+        for (String s : list) {
+            System.out.println(s);
+            int time = random.nextInt(5000)+1000;
 
 
+            Thread.sleep(time);
+        }
 
 
     }
