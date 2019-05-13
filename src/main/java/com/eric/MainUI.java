@@ -679,9 +679,14 @@ public class MainUI extends Application {
                                 if (null != path) {
                                     //批量反编译结果存放文件夹
                                     String batchDecompileResultPath = TEMP_BASE_PATH + File.separator + "DecompileResults_" + i + "_" + stringDate;
-                                    rightDecompileInfoTextArea.setText("");
-                                    rightDecompileInfoTextArea.appendText("开始批量反编译...\n");
-                                    rightDecompileInfoTextArea.appendText("正在进行批量反编译，预计耗时" + minute + "分" + second + "秒...\n");
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            rightDecompileInfoTextArea.setText("");
+                                            rightDecompileInfoTextArea.appendText("开始批量反编译...\n");
+                                            rightDecompileInfoTextArea.appendText("正在进行批量反编译，预计耗时" + minute + "分" + second + "秒...\n");
+                                        }
+                                    });
                                     APKTool.decode(path, batchDecompileResultPath);
                                     i++;
                                 }
@@ -891,7 +896,7 @@ public class MainUI extends Application {
                                 Platform.runLater(new Runnable() {
                                     @Override
                                     public void run() {
-                                        rightAuthorityInfoTextArea.appendText("Java调用python程序执行"+execResult+"\n");
+                                        rightAuthorityInfoTextArea.appendText("Java调用python程序执行" + execResult + "\n");
                                     }
                                 });
 
@@ -1126,7 +1131,6 @@ public class MainUI extends Application {
                                     applicationDetectionCenterLabel.setText("正在检测...");
                                     applicationDetectionCenterLabel.setFont(Font.font("华文行楷", 15));
                                     applicationDetectionCenterLabel.setTextFill(Paint.valueOf("#1E90FF"));
-//                                    detectResultTextArea.setText("");
                                 }
                             });
                             //调用python程序提取权限
